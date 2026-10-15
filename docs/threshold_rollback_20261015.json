@@ -1,0 +1,27 @@
+{
+  "status": "rolled_back",
+  "target": "before_this_threshold_calibration",
+  "time": "2026-10-15T17:51:03.587318",
+  "backup": "C:\\Users\\ZZH\\Documents\\ChatGPT\\宁波开发\\before_threshold_rollback_20261015_175100",
+  "baseline_archive_sha256": "4bda094d04a5b7d2ec0ee90b5f70788cc689c84a9624392ec8853bffc6da1ebe",
+  "active_feedback_voltage_limits": {
+    "servo": [
+      0.01,
+      0.0115
+    ]
+  },
+  "restored_sha256": {
+    "JETSON/Sensor/Config.py": "0db09aed71db2198091fd007d2343d81493e2c9f0916c51d49472a4450d7da0b",
+    "JETSON/Sensor/diagnostics/actuator_checks.py": "0e605c9317713aa267b7bb3fe83d83463c7728ee3b5c140326a2edfc24fd3491",
+    "tests/test_ads1115.py": "d56a5998ed2bcdb56a653ce14685af3dbd205ca553bcc9d34fc46d1c2ea80cb5",
+    "tests/test_diagnostics.py": "b87a5e0f1cd26e24dec77a4ea70728b5826111eae913856ad1d58c35e012fe27"
+  },
+  "removed_from_active_project": [
+    "deploy/calibrate_actuator_feedback.py",
+    "deploy/analyze_actuator_calibration.py",
+    "tests/test_actuator_calibration.py"
+  ],
+  "tests_passed": 201,
+  "hardware_tests_run": false,
+  "historical_records_preserved": true
+}

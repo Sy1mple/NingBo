@@ -1,0 +1,705 @@
+{
+  "time": "2026-10-15T22:27:07.537874",
+  "remote": "dianxin@192.168.1.121:/opt/test/NingBo_Linux",
+  "remote_export": "project-source-sync-20261015_222115",
+  "files": [
+    {
+      "path": ".env.voice.example",
+      "action": "identical",
+      "sha256": "7bc1392539b71164987817c5f29323d28beff1184ceeee456d0ca3a0c07d36e6"
+    },
+    {
+      "path": ".gitignore",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "736ecc5761df260dec0ba26232ec80ccfc8649578ea1d36d38c906a6f7241566",
+      "local_sha256": "c45753a28f50658ed240f6f063eb0bd6d734242bdd73fc2ddb3733b8be2cbb62"
+    },
+    {
+      "path": "ADS1115_INTEGRATION.md",
+      "action": "identical",
+      "sha256": "ea3e82c98c93a1ee93a2097b2c4fa62e88862d05f1386654d35db49eea8fc7fe"
+    },
+    {
+      "path": "GY906_INTEGRATION.md",
+      "action": "identical",
+      "sha256": "1660c9042f246b59dfcf9a566e15d001c5ce8f1d7f20d26463af742ad718bbec"
+    },
+    {
+      "path": "JETSON/Inference/__init__.py",
+      "action": "identical",
+      "sha256": "1e0b5e5a3870ae1d004950682e248adb192cda3875abd69238d24ea38e6c7f4d"
+    },
+    {
+      "path": "JETSON/Inference/checks.py",
+      "action": "identical",
+      "sha256": "5e728806d78f472ba68d4e167192ec66fd344b00584a5bb1b82f4d2033af1fd3"
+    },
+    {
+      "path": "JETSON/Inference/tensorrt_runner.py",
+      "action": "identical",
+      "sha256": "cfeee171c3f400144aae1baf6789db4d4d54316a57b71f6e6f767ea02bdbb1a5"
+    },
+    {
+      "path": "JETSON/Sensor/Config.py",
+      "action": "identical",
+      "sha256": "dd80cabc2590a9b548aa8d83d7088fd35f60f1d56e7e9db1212a9c03f2e92229"
+    },
+    {
+      "path": "JETSON/Sensor/__init__.py",
+      "action": "identical",
+      "sha256": "c1daa5dba2dc28c39b45a65d4e78b1547a4a1631dbfaf05c23e40ab829bc0f66"
+    },
+    {
+      "path": "JETSON/Sensor/actuators/__init__.py",
+      "action": "identical",
+      "sha256": "a64682d02eef53f51646e1e5b51c28d93e523c66fe67bb8d5d21d76d3408ebcb"
+    },
+    {
+      "path": "JETSON/Sensor/actuators/oled.py",
+      "action": "identical",
+      "sha256": "b4ed882ebf66f8027adafac28d32ca6fa4b046739c3c85c61ced7de25adee024"
+    },
+    {
+      "path": "JETSON/Sensor/actuators/outputs.py",
+      "action": "identical",
+      "sha256": "98f7024a17371c5d7e8d7b67ad49ebbf0f619846b5e96af7688f60472fa68af6"
+    },
+    {
+      "path": "JETSON/Sensor/actuators/servo.py",
+      "action": "identical",
+      "sha256": "9cd9670a044c401fa0e5957f1758280ca68aba79c077ed9ffc606e299a1aec04"
+    },
+    {
+      "path": "JETSON/Sensor/actuators/stepper.py",
+      "action": "identical",
+      "sha256": "4062df1b2d0d4873d91f27f2c64904b30cfa73386d7370e9c0fd8295a9e23c48"
+    },
+    {
+      "path": "JETSON/Sensor/diagnostics/__init__.py",
+      "action": "identical",
+      "sha256": "d0326a288b911695c4cd0b829e5a93e4630634e7099aae57ed94a46ab649f7d2"
+    },
+    {
+      "path": "JETSON/Sensor/diagnostics/actuator_checks.py",
+      "action": "identical",
+      "sha256": "0e605c9317713aa267b7bb3fe83d83463c7728ee3b5c140326a2edfc24fd3491"
+    },
+    {
+      "path": "JETSON/Sensor/diagnostics/definitions.py",
+      "action": "identical",
+      "sha256": "7eca6d62ca0fa2efc81c0f531a268265cda14062099c6f0c5644123705a2da39"
+    },
+    {
+      "path": "JETSON/Sensor/diagnostics/sensor_checks.py",
+      "action": "identical",
+      "sha256": "6797c5edce0003e6c9a977113413ececdb9d555e3019fb730e3523f37ad261e7"
+    },
+    {
+      "path": "JETSON/Sensor/diagnostics/service.py",
+      "action": "identical",
+      "sha256": "d214746d962a637e02a046a73b2c72ae3a367ec5d597b2542e88f53bd632e4de"
+    },
+    {
+      "path": "JETSON/Sensor/manager.py",
+      "action": "identical",
+      "sha256": "f86a33f4ed44b660b10f94d316c979ef3430c250ac199572f7c881d5a57efe23"
+    },
+    {
+      "path": "JETSON/Sensor/native/dht11_gpiod",
+      "action": "identical",
+      "sha256": "263fc5f677b7a53510b9be8a286a6136380534146e3891e50db1b582806e0cdd"
+    },
+    {
+      "path": "JETSON/Sensor/native/dht11_gpiod.c",
+      "action": "identical",
+      "sha256": "19753522790700f2d2bb219e8dbb4c9a5adf34d9756a07b7cbadc47ade02647a"
+    },
+    {
+      "path": "JETSON/Sensor/pinmap.py",
+      "action": "identical",
+      "sha256": "66bb2f23f7dcfab64bb8e8e4697b3fed9e5c1e5d16532cc49a7f8b0becfc87a2"
+    },
+    {
+      "path": "JETSON/Sensor/resources.py",
+      "action": "identical",
+      "sha256": "b62859cb9093a8ea2d9958a813da8461007c612aa4da0fec747a3ed9ba1a0827"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/__init__.py",
+      "action": "identical",
+      "sha256": "7b26de091a3a0f582211f120dd3c3bc969936007f5778e410c75ada75e6a4d91"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/ads1115.py",
+      "action": "identical",
+      "sha256": "0d65d59a4c931dcf6ebe302f4a42e387fa3f973f002d8605cd7115a589c19629"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/current.py",
+      "action": "identical",
+      "sha256": "43d420456193dbba96927b5aac7331dc66499b36129912177cb5a52b1ce0fc32"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/dht11.py",
+      "action": "identical",
+      "sha256": "7dc180ef2486946e2d7c862b22097c762ed36013fdf32782770502fe1396804c"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/light.py",
+      "action": "identical",
+      "sha256": "c89247ef81f3002766e2e46382f059bac9e12d59f8298ca0709dd392590da324"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/mlx90614.py",
+      "action": "identical",
+      "sha256": "d55c43996eca8076234dfcdbf769ce11d843d074cdb8b1bee11f8130a4b02400"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/smoke.py",
+      "action": "identical",
+      "sha256": "3938bfc9e58306c2003578330970ac9b1b37b46330fb0f391af51be76f102194"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/smoke_protocol.py",
+      "action": "identical",
+      "sha256": "04863909aa476e6f9f8203a6a8d592997369a8c7a6e435a726aa7f5f38764b12"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/ultrasonic.py",
+      "action": "identical",
+      "sha256": "4f465af63fe6d0b712d351d235519b3abe152153ea7fbc91e47ffa2377d2d1d8"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/usb_camera.py",
+      "action": "identical",
+      "sha256": "78753a95fe98acc29b48bf0c29ef2c997cf64bcdc8ab8f269846633a1bc2af62"
+    },
+    {
+      "path": "JETSON/Sensor/sensors/usb_microphone.py",
+      "action": "identical",
+      "sha256": "7750b94a70338f1d86eb710b9f0ff2e83a89a223d0eed28989cb55f90313dfc2"
+    },
+    {
+      "path": "JETSON/Sensor/service.py",
+      "action": "identical",
+      "sha256": "17fd8e1769c299428dccc7fcd3d2134c3556057d1145750e9fa780ea81912076"
+    },
+    {
+      "path": "JETSON/Vision/__init__.py",
+      "action": "identical",
+      "sha256": "5ea808db99aff8405105392dcc68066b5928e14f1c6192c7ea71f53430640d85"
+    },
+    {
+      "path": "JETSON/Vision/engine.py",
+      "action": "identical",
+      "sha256": "5ba7b57592aabf08dd8bcfa361cfa04a74e43d7100ffec039dfba5f8511dd443"
+    },
+    {
+      "path": "JETSON/Vision/features.py",
+      "action": "identical",
+      "sha256": "a9d0dc35dbd81e7b6a2f5f5d47de4d395f6ae71c87c9d6338d71f6c36c227ba8"
+    },
+    {
+      "path": "JETSON/Vision/library.py",
+      "action": "identical",
+      "sha256": "8aba01bc5858da5c5d9c299c0ce8d4c6a4beaf3dd79e42e3f871a44db70d2beb"
+    },
+    {
+      "path": "JETSON/Vision/models/LICENSE-SFace.txt",
+      "action": "identical",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "JETSON/Vision/models/LICENSE-YuNet.txt",
+      "action": "identical",
+      "sha256": "c83b8120c50ccbd4c4f96edf53141bdd566ebb8f8e9227e415326aa1b1aba958"
+    },
+    {
+      "path": "JETSON/Vision/models/NOTICE.md",
+      "action": "identical",
+      "sha256": "fe22087b523c443c9f11c57da71800e314fd007530c141a21c65441f689fe508"
+    },
+    {
+      "path": "JETSON/Vision/models/face_detection_yunet_2023mar.onnx",
+      "action": "identical",
+      "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4"
+    },
+    {
+      "path": "JETSON/Vision/service.py",
+      "action": "identical",
+      "sha256": "c67c40e43aa73c0bef69027998e9af5b5d64b889ba76e7ff419f256189faa1ca"
+    },
+    {
+      "path": "JETSON/Vision/tensorrt_models.py",
+      "action": "identical",
+      "sha256": "b897ba0b3ef9e7e1c1b94a7ae04257449af6da1d9d9c929d1fddcab52bfb4ed1"
+    },
+    {
+      "path": "JETSON/Voice/__init__.py",
+      "action": "identical",
+      "sha256": "935b48135ffb31bd98a20ed90cadd930751a64f8b0fd58c41a2ab0d7d137dd4d"
+    },
+    {
+      "path": "JETSON/Voice/models/LICENSE-2.0.txt",
+      "action": "identical",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "JETSON/Voice/models/LICENSE-Whisper.txt",
+      "action": "identical",
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d"
+    },
+    {
+      "path": "JETSON/Voice/models/NOTICE.md",
+      "action": "identical",
+      "sha256": "4340607da2d2a9835aed22bf891615384b6766ae7d44f24624dd868e43ae9c38"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/README",
+      "action": "identical",
+      "sha256": "7362be411c609f2a1c9d2dfe22c2d72555c15eb90bfe47c41772f49ef94840ce"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/mfcc.conf",
+      "action": "identical",
+      "sha256": "6c326fea5741c2d78be12f76eb1b36ea2ace040da9e355e4cfe6bb80e5f7d5ab"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/model.conf",
+      "action": "identical",
+      "sha256": "468a8125c07530f96adcc219a0a5f993e8e0721ccf18acbd3169b77fc685fb9b"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/disambig_tid.int",
+      "action": "identical",
+      "sha256": "c9200318c2a265549ebfbea7e0176fa62e131e953abd140c9b0b39fe61e24015"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/phones/word_boundary.int",
+      "action": "identical",
+      "sha256": "11ca784b99f03188b451fb54714c2de3dd694e662a5f88e82df435c2789b9aec"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.dubm",
+      "action": "identical",
+      "sha256": "e33276cbd548c0a03ae5812c98115940614997dff23a6d59968af6eaf7630ff8"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.mat",
+      "action": "identical",
+      "sha256": "42706d88818070ea0d0182b4d11367ba52a13b9a2be45630f60858a422109ada"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/global_cmvn.stats",
+      "action": "identical",
+      "sha256": "b267dc89c1556fdd5bc358f0a480929da1743eeccfa06a67daf8db629ca336bb"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/online_cmvn.conf",
+      "action": "identical",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/splice.conf",
+      "action": "identical",
+      "sha256": "9f0c5f7c82d18eaf25d8bce470efa9f7741f88411fe428774bc0a9bb69a24756"
+    },
+    {
+      "path": "JETSON/Voice/recognizer.py",
+      "action": "identical",
+      "sha256": "7248585038f0526eaee9364813917e0df7554d6bd3c43950cf80994a4fd1f4c5"
+    },
+    {
+      "path": "JETSON/Voice/service.py",
+      "action": "identical",
+      "sha256": "c458aad721b17b40b8b4e190bfa36ac3d72c2a8cc86b147cdd991b6a9d2b4b16"
+    },
+    {
+      "path": "JETSON/Voice/whisper_recognizer.py",
+      "action": "identical",
+      "sha256": "0ac2d7582a12a1630c655294e7a1c4152fc36c87e03fd4de670a0b09eb9edf1d"
+    },
+    {
+      "path": "JETSON/Voice/xfyun_recognizer.py",
+      "action": "identical",
+      "sha256": "37b9d04914b4eb6cf132168cd4dca40c2daed773df41af7da3b26b36123043a3"
+    },
+    {
+      "path": "JETSON/__init__.py",
+      "action": "identical",
+      "sha256": "6b34d870c9db5db048fab907a4ad83514add0926c3fd633ceee8eecd87f7e43f"
+    },
+    {
+      "path": "README.md",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "87b75c63e30c517612fcb95e9e7065757cbb25fc04990a022ab10da2e93a90fd",
+      "local_sha256": "fdc1f6fd53442a232cb3d01d45fc0ac73312e951cf6a6a8d3700b1c6511a9003"
+    },
+    {
+      "path": "SMOKE_UART_INTEGRATION.md",
+      "action": "identical",
+      "sha256": "e83bf584820e3bac277ae5187aa90dce99cc36e0613c29aeed6118c79aed78eb"
+    },
+    {
+      "path": "START_HERE.md",
+      "action": "identical",
+      "sha256": "30f571edbd10f10a2357ad185c75d0b643c5539ee06b1a7c70c68b7004c08051"
+    },
+    {
+      "path": "Serial_Screen/__init__.py",
+      "action": "identical",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Serial_Screen/access_bridge.py",
+      "action": "identical",
+      "sha256": "b6f95cbd772902b18c5630d8976b01861337079df7be1b23c6a5ce31269591ab"
+    },
+    {
+      "path": "Serial_Screen/control_bridge.before_stepper_defaults_20261014_221909.py",
+      "action": "archive_remote_backup",
+      "sha256": "c553b01e17415d3d2ca40a8c07fd33e99c5a4073c2c011a257b39cc4ae322c38"
+    },
+    {
+      "path": "Serial_Screen/control_bridge.py",
+      "action": "identical",
+      "sha256": "d75317135096632485fe49254e79df771f7bf36e52f95f886bf91e7f6df86272"
+    },
+    {
+      "path": "Serial_Screen/device_bridge.py",
+      "action": "identical",
+      "sha256": "e1f56017ed909a02ae22d61e5c00de0d642251ceae482eb53394f4f1e973e7e8"
+    },
+    {
+      "path": "Serial_Screen/diagnostics_bridge.py",
+      "action": "identical",
+      "sha256": "9bdb0bcbb55167a0eefb60754a8fc9efb0aae517473355df6d4255d52144a656"
+    },
+    {
+      "path": "Serial_Screen/screen_service/__init__.py",
+      "action": "identical",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/__init__.py",
+      "action": "identical",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/addresses.py",
+      "action": "identical",
+      "sha256": "89eb275eeb80394cf0bbf89ffd177638276df3b08362458d9e3a3517fa7fb072"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/message_parser.py",
+      "action": "identical",
+      "sha256": "6174298320e8a378142bf09b92e5b8a678b7ce901bd7f56cc29df37beb3d2235"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/screen_events.py",
+      "action": "identical",
+      "sha256": "ccf0c017e0b1a8329085ca8e632d94a2c219d2094df986b0100fc6fd3d481f0b"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/screen_sender.py",
+      "action": "identical",
+      "sha256": "e75e2cc917d5205e2e369f56797df9226201548a7c7dda7811d845de3f35df26"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/serial_discovery.py",
+      "action": "identical",
+      "sha256": "966f4b2933592e6da6d12b2940a4efec40897344761f834ae44d89336b9b85e6"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/service.py",
+      "action": "identical",
+      "sha256": "431bffe2ae6af31b64cc2dc083fa18213dfa7e7bf59fb331f7e4f6b5f052d69f"
+    },
+    {
+      "path": "Serial_Screen/screen_service/screen/text_updates.py",
+      "action": "identical",
+      "sha256": "1571a9099c421b74688a18f1b3d0fa3c37bb71f34f4e2edd5424778f6b376cc0"
+    },
+    {
+      "path": "Serial_Screen/voice_bridge.py",
+      "action": "identical",
+      "sha256": "81fbf9afe2b217dc7fbf11d4489debdd844784cf1c85ca2cc2e2c4d466f0ccc3"
+    },
+    {
+      "path": "application.py",
+      "action": "identical",
+      "sha256": "801ab5ecb5059ed4c609b88ee05bc8ce1c7dc178a2ddc758efac178987f5e02e"
+    },
+    {
+      "path": "business/__init__.py",
+      "action": "identical",
+      "sha256": "d835d50eb30433daccdef2142a7430eb5d67b049027d29b2cd4dc104a373f444"
+    },
+    {
+      "path": "business/access_control.py",
+      "action": "identical",
+      "sha256": "36af5db61c57880ef60b6ab2f8580eec99216a32e92362e04531953d6cbfed62"
+    },
+    {
+      "path": "business/proximity_alarm.py",
+      "action": "identical",
+      "sha256": "7610ca81c4dca21838bffa122eefbd6df808e76dec8eaf91acd4720b569009a4"
+    },
+    {
+      "path": "business/rgb_feedback.py",
+      "action": "identical",
+      "sha256": "f579d85c7dd25072192d6e7d7c263f4eda897631d44faed42bb5887785809e9c"
+    },
+    {
+      "path": "constraints-jetson.txt",
+      "action": "identical",
+      "sha256": "891247d9d266a10243675e3da0de6f60b7c815f7ee4ef821c925a02c222f4faa"
+    },
+    {
+      "path": "deploy/99-ningbo-i2c.rules",
+      "action": "identical",
+      "sha256": "f8fc64dcc6d03d3cc46a70c688bb40813c6d839456fdddcfb6f70165f5c14f68"
+    },
+    {
+      "path": "deploy/99-ningbo-uart.rules",
+      "action": "identical",
+      "sha256": "626434f09eb374926e592f638dd8fbeb07049ee7e426537448d64c8e3cc407fc"
+    },
+    {
+      "path": "deploy/README_LINUX.md",
+      "action": "identical",
+      "sha256": "1336ac9fac3b88dfddc440bc4e325efecb16c40e439ae081bdcf0f276e531571"
+    },
+    {
+      "path": "deploy/README_VOICE_XFYUN.md",
+      "action": "identical",
+      "sha256": "24f02f4d41b0a10933719f772081fdb8633c4dc5539bad8fe033fd41f73976e4"
+    },
+    {
+      "path": "deploy/check_ads1115.py",
+      "action": "identical",
+      "sha256": "e3686577ebd8cf8c9e4601c520c577f9648e7ff2b9e85a1432fbb7fe2f0271f2"
+    },
+    {
+      "path": "deploy/check_mlx90614.py",
+      "action": "identical",
+      "sha256": "bf5497e84d68a5f5ad8109dbdbce2c805259c91c9c0851a756c0444b9092792c"
+    },
+    {
+      "path": "deploy/check_rgb_adc.py",
+      "action": "identical",
+      "sha256": "0d2f471f8c521452b71895f2b072b4bf3da2c46a93fa9a7b6fd045dec5ac7b6b"
+    },
+    {
+      "path": "deploy/check_servo_adc.py",
+      "action": "identical",
+      "sha256": "43efda06511e760d9fa4806a93f76aeff66629d0992ee631cc0d11ecc464f5af"
+    },
+    {
+      "path": "deploy/check_smoke_uart.py",
+      "action": "identical",
+      "sha256": "bfd2230533528cd72b034d35820206677277f75012822b0f13a3e4fd8c5c5c9f"
+    },
+    {
+      "path": "deploy/configure_smoke_uart.sh",
+      "action": "identical",
+      "sha256": "99202ed305bacc66697c6b2ced33081370eb89b32f624f0f4ed51c354e9699a8"
+    },
+    {
+      "path": "deploy/configure_voice.py",
+      "action": "identical",
+      "sha256": "4100709549dd7794cd1ce29f816d9b3b7b69efeb8d7b8ec81d6d81fe005b94ae"
+    },
+    {
+      "path": "deploy/ningbo.service",
+      "action": "identical",
+      "sha256": "b3f1960b888d38e12e29a297906059d302216fbe2e8919d9fb147e0cadb116ca"
+    },
+    {
+      "path": "deploy/platform_check.py",
+      "action": "identical",
+      "sha256": "40386d567c0188db484a97a7882d500d0776bd672e63d9d9ca9aeadd79fb7bda"
+    },
+    {
+      "path": "deploy/run_rgb_blue_test.py",
+      "action": "updated_from_remote",
+      "sha256": "d77145b8605455552581088ae7bb71db02ae9640f6c8e22b633c11f3d2306190"
+    },
+    {
+      "path": "deploy/run_rgb_green_test.py",
+      "action": "updated_from_remote",
+      "sha256": "767832c066a534410d50106266401c5cef7690596babdb82160916a369dbb6d5"
+    },
+    {
+      "path": "deploy/run_rgb_red_test.py",
+      "action": "updated_from_remote",
+      "sha256": "5f5bfdcece7fcf3a55ff4c3c3cc47de993f23cdda7b82754a6e5b23899a38eea"
+    },
+    {
+      "path": "deploy/run_rgb_white_test.py",
+      "action": "updated_from_remote",
+      "sha256": "e68356a23dcf84262c788ffd5422a962f2fcb5c01a77630dc67667f3d93fd765"
+    },
+    {
+      "path": "deploy/run_stepper_forward_test.py",
+      "action": "identical",
+      "sha256": "01a6ce3d64d8c0dc4d6b2f955c3b5a31ad97b93fe06cfa2aab830fbfcd19ae85"
+    },
+    {
+      "path": "deploy/verify_models.py",
+      "action": "identical",
+      "sha256": "51ae677dc7dd28ee675ca3492cf11388523c3e577fcea30084e775ae4af31c68"
+    },
+    {
+      "path": "deploy.sh",
+      "action": "identical",
+      "sha256": "268547a51ac391c52a5d1b0979fd3d11fc387e7f31fed3e3f4e3b9b885ee831d"
+    },
+    {
+      "path": "docs/ACTUATOR_FEEDBACK_CALIBRATION_20261015.md",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "3612e9a8874cda2c299e0a3598901e6913ec93d2e63915e3868f3470c3cb4ddb",
+      "local_sha256": "4e5430d7f9522a434fcb00c04748e566c1be4b3ba09a0a59e62ef1ca1feeb931"
+    },
+    {
+      "path": "docs/ACTUATOR_FEEDBACK_RETEST_20261015.md",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "fa22159a9108f1a53b8c5e1f4f8e96f70bc363866851d6d33fdee62d25940fff",
+      "local_sha256": "163e78a6ae70dd43d6e8a21c0fac8449ab3e38af9e74b8f52e622a7eec1088ad"
+    },
+    {
+      "path": "docs/actuator_feedback_latest.json",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "313422fdb5be6dcc2fbdc9d23fb89720a5dce5d5d61e278da2430d7fa454686e",
+      "local_sha256": "b7106ce698cc95b19f86062099084ab290e55fe6591aba69c1b93c0251b462f2"
+    },
+    {
+      "path": "docs/threshold_rollback_20261015.json",
+      "action": "preserve_local_documentation_or_metadata",
+      "remote_sha256": "313422fdb5be6dcc2fbdc9d23fb89720a5dce5d5d61e278da2430d7fa454686e",
+      "local_sha256": "b7106ce698cc95b19f86062099084ab290e55fe6591aba69c1b93c0251b462f2"
+    },
+    {
+      "path": "docs/宁波实验箱接线说明.docx",
+      "action": "identical",
+      "sha256": "131066f60cfdaffa8d9331e1de00d7efcb651bada65929fa4ef9b521b8cf79a8"
+    },
+    {
+      "path": "main.py",
+      "action": "identical",
+      "sha256": "685fdf12ab69c911c97d2141ce806fd7aa36ba3f87cd1857f5bb1d566b3e0ddf"
+    },
+    {
+      "path": "requirements-whisper.txt",
+      "action": "identical",
+      "sha256": "f7837827596de343636a2dec6b36ec9f7c82648c58ec412c894a1867ad4a7b02"
+    },
+    {
+      "path": "requirements.txt",
+      "action": "identical",
+      "sha256": "0ef3b5abb131f34d97b972bc65f6d35dea6dbe18cc8727adeb2bf9f0db5a48e5"
+    },
+    {
+      "path": "run.sh",
+      "action": "identical",
+      "sha256": "4c147c91a037de4114e2c49d0bcbc00a54401d4797d69356153af8386b07f0be"
+    },
+    {
+      "path": "tests/test_ads1115.py",
+      "action": "identical",
+      "sha256": "d56a5998ed2bcdb56a653ce14685af3dbd205ca553bcc9d34fc46d1c2ea80cb5"
+    },
+    {
+      "path": "tests/test_application.py",
+      "action": "identical",
+      "sha256": "888c964704a41f48429d42190734551c49d2fa0c76c0a06ea6611da3d07fa501"
+    },
+    {
+      "path": "tests/test_business_bridge.py",
+      "action": "identical",
+      "sha256": "d29c74467cd63c9267d33b5273bdd8ba0b68be5a2430094e390b075a1dabb5ea"
+    },
+    {
+      "path": "tests/test_deploy.py",
+      "action": "identical",
+      "sha256": "f79415f7955e00d41b6d0625695314924555e2cc00963232b3911d4b0bd44ef1"
+    },
+    {
+      "path": "tests/test_device_bridge.py",
+      "action": "identical",
+      "sha256": "f705fe56bbae4497284d6c0fb636a86033356de0506546cd06e34e742976f6b5"
+    },
+    {
+      "path": "tests/test_dht11.py",
+      "action": "identical",
+      "sha256": "faa0d0ccb56f9089cae2a8c7dbaa8675b531750381c33c40007f28a338c4fc4d"
+    },
+    {
+      "path": "tests/test_diagnostics.py",
+      "action": "identical",
+      "sha256": "b87a5e0f1cd26e24dec77a4ea70728b5826111eae913856ad1d58c35e012fe27"
+    },
+    {
+      "path": "tests/test_face.py",
+      "action": "identical",
+      "sha256": "932ff66b9063e894d1a8a4cae32b5c3c80b3157833fa6826ad97ba8d167f0998"
+    },
+    {
+      "path": "tests/test_inference.py",
+      "action": "identical",
+      "sha256": "f5c78741845b470c0fd2f00736f01eae12c51d0687ebfd21090ab4a8acd2c97f"
+    },
+    {
+      "path": "tests/test_mlx90614.py",
+      "action": "identical",
+      "sha256": "e05bf64644823bad42dd875975f6090f59712293864a3fbb8ccf67f71ea4d21a"
+    },
+    {
+      "path": "tests/test_proximity_alarm.py",
+      "action": "identical",
+      "sha256": "df559d35e07bb22af60635f2a27241f5b315c16e9868bfa0e102a4176804a026"
+    },
+    {
+      "path": "tests/test_sensor_architecture.py",
+      "action": "identical",
+      "sha256": "4427d5ec6eff0315d29ce33c3934955ce6eea26b0d9894111b3b909f09114237"
+    },
+    {
+      "path": "tests/test_servo_pwm.py",
+      "action": "identical",
+      "sha256": "87bfea7f72227a1c6a0594a90e2768b9609160e1014c91f0f3627178e6d9330f"
+    },
+    {
+      "path": "tests/test_servo_screen_read.py",
+      "action": "identical",
+      "sha256": "83730c06bb4c852cd4a6988eb1206785d3f39f3ac106d1a4760fc210a12de0f8"
+    },
+    {
+      "path": "tests/test_smoke_uart.py",
+      "action": "identical",
+      "sha256": "54032b8f0e519c696ab4fe667f2ddaa13d7374e693428ab861504f1061234b7e"
+    },
+    {
+      "path": "tests/test_usb_discovery.py",
+      "action": "identical",
+      "sha256": "f9bfdb308732f370601b45673e20cfa58057b9c7e290cef0a90f7474877280b6"
+    },
+    {
+      "path": "tests/test_voice.py",
+      "action": "identical",
+      "sha256": "5acc6c04b2d347260415f946d94fa3c969cf17a3a5accaaef298a0cbcdb428e0"
+    },
+    {
+      "path": "tests/test_xfyun.py",
+      "action": "identical",
+      "sha256": "c6955ee25c6141c9f67596fe3abab1f0b3e0cc43098aa4b40fd78a56c81e6876"
+    }
+  ],
+  "notes": [
+    "Runtime source checked against device SHA256",
+    "RGB BOARD pins remain red=12 green=35 blue=38",
+    "Access light change remains rolled back",
+    "Only original servo feedback thresholds remain active",
+    "Private runtime state and model assets retained locally"
+  ]
+}

@@ -1,0 +1,26 @@
+
+.env.voice
+
+data/voice_usage.sqlite3*
+
+# Local environments, IDE settings and generated files.
+.venv/
+.idea/
+__pycache__/
+*.py[cod]
+logs/
+.deploy-cache/
+data/engines/
+data/*.sqlite3*
+
+# Device captures and historic patch bundles are retained locally.
+artifacts/
+archive/
+
+# Credentials, local backups and downloaded model assets.
+.env
+.env.*
+!.env.voice.example
+backups/
+JETSON/Voice/models/
+JETSON/Vision/models/

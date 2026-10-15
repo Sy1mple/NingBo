@@ -1,0 +1,1802 @@
+{
+  "host": "192.168.1.121",
+  "export_created": "2026-10-15T11:13:34.105163",
+  "remote_export_sha256": "6e642bd10e07f6a842dfd770674f92c9145c8cb9bacd6cb55821634da4018a24",
+  "local_backup": "C:\\Users\\ZZH\\Documents\\ChatGPT\\宁波开发\\sync_20261015\\local_project_before.tar.gz",
+  "project": "C:\\Users\\ZZH\\PycharmProjects\\NingBo",
+  "comparison": {
+    "new": [
+      "ADS1115_INTEGRATION.md",
+      "deploy/99-ningbo-uart.rules",
+      "deploy/check_mlx90614.py",
+      "deploy/check_rgb_adc.py",
+      "deploy/check_servo_adc.py",
+      "deploy/check_smoke_uart.py",
+      "deploy/configure_smoke_uart.sh",
+      "deploy/run_stepper_forward_test.py",
+      "docs/宁波实验箱接线说明.docx",
+      "GY906_INTEGRATION.md",
+      "JETSON/Sensor/native/dht11_gpiod",
+      "JETSON/Sensor/sensors/ads1115.py",
+      "JETSON/Sensor/sensors/mlx90614.py",
+      "JETSON/Sensor/sensors/smoke_protocol.py",
+      "SMOKE_UART_INTEGRATION.md",
+      "START_HERE.md",
+      "tests/test_ads1115.py",
+      "tests/test_mlx90614.py",
+      "tests/test_smoke_uart.py"
+    ],
+    "changed": [
+      ".gitignore",
+      "business/proximity_alarm.py",
+      "business/rgb_feedback.py",
+      "constraints-jetson.txt",
+      "deploy/check_ads1115.py",
+      "deploy/README_LINUX.md",
+      "deploy/README_VOICE_XFYUN.md",
+      "deploy.sh",
+      "JETSON/Inference/checks.py",
+      "JETSON/Sensor/Config.py",
+      "JETSON/Sensor/diagnostics/actuator_checks.py",
+      "JETSON/Sensor/diagnostics/definitions.py",
+      "JETSON/Sensor/diagnostics/sensor_checks.py",
+      "JETSON/Sensor/manager.py",
+      "JETSON/Sensor/resources.py",
+      "JETSON/Sensor/sensors/current.py",
+      "JETSON/Sensor/sensors/smoke.py",
+      "JETSON/Sensor/service.py",
+      "main.py",
+      "README.md",
+      "requirements.txt",
+      "Serial_Screen/control_bridge.py",
+      "Serial_Screen/device_bridge.py",
+      "tests/test_business_bridge.py",
+      "tests/test_proximity_alarm.py",
+      "tests/test_sensor_architecture.py",
+      "tests/test_servo_screen_read.py"
+    ],
+    "same": [
+      ".env.voice.example",
+      "application.py",
+      "business/__init__.py",
+      "business/access_control.py",
+      "deploy/99-ningbo-i2c.rules",
+      "deploy/configure_voice.py",
+      "deploy/ningbo.service",
+      "deploy/platform_check.py",
+      "deploy/verify_models.py",
+      "JETSON/__init__.py",
+      "JETSON/Inference/__init__.py",
+      "JETSON/Inference/tensorrt_runner.py",
+      "JETSON/Sensor/__init__.py",
+      "JETSON/Sensor/actuators/__init__.py",
+      "JETSON/Sensor/actuators/oled.py",
+      "JETSON/Sensor/actuators/outputs.py",
+      "JETSON/Sensor/actuators/servo.py",
+      "JETSON/Sensor/actuators/stepper.py",
+      "JETSON/Sensor/diagnostics/__init__.py",
+      "JETSON/Sensor/diagnostics/service.py",
+      "JETSON/Sensor/native/dht11_gpiod.c",
+      "JETSON/Sensor/pinmap.py",
+      "JETSON/Sensor/sensors/__init__.py",
+      "JETSON/Sensor/sensors/dht11.py",
+      "JETSON/Sensor/sensors/light.py",
+      "JETSON/Sensor/sensors/ultrasonic.py",
+      "JETSON/Sensor/sensors/usb_camera.py",
+      "JETSON/Sensor/sensors/usb_microphone.py",
+      "JETSON/Vision/__init__.py",
+      "JETSON/Vision/engine.py",
+      "JETSON/Vision/features.py",
+      "JETSON/Vision/library.py",
+      "JETSON/Vision/models/face_detection_yunet_2023mar.onnx",
+      "JETSON/Vision/models/face_recognition_sface_2021dec.onnx",
+      "JETSON/Vision/models/LICENSE-SFace.txt",
+      "JETSON/Vision/models/LICENSE-YuNet.txt",
+      "JETSON/Vision/models/NOTICE.md",
+      "JETSON/Vision/service.py",
+      "JETSON/Vision/tensorrt_models.py",
+      "JETSON/Voice/__init__.py",
+      "JETSON/Voice/models/LICENSE-2.0.txt",
+      "JETSON/Voice/models/LICENSE-Whisper.txt",
+      "JETSON/Voice/models/NOTICE.md",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/am/final.mdl",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/mfcc.conf",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/model.conf",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/disambig_tid.int",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/Gr.fst",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/HCLr.fst",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/phones/word_boundary.int",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.dubm",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.ie",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.mat",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/global_cmvn.stats",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/online_cmvn.conf",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/splice.conf",
+      "JETSON/Voice/models/vosk-model-small-cn-0.22/README",
+      "JETSON/Voice/models/whisper-tiny.pt",
+      "JETSON/Voice/recognizer.py",
+      "JETSON/Voice/service.py",
+      "JETSON/Voice/whisper_recognizer.py",
+      "JETSON/Voice/xfyun_recognizer.py",
+      "requirements-whisper.txt",
+      "run.sh",
+      "Serial_Screen/__init__.py",
+      "Serial_Screen/access_bridge.py",
+      "Serial_Screen/diagnostics_bridge.py",
+      "Serial_Screen/screen_service/__init__.py",
+      "Serial_Screen/screen_service/screen/__init__.py",
+      "Serial_Screen/screen_service/screen/addresses.py",
+      "Serial_Screen/screen_service/screen/message_parser.py",
+      "Serial_Screen/screen_service/screen/screen_events.py",
+      "Serial_Screen/screen_service/screen/screen_sender.py",
+      "Serial_Screen/screen_service/screen/service.py",
+      "Serial_Screen/screen_service/screen/text_updates.py",
+      "Serial_Screen/voice_bridge.py",
+      "tests/test_application.py",
+      "tests/test_deploy.py",
+      "tests/test_device_bridge.py",
+      "tests/test_dht11.py",
+      "tests/test_diagnostics.py",
+      "tests/test_face.py",
+      "tests/test_inference.py",
+      "tests/test_servo_pwm.py",
+      "tests/test_voice.py",
+      "tests/test_xfyun.py"
+    ],
+    "local_only": [
+      "data/faces.sqlite3"
+    ]
+  },
+  "files": [
+    {
+      "export": "project/.env.voice.example",
+      "local": ".env.voice.example",
+      "sha256": "7bc1392539b71164987817c5f29323d28beff1184ceeee456d0ca3a0c07d36e6",
+      "role": "active"
+    },
+    {
+      "export": "project/.gitignore",
+      "local": ".gitignore",
+      "sha256": "736ecc5761df260dec0ba26232ec80ccfc8649578ea1d36d38c906a6f7241566",
+      "role": "active"
+    },
+    {
+      "export": "project/ADS1115_INTEGRATION.md",
+      "local": "ADS1115_INTEGRATION.md",
+      "sha256": "ea3e82c98c93a1ee93a2097b2c4fa62e88862d05f1386654d35db49eea8fc7fe",
+      "role": "active"
+    },
+    {
+      "export": "project/application.py",
+      "local": "application.py",
+      "sha256": "963560373e86ad149b70548e9e93b4e5caeecaabc502a2ee22bfcd54fed0bfc8",
+      "role": "active"
+    },
+    {
+      "export": "project/business/__init__.py",
+      "local": "business/__init__.py",
+      "sha256": "d835d50eb30433daccdef2142a7430eb5d67b049027d29b2cd4dc104a373f444",
+      "role": "active"
+    },
+    {
+      "export": "project/business/access_control.py",
+      "local": "business/access_control.py",
+      "sha256": "36af5db61c57880ef60b6ab2f8580eec99216a32e92362e04531953d6cbfed62",
+      "role": "active"
+    },
+    {
+      "export": "project/business/proximity_alarm.py",
+      "local": "business/proximity_alarm.py",
+      "sha256": "7610ca81c4dca21838bffa122eefbd6df808e76dec8eaf91acd4720b569009a4",
+      "role": "active"
+    },
+    {
+      "export": "project/business/rgb_feedback.py",
+      "local": "business/rgb_feedback.py",
+      "sha256": "f579d85c7dd25072192d6e7d7c263f4eda897631d44faed42bb5887785809e9c",
+      "role": "active"
+    },
+    {
+      "export": "project/constraints-jetson.txt",
+      "local": "constraints-jetson.txt",
+      "sha256": "891247d9d266a10243675e3da0de6f60b7c815f7ee4ef821c925a02c222f4faa",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/99-ningbo-i2c.rules",
+      "local": "deploy/99-ningbo-i2c.rules",
+      "sha256": "f8fc64dcc6d03d3cc46a70c688bb40813c6d839456fdddcfb6f70165f5c14f68",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/99-ningbo-uart.rules",
+      "local": "deploy/99-ningbo-uart.rules",
+      "sha256": "626434f09eb374926e592f638dd8fbeb07049ee7e426537448d64c8e3cc407fc",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/check_ads1115.py",
+      "local": "deploy/check_ads1115.py",
+      "sha256": "e3686577ebd8cf8c9e4601c520c577f9648e7ff2b9e85a1432fbb7fe2f0271f2",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/check_mlx90614.py",
+      "local": "deploy/check_mlx90614.py",
+      "sha256": "bf5497e84d68a5f5ad8109dbdbce2c805259c91c9c0851a756c0444b9092792c",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/check_rgb_adc.py",
+      "local": "deploy/check_rgb_adc.py",
+      "sha256": "0d2f471f8c521452b71895f2b072b4bf3da2c46a93fa9a7b6fd045dec5ac7b6b",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/check_servo_adc.py",
+      "local": "deploy/check_servo_adc.py",
+      "sha256": "43efda06511e760d9fa4806a93f76aeff66629d0992ee631cc0d11ecc464f5af",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/check_smoke_uart.py",
+      "local": "deploy/check_smoke_uart.py",
+      "sha256": "bfd2230533528cd72b034d35820206677277f75012822b0f13a3e4fd8c5c5c9f",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/configure_smoke_uart.sh",
+      "local": "deploy/configure_smoke_uart.sh",
+      "sha256": "99202ed305bacc66697c6b2ced33081370eb89b32f624f0f4ed51c354e9699a8",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/configure_voice.py",
+      "local": "deploy/configure_voice.py",
+      "sha256": "4100709549dd7794cd1ce29f816d9b3b7b69efeb8d7b8ec81d6d81fe005b94ae",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/ningbo.service",
+      "local": "deploy/ningbo.service",
+      "sha256": "46a769ca8bfd58b5e16444df5846635f42296f256c508874d0ef111eb2dc5d88",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/platform_check.py",
+      "local": "deploy/platform_check.py",
+      "sha256": "40386d567c0188db484a97a7882d500d0776bd672e63d9d9ca9aeadd79fb7bda",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/README_LINUX.md",
+      "local": "deploy/README_LINUX.md",
+      "sha256": "54941aa42eb62930b1316d610d0bb2aedfa9056610a6cec210e0d4626c2236a6",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/README_VOICE_XFYUN.md",
+      "local": "deploy/README_VOICE_XFYUN.md",
+      "sha256": "24f02f4d41b0a10933719f772081fdb8633c4dc5539bad8fe033fd41f73976e4",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/run_stepper_forward_test.py",
+      "local": "deploy/run_stepper_forward_test.py",
+      "sha256": "41c37a5639f75cd5256fbc1bce4a7b17e020bba99eb24c2e540e13a87fecb87f",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy/verify_models.py",
+      "local": "deploy/verify_models.py",
+      "sha256": "51ae677dc7dd28ee675ca3492cf11388523c3e577fcea30084e775ae4af31c68",
+      "role": "active"
+    },
+    {
+      "export": "project/deploy.sh",
+      "local": "deploy.sh",
+      "sha256": "268547a51ac391c52a5d1b0979fd3d11fc387e7f31fed3e3f4e3b9b885ee831d",
+      "role": "active"
+    },
+    {
+      "export": "project/docs/宁波实验箱接线说明.docx",
+      "local": "docs/宁波实验箱接线说明.docx",
+      "sha256": "131066f60cfdaffa8d9331e1de00d7efcb651bada65929fa4ef9b521b8cf79a8",
+      "role": "active"
+    },
+    {
+      "export": "project/GY906_INTEGRATION.md",
+      "local": "GY906_INTEGRATION.md",
+      "sha256": "1660c9042f246b59dfcf9a566e15d001c5ce8f1d7f20d26463af742ad718bbec",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/__init__.py",
+      "local": "JETSON/__init__.py",
+      "sha256": "6b34d870c9db5db048fab907a4ad83514add0926c3fd633ceee8eecd87f7e43f",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Inference/__init__.py",
+      "local": "JETSON/Inference/__init__.py",
+      "sha256": "1e0b5e5a3870ae1d004950682e248adb192cda3875abd69238d24ea38e6c7f4d",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Inference/checks.py",
+      "local": "JETSON/Inference/checks.py",
+      "sha256": "5e728806d78f472ba68d4e167192ec66fd344b00584a5bb1b82f4d2033af1fd3",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Inference/tensorrt_runner.py",
+      "local": "JETSON/Inference/tensorrt_runner.py",
+      "sha256": "cfeee171c3f400144aae1baf6789db4d4d54316a57b71f6e6f767ea02bdbb1a5",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/__init__.py",
+      "local": "JETSON/Sensor/__init__.py",
+      "sha256": "c1daa5dba2dc28c39b45a65d4e78b1547a4a1631dbfaf05c23e40ab829bc0f66",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/actuators/__init__.py",
+      "local": "JETSON/Sensor/actuators/__init__.py",
+      "sha256": "a64682d02eef53f51646e1e5b51c28d93e523c66fe67bb8d5d21d76d3408ebcb",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/actuators/oled.py",
+      "local": "JETSON/Sensor/actuators/oled.py",
+      "sha256": "b4ed882ebf66f8027adafac28d32ca6fa4b046739c3c85c61ced7de25adee024",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/actuators/outputs.py",
+      "local": "JETSON/Sensor/actuators/outputs.py",
+      "sha256": "98f7024a17371c5d7e8d7b67ad49ebbf0f619846b5e96af7688f60472fa68af6",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/actuators/servo.py",
+      "local": "JETSON/Sensor/actuators/servo.py",
+      "sha256": "9cd9670a044c401fa0e5957f1758280ca68aba79c077ed9ffc606e299a1aec04",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/actuators/stepper.py",
+      "local": "JETSON/Sensor/actuators/stepper.py",
+      "sha256": "4062df1b2d0d4873d91f27f2c64904b30cfa73386d7370e9c0fd8295a9e23c48",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/Config.py",
+      "local": "JETSON/Sensor/Config.py",
+      "sha256": "0db09aed71db2198091fd007d2343d81493e2c9f0916c51d49472a4450d7da0b",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/diagnostics/__init__.py",
+      "local": "JETSON/Sensor/diagnostics/__init__.py",
+      "sha256": "d0326a288b911695c4cd0b829e5a93e4630634e7099aae57ed94a46ab649f7d2",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/diagnostics/actuator_checks.py",
+      "local": "JETSON/Sensor/diagnostics/actuator_checks.py",
+      "sha256": "0e605c9317713aa267b7bb3fe83d83463c7728ee3b5c140326a2edfc24fd3491",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/diagnostics/definitions.py",
+      "local": "JETSON/Sensor/diagnostics/definitions.py",
+      "sha256": "7eca6d62ca0fa2efc81c0f531a268265cda14062099c6f0c5644123705a2da39",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/diagnostics/sensor_checks.py",
+      "local": "JETSON/Sensor/diagnostics/sensor_checks.py",
+      "sha256": "6797c5edce0003e6c9a977113413ececdb9d555e3019fb730e3523f37ad261e7",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/diagnostics/service.py",
+      "local": "JETSON/Sensor/diagnostics/service.py",
+      "sha256": "d214746d962a637e02a046a73b2c72ae3a367ec5d597b2542e88f53bd632e4de",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/manager.py",
+      "local": "JETSON/Sensor/manager.py",
+      "sha256": "f86a33f4ed44b660b10f94d316c979ef3430c250ac199572f7c881d5a57efe23",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/native/dht11_gpiod",
+      "local": "JETSON/Sensor/native/dht11_gpiod",
+      "sha256": "263fc5f677b7a53510b9be8a286a6136380534146e3891e50db1b582806e0cdd",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/native/dht11_gpiod.c",
+      "local": "JETSON/Sensor/native/dht11_gpiod.c",
+      "sha256": "19753522790700f2d2bb219e8dbb4c9a5adf34d9756a07b7cbadc47ade02647a",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/pinmap.py",
+      "local": "JETSON/Sensor/pinmap.py",
+      "sha256": "66bb2f23f7dcfab64bb8e8e4697b3fed9e5c1e5d16532cc49a7f8b0becfc87a2",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/resources.py",
+      "local": "JETSON/Sensor/resources.py",
+      "sha256": "b62859cb9093a8ea2d9958a813da8461007c612aa4da0fec747a3ed9ba1a0827",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/__init__.py",
+      "local": "JETSON/Sensor/sensors/__init__.py",
+      "sha256": "7b26de091a3a0f582211f120dd3c3bc969936007f5778e410c75ada75e6a4d91",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/ads1115.py",
+      "local": "JETSON/Sensor/sensors/ads1115.py",
+      "sha256": "0d65d59a4c931dcf6ebe302f4a42e387fa3f973f002d8605cd7115a589c19629",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/current.py",
+      "local": "JETSON/Sensor/sensors/current.py",
+      "sha256": "43d420456193dbba96927b5aac7331dc66499b36129912177cb5a52b1ce0fc32",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/dht11.py",
+      "local": "JETSON/Sensor/sensors/dht11.py",
+      "sha256": "7dc180ef2486946e2d7c862b22097c762ed36013fdf32782770502fe1396804c",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/light.py",
+      "local": "JETSON/Sensor/sensors/light.py",
+      "sha256": "c89247ef81f3002766e2e46382f059bac9e12d59f8298ca0709dd392590da324",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/mlx90614.py",
+      "local": "JETSON/Sensor/sensors/mlx90614.py",
+      "sha256": "d55c43996eca8076234dfcdbf769ce11d843d074cdb8b1bee11f8130a4b02400",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/smoke.py",
+      "local": "JETSON/Sensor/sensors/smoke.py",
+      "sha256": "3938bfc9e58306c2003578330970ac9b1b37b46330fb0f391af51be76f102194",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/smoke_protocol.py",
+      "local": "JETSON/Sensor/sensors/smoke_protocol.py",
+      "sha256": "04863909aa476e6f9f8203a6a8d592997369a8c7a6e435a726aa7f5f38764b12",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/ultrasonic.py",
+      "local": "JETSON/Sensor/sensors/ultrasonic.py",
+      "sha256": "4f465af63fe6d0b712d351d235519b3abe152153ea7fbc91e47ffa2377d2d1d8",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/usb_camera.py",
+      "local": "JETSON/Sensor/sensors/usb_camera.py",
+      "sha256": "785e6b46e5193a45c3129fd42d774c8ef225c429a04a7990d2237e8b1fc77c61",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/sensors/usb_microphone.py",
+      "local": "JETSON/Sensor/sensors/usb_microphone.py",
+      "sha256": "c71a0933fcba5f794c8362ff3088d10befc23058125619c968bd3c82db8ec54a",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Sensor/service.py",
+      "local": "JETSON/Sensor/service.py",
+      "sha256": "17fd8e1769c299428dccc7fcd3d2134c3556057d1145750e9fa780ea81912076",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/__init__.py",
+      "local": "JETSON/Vision/__init__.py",
+      "sha256": "5ea808db99aff8405105392dcc68066b5928e14f1c6192c7ea71f53430640d85",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/engine.py",
+      "local": "JETSON/Vision/engine.py",
+      "sha256": "5ba7b57592aabf08dd8bcfa361cfa04a74e43d7100ffec039dfba5f8511dd443",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/features.py",
+      "local": "JETSON/Vision/features.py",
+      "sha256": "a9d0dc35dbd81e7b6a2f5f5d47de4d395f6ae71c87c9d6338d71f6c36c227ba8",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/library.py",
+      "local": "JETSON/Vision/library.py",
+      "sha256": "8aba01bc5858da5c5d9c299c0ce8d4c6a4beaf3dd79e42e3f871a44db70d2beb",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/models/face_detection_yunet_2023mar.onnx",
+      "local": "JETSON/Vision/models/face_detection_yunet_2023mar.onnx",
+      "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/models/face_recognition_sface_2021dec.onnx",
+      "local": "JETSON/Vision/models/face_recognition_sface_2021dec.onnx",
+      "sha256": "0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/models/LICENSE-SFace.txt",
+      "local": "JETSON/Vision/models/LICENSE-SFace.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/models/LICENSE-YuNet.txt",
+      "local": "JETSON/Vision/models/LICENSE-YuNet.txt",
+      "sha256": "c83b8120c50ccbd4c4f96edf53141bdd566ebb8f8e9227e415326aa1b1aba958",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/models/NOTICE.md",
+      "local": "JETSON/Vision/models/NOTICE.md",
+      "sha256": "fe22087b523c443c9f11c57da71800e314fd007530c141a21c65441f689fe508",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/service.py",
+      "local": "JETSON/Vision/service.py",
+      "sha256": "c67c40e43aa73c0bef69027998e9af5b5d64b889ba76e7ff419f256189faa1ca",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Vision/tensorrt_models.py",
+      "local": "JETSON/Vision/tensorrt_models.py",
+      "sha256": "b897ba0b3ef9e7e1c1b94a7ae04257449af6da1d9d9c929d1fddcab52bfb4ed1",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/__init__.py",
+      "local": "JETSON/Voice/__init__.py",
+      "sha256": "935b48135ffb31bd98a20ed90cadd930751a64f8b0fd58c41a2ab0d7d137dd4d",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/LICENSE-2.0.txt",
+      "local": "JETSON/Voice/models/LICENSE-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/LICENSE-Whisper.txt",
+      "local": "JETSON/Voice/models/LICENSE-Whisper.txt",
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/NOTICE.md",
+      "local": "JETSON/Voice/models/NOTICE.md",
+      "sha256": "4340607da2d2a9835aed22bf891615384b6766ae7d44f24624dd868e43ae9c38",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/am/final.mdl",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/am/final.mdl",
+      "sha256": "91eda2c04c4f599361cb92b0e5298ccdf6b3c7a1fa52bfcefcd2c4e07aa1c131",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/conf/mfcc.conf",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/mfcc.conf",
+      "sha256": "6c326fea5741c2d78be12f76eb1b36ea2ace040da9e355e4cfe6bb80e5f7d5ab",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/conf/model.conf",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/conf/model.conf",
+      "sha256": "468a8125c07530f96adcc219a0a5f993e8e0721ccf18acbd3169b77fc685fb9b",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/graph/disambig_tid.int",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/disambig_tid.int",
+      "sha256": "c9200318c2a265549ebfbea7e0176fa62e131e953abd140c9b0b39fe61e24015",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/graph/Gr.fst",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/Gr.fst",
+      "sha256": "46d41a9b1723abccdcb354d731a5b58d87c060100d88ada1a3e31220f52b0434",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/graph/HCLr.fst",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/HCLr.fst",
+      "sha256": "798af0d9ba6f2d727747f58e1e7b2305f8618bc8ea7f6c51beecd8a2c965b965",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/graph/phones/word_boundary.int",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/graph/phones/word_boundary.int",
+      "sha256": "11ca784b99f03188b451fb54714c2de3dd694e662a5f88e82df435c2789b9aec",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.dubm",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.dubm",
+      "sha256": "e33276cbd548c0a03ae5812c98115940614997dff23a6d59968af6eaf7630ff8",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.ie",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.ie",
+      "sha256": "c39d46fbff04efb7baa9660ae7a728b0e2f35a4a1250b56ed3a599e26956df86",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.mat",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/final.mat",
+      "sha256": "42706d88818070ea0d0182b4d11367ba52a13b9a2be45630f60858a422109ada",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/global_cmvn.stats",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/global_cmvn.stats",
+      "sha256": "b267dc89c1556fdd5bc358f0a480929da1743eeccfa06a67daf8db629ca336bb",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/online_cmvn.conf",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/online_cmvn.conf",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/splice.conf",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/ivector/splice.conf",
+      "sha256": "9f0c5f7c82d18eaf25d8bce470efa9f7741f88411fe428774bc0a9bb69a24756",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/vosk-model-small-cn-0.22/README",
+      "local": "JETSON/Voice/models/vosk-model-small-cn-0.22/README",
+      "sha256": "7362be411c609f2a1c9d2dfe22c2d72555c15eb90bfe47c41772f49ef94840ce",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/models/whisper-tiny.pt",
+      "local": "JETSON/Voice/models/whisper-tiny.pt",
+      "sha256": "65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/recognizer.py",
+      "local": "JETSON/Voice/recognizer.py",
+      "sha256": "7248585038f0526eaee9364813917e0df7554d6bd3c43950cf80994a4fd1f4c5",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/service.py",
+      "local": "JETSON/Voice/service.py",
+      "sha256": "6db854387d52c8508d32674d84921cb306dfa1591e7debcaa677efa0532daa5c",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/whisper_recognizer.py",
+      "local": "JETSON/Voice/whisper_recognizer.py",
+      "sha256": "0ac2d7582a12a1630c655294e7a1c4152fc36c87e03fd4de670a0b09eb9edf1d",
+      "role": "active"
+    },
+    {
+      "export": "project/JETSON/Voice/xfyun_recognizer.py",
+      "local": "JETSON/Voice/xfyun_recognizer.py",
+      "sha256": "37b9d04914b4eb6cf132168cd4dca40c2daed773df41af7da3b26b36123043a3",
+      "role": "active"
+    },
+    {
+      "export": "project/main.py",
+      "local": "main.py",
+      "sha256": "08caa89a84759b87659a1a00c7dd4ebc537bdc5b4048cec2527d30b6dc62d5e1",
+      "role": "active"
+    },
+    {
+      "export": "project/README.md",
+      "local": "README.md",
+      "sha256": "6d3f330d3f64a3cb92477c33f6ff5f5e982eb4737ea0dd2b63d4615e4f6d4245",
+      "role": "active"
+    },
+    {
+      "export": "project/requirements-whisper.txt",
+      "local": "requirements-whisper.txt",
+      "sha256": "f7837827596de343636a2dec6b36ec9f7c82648c58ec412c894a1867ad4a7b02",
+      "role": "active"
+    },
+    {
+      "export": "project/requirements.txt",
+      "local": "requirements.txt",
+      "sha256": "0ef3b5abb131f34d97b972bc65f6d35dea6dbe18cc8727adeb2bf9f0db5a48e5",
+      "role": "active"
+    },
+    {
+      "export": "project/run.sh",
+      "local": "run.sh",
+      "sha256": "4c147c91a037de4114e2c49d0bcbc00a54401d4797d69356153af8386b07f0be",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/__init__.py",
+      "local": "Serial_Screen/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/access_bridge.py",
+      "local": "Serial_Screen/access_bridge.py",
+      "sha256": "b6f95cbd772902b18c5630d8976b01861337079df7be1b23c6a5ce31269591ab",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/control_bridge.py",
+      "local": "Serial_Screen/control_bridge.py",
+      "sha256": "d75317135096632485fe49254e79df771f7bf36e52f95f886bf91e7f6df86272",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/device_bridge.py",
+      "local": "Serial_Screen/device_bridge.py",
+      "sha256": "e1f56017ed909a02ae22d61e5c00de0d642251ceae482eb53394f4f1e973e7e8",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/diagnostics_bridge.py",
+      "local": "Serial_Screen/diagnostics_bridge.py",
+      "sha256": "9bdb0bcbb55167a0eefb60754a8fc9efb0aae517473355df6d4255d52144a656",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/__init__.py",
+      "local": "Serial_Screen/screen_service/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/__init__.py",
+      "local": "Serial_Screen/screen_service/screen/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/addresses.py",
+      "local": "Serial_Screen/screen_service/screen/addresses.py",
+      "sha256": "89eb275eeb80394cf0bbf89ffd177638276df3b08362458d9e3a3517fa7fb072",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/message_parser.py",
+      "local": "Serial_Screen/screen_service/screen/message_parser.py",
+      "sha256": "6174298320e8a378142bf09b92e5b8a678b7ce901bd7f56cc29df37beb3d2235",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/screen_events.py",
+      "local": "Serial_Screen/screen_service/screen/screen_events.py",
+      "sha256": "ccf0c017e0b1a8329085ca8e632d94a2c219d2094df986b0100fc6fd3d481f0b",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/screen_sender.py",
+      "local": "Serial_Screen/screen_service/screen/screen_sender.py",
+      "sha256": "a01961e6b87f2f8c17c2c1c2077c214e5b9e56c37307b1b47399a8f5dba9cd6b",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/service.py",
+      "local": "Serial_Screen/screen_service/screen/service.py",
+      "sha256": "dbede90d74454380611620c0b2f0e6b898f47781eb8e37c0d8a09f9d0c27fe01",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/screen_service/screen/text_updates.py",
+      "local": "Serial_Screen/screen_service/screen/text_updates.py",
+      "sha256": "1571a9099c421b74688a18f1b3d0fa3c37bb71f34f4e2edd5424778f6b376cc0",
+      "role": "active"
+    },
+    {
+      "export": "project/Serial_Screen/voice_bridge.py",
+      "local": "Serial_Screen/voice_bridge.py",
+      "sha256": "81fbf9afe2b217dc7fbf11d4489debdd844784cf1c85ca2cc2e2c4d466f0ccc3",
+      "role": "active"
+    },
+    {
+      "export": "project/SMOKE_UART_INTEGRATION.md",
+      "local": "SMOKE_UART_INTEGRATION.md",
+      "sha256": "1d7acb60dd618804c8c3e0055b8172b4c5e11dbd5d48fd53f10ca8a256cf24dd",
+      "role": "active"
+    },
+    {
+      "export": "project/START_HERE.md",
+      "local": "START_HERE.md",
+      "sha256": "cffa6c85cae365522ebf8f1bf89f20f42dbcc6473a09889ffc3a024d94e45526",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_ads1115.py",
+      "local": "tests/test_ads1115.py",
+      "sha256": "d56a5998ed2bcdb56a653ce14685af3dbd205ca553bcc9d34fc46d1c2ea80cb5",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_application.py",
+      "local": "tests/test_application.py",
+      "sha256": "888c964704a41f48429d42190734551c49d2fa0c76c0a06ea6611da3d07fa501",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_business_bridge.py",
+      "local": "tests/test_business_bridge.py",
+      "sha256": "b09928ab8a5a52efa70eb3aafef59e4a60a38215b5ba8e965c990f3d37bcfc11",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_deploy.py",
+      "local": "tests/test_deploy.py",
+      "sha256": "f79415f7955e00d41b6d0625695314924555e2cc00963232b3911d4b0bd44ef1",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_device_bridge.py",
+      "local": "tests/test_device_bridge.py",
+      "sha256": "f705fe56bbae4497284d6c0fb636a86033356de0506546cd06e34e742976f6b5",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_dht11.py",
+      "local": "tests/test_dht11.py",
+      "sha256": "faa0d0ccb56f9089cae2a8c7dbaa8675b531750381c33c40007f28a338c4fc4d",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_diagnostics.py",
+      "local": "tests/test_diagnostics.py",
+      "sha256": "b87a5e0f1cd26e24dec77a4ea70728b5826111eae913856ad1d58c35e012fe27",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_face.py",
+      "local": "tests/test_face.py",
+      "sha256": "0d1da51dfbc7b5f5548f66088c20a8dc076dfa6dc11bcfa207a1d2cc5cfa99d2",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_inference.py",
+      "local": "tests/test_inference.py",
+      "sha256": "f5c78741845b470c0fd2f00736f01eae12c51d0687ebfd21090ab4a8acd2c97f",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_mlx90614.py",
+      "local": "tests/test_mlx90614.py",
+      "sha256": "e05bf64644823bad42dd875975f6090f59712293864a3fbb8ccf67f71ea4d21a",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_proximity_alarm.py",
+      "local": "tests/test_proximity_alarm.py",
+      "sha256": "df559d35e07bb22af60635f2a27241f5b315c16e9868bfa0e102a4176804a026",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_sensor_architecture.py",
+      "local": "tests/test_sensor_architecture.py",
+      "sha256": "4427d5ec6eff0315d29ce33c3934955ce6eea26b0d9894111b3b909f09114237",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_servo_pwm.py",
+      "local": "tests/test_servo_pwm.py",
+      "sha256": "87bfea7f72227a1c6a0594a90e2768b9609160e1014c91f0f3627178e6d9330f",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_servo_screen_read.py",
+      "local": "tests/test_servo_screen_read.py",
+      "sha256": "071b7e0ce6048dd8c44c4e97cee45eb842a9a0693c6fc622a2354cd1e4f4f205",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_smoke_uart.py",
+      "local": "tests/test_smoke_uart.py",
+      "sha256": "54032b8f0e519c696ab4fe667f2ddaa13d7374e693428ab861504f1061234b7e",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_voice.py",
+      "local": "tests/test_voice.py",
+      "sha256": "5acc6c04b2d347260415f946d94fa3c969cf17a3a5accaaef298a0cbcdb428e0",
+      "role": "active"
+    },
+    {
+      "export": "project/tests/test_xfyun.py",
+      "local": "tests/test_xfyun.py",
+      "sha256": "c6955ee25c6141c9f67596fe3abab1f0b3e0cc43098aa4b40fd78a56c81e6876",
+      "role": "active"
+    },
+    {
+      "export": "project_history/backups/Config_before_adc_mapping_20261015_092238.py",
+      "local": "archive/jetson_20261015/project_history/backups/Config_before_adc_mapping_20261015_092238.py",
+      "sha256": "925eb826762081d76ad8b12330f01bca276e1bfc25e496c8a3cca23a09f02924",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/Config_before_adc_scl_address_20261015_093857.py",
+      "local": "archive/jetson_20261015/project_history/backups/Config_before_adc_scl_address_20261015_093857.py",
+      "sha256": "c6c88c4c8642139d10fe45f303d0097778dc0fb10b6578339be4c3d86b1e1088",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/Config_before_gy906_merge_20261014_215854.py",
+      "local": "archive/jetson_20261015/project_history/backups/Config_before_gy906_merge_20261014_215854.py",
+      "sha256": "cd284b2163769bcbd17cb893faac11c637792cd67784de610bdef148af2ecbcf",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/deploy/README_LINUX.md",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/deploy/README_LINUX.md",
+      "sha256": "461c368fb2fb160993efeaceb385131dd5d2b27ecf67deed7de6573a9bccc2fa",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/JETSON/Sensor/Config.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/JETSON/Sensor/Config.py",
+      "sha256": "ee01ef04ec583eca546d5993736020cee6a8eec8ad0eba1cd293898d54ff0fd9",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/JETSON/Sensor/diagnostics/sensor_checks.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/JETSON/Sensor/diagnostics/sensor_checks.py",
+      "sha256": "d4a13594b543c7045853c3875190a5d308f67bfffd3eb672060a0077d0bd52ed",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/JETSON/Sensor/manager.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/JETSON/Sensor/manager.py",
+      "sha256": "6dd161e55c0462b117c68b5f226137a977b08aac099b6ae8b31720a4208b305b",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/JETSON/Sensor/resources.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/JETSON/Sensor/resources.py",
+      "sha256": "d20360e7f4c2e21dcff0b139bdc042f83d8a3cb2576d2432e758b02b997c686a",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/main.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/main.py",
+      "sha256": "794b5ee0d2caf8cd50aab3e4e14b1e1e87d8bb736e651000ffb4db21f4ffdb3f",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/manifest.json",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/manifest.json",
+      "sha256": "7205105f9088346abf9a77c720fb077e2c9da23fe6ff4c6e8f6c99710a4e324b",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/README.md",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/README.md",
+      "sha256": "908bc55b5f1c87b509bfd01318bc030917e9d403747c91c84c32adf123a14eff",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/Serial_Screen/device_bridge.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/Serial_Screen/device_bridge.py",
+      "sha256": "c9ebbed468970cbdcd1f169003680340c27ba64e67123abf132d6f04ee5cfb2a",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/START_HERE.md",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/START_HERE.md",
+      "sha256": "8a75606e7594caa36ac1ef96262cc5ea76dee0c1ab394dcedc68e9319098bd44",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/gy906_20261014_215512/tests/test_sensor_architecture.py",
+      "local": "archive/jetson_20261015/project_history/backups/gy906_20261014_215512/tests/test_sensor_architecture.py",
+      "sha256": "c8ac0ac33eeef936a8a4609b3d0d73837ae93a2b17c9304ef6c9da0a81f7d3ab",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/deploy/README_LINUX.md",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/deploy/README_LINUX.md",
+      "sha256": "fffcc5d2331dbd59a703ea1f7e52e408165864f69abc9d7b6d8a1b8e5fd9553f",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/deploy.sh",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/deploy.sh",
+      "sha256": "c8ca503c6710455c544cb63ccf71e0c93a3edf52202e73cf217a614230e03994",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/JETSON/Sensor/Config.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/JETSON/Sensor/Config.py",
+      "sha256": "7a3c480ccd584e303f40f1a74fb70701180264e4f9ac7d45f998bfcac9194c26",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/JETSON/Sensor/diagnostics/sensor_checks.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/JETSON/Sensor/diagnostics/sensor_checks.py",
+      "sha256": "ae57c95b63d6d1bf254cda2a36ceb687cb53521925c8890a177f6e28959676ab",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/JETSON/Sensor/manager.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/JETSON/Sensor/manager.py",
+      "sha256": "387365dd65197237e19bf4d0070db73ff3642310b321c49c8b31e8829c4f8cb8",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/JETSON/Sensor/sensors/smoke.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/JETSON/Sensor/sensors/smoke.py",
+      "sha256": "d5401acd48807d48cc1ef6b9e21f119b052333baa81763d843390d3181dfd781",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/main.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/main.py",
+      "sha256": "896d09fbe0c38c96726efe44ed4c70693058c7cf66dab54f355c18e5e3496954",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/manifest.json",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/manifest.json",
+      "sha256": "eba5c1249c08192d1a6e971986f96cb1974eb4d772683034dde705a34f350e31",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/README.md",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/README.md",
+      "sha256": "227bbb6885a3524f50879675ce6eb588769e3793672242cd8456fc90a7abe6fd",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/Serial_Screen/device_bridge.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/Serial_Screen/device_bridge.py",
+      "sha256": "2b8e0adda25c45992cc6cef9eeee7271b8530ceb2262e1cd97056c13b3645a46",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/START_HERE.md",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/START_HERE.md",
+      "sha256": "80c2b241b307855d1b7ab1a567cd5a663137c988657c788bcee9f53906eb7130",
+      "role": "history"
+    },
+    {
+      "export": "project_history/backups/smoke_20261014_222827/tests/test_sensor_architecture.py",
+      "local": "archive/jetson_20261015/project_history/backups/smoke_20261014_222827/tests/test_sensor_architecture.py",
+      "sha256": "2a0a2ae8cd1518bc1e40da30b65cd39952b8daf250f99c7dc4876e96aa3f9bc7",
+      "role": "history"
+    },
+    {
+      "export": "project_history/face_runtime_fix.tar.gz",
+      "local": "archive/jetson_20261015/project_history/face_runtime_fix.tar.gz",
+      "sha256": "c2357696fabd5d3a3ba799661e67eb85be24569471db75dba7c30494aba4d9c1",
+      "role": "history"
+    },
+    {
+      "export": "project_history/MANIFEST.sha256",
+      "local": "archive/jetson_20261015/project_history/MANIFEST.sha256",
+      "sha256": "e6889febf58766c1d9d0546091e4abe86c42c6afe1f4b33b093daccf28d04999",
+      "role": "history"
+    },
+    {
+      "export": "project_history/Serial_Screen/control_bridge.before_stepper_defaults_20261014_221909.py",
+      "local": "archive/jetson_20261015/project_history/Serial_Screen/control_bridge.before_stepper_defaults_20261014_221909.py",
+      "sha256": "c553b01e17415d3d2ca40a8c07fd33e99c5a4073c2c011a257b39cc4ae322c38",
+      "role": "history"
+    },
+    {
+      "export": "home_files/apply_servo_simple.py",
+      "local": "archive/jetson_20261015/home_files/apply_servo_simple.py",
+      "sha256": "eaed10471a90cd6e61d88c6902fc1568fa370d2f6d1174ba4bd6eb08a8bf57b4",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/apply_xfyun_update.py",
+      "local": "archive/jetson_20261015/home_files/apply_xfyun_update.py",
+      "sha256": "bea9fc01ed5049d28b38c48af66634cbe11f88fdaf57abd51436e73287b0afde",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/Config.py",
+      "local": "archive/jetson_20261015/home_files/Config.py",
+      "sha256": "dfa814ace854f1e137789b356dc8bafff9f705da8e337774a99703bef9572f36",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/control_bridge_before_clear_20261013.py",
+      "local": "archive/jetson_20261015/home_files/control_bridge_before_clear_20261013.py",
+      "sha256": "980c01b71d04b0be460f3626f69a38c9c77d4d0269ac4198d15f9d79851adde5",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/control_bridge_before_direction_swap_20261014.py",
+      "local": "archive/jetson_20261015/home_files/control_bridge_before_direction_swap_20261014.py",
+      "sha256": "f5c74280060323453b6e488982930a611f874ae24bc94f49f7ce0186453e0e3f",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/control_bridge_servo_clear.py",
+      "local": "archive/jetson_20261015/home_files/control_bridge_servo_clear.py",
+      "sha256": "3a5502e5e4ccadc7c7ed563a97f95a56792dcb5abddbc4f577db04505abfb45f",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/deploy.sh",
+      "local": "archive/jetson_20261015/home_files/deploy.sh",
+      "sha256": "c8ca503c6710455c544cb63ccf71e0c93a3edf52202e73cf217a614230e03994",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/device_bridge.py",
+      "local": "archive/jetson_20261015/home_files/device_bridge.py",
+      "sha256": "ce5cb2bc80cb6bc137455a70967c65da923b19f98d9fa32283c49212d0049564",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/dht11.py",
+      "local": "archive/jetson_20261015/home_files/dht11.py",
+      "sha256": "7dc180ef2486946e2d7c862b22097c762ed36013fdf32782770502fe1396804c",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/dht11_gpiod.c",
+      "local": "archive/jetson_20261015/home_files/dht11_gpiod.c",
+      "sha256": "19753522790700f2d2bb219e8dbb4c9a5adf34d9756a07b7cbadc47ade02647a",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/jetson-gateway.service",
+      "local": "archive/jetson_20261015/home_files/jetson-gateway.service",
+      "sha256": "9a86a61491880d204d4e7fc5725262e762de481ccbda9fd969d32d6665d5dd52",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/message_parser.py",
+      "local": "archive/jetson_20261015/home_files/message_parser.py",
+      "sha256": "76f00a00264b164e0a65a6aa8e31ff82206fb2541f3c9df6ec8800ffe0c2fed2",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/oled_hello.py",
+      "local": "tools/standalone/oled/oled_hello.py",
+      "sha256": "7adfdf33da4bc0d4c3716ed1dbec241cd778c0907b81ddbc7444fd4fe5bfdd65",
+      "role": "standalone-oled"
+    },
+    {
+      "export": "home_files/oled_raw.py",
+      "local": "tools/standalone/oled/oled_raw.py",
+      "sha256": "fb920dde1726569fba21e11abe859b93df6113d2deb34038a6021d9c99270029",
+      "role": "standalone-oled"
+    },
+    {
+      "export": "home_files/oled_test.py",
+      "local": "tools/standalone/oled/oled_test.py",
+      "sha256": "0aa60e7062aa896f9c9dc95130b97407f2cd2340ceb1ff06c2635b900e7023b3",
+      "role": "standalone-oled"
+    },
+    {
+      "export": "home_files/oled_text.py",
+      "local": "tools/standalone/oled/oled_text.py",
+      "sha256": "c69907048b1f6105b7ba1ad2da00c700bd0abad4c8c6bcab10326d98e025e194",
+      "role": "standalone-oled"
+    },
+    {
+      "export": "home_files/proximity_alarm.py",
+      "local": "archive/jetson_20261015/home_files/proximity_alarm.py",
+      "sha256": "8954c0ba028458472d77cfb3d785f0828a1ac75ad0ce7ac156393b45b8a2e008",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/README.md",
+      "local": "archive/jetson_20261015/home_files/README.md",
+      "sha256": "921fc2b05b0bc6ba416c06d5f1487a5d0142a95de445049fdf07471753fd3101",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_before_20261013.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_before_20261013.tar.gz",
+      "sha256": "17162d6344d55e8618f5e6086d9b678bb3271824942a9d4a9e9f2b0b70c1e708",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_before_buttons_20261013.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_before_buttons_20261013.tar.gz",
+      "sha256": "aa3d5526e5ce54558054a613a01422547624a5d29db0b6a257d9864fbfea5982",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_before_hardware_20261013.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_before_hardware_20261013.tar.gz",
+      "sha256": "b4cb0070c1df474facb0559d0377dd9a37032ebe3968a9d6228552b7343939b5",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_before_simple_20261013.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_before_simple_20261013.tar.gz",
+      "sha256": "625c749487e51517364d3a714ed72ab1750c15f36d8389097c19e7fd3858025d",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_before_sweep_20261013.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_before_sweep_20261013.tar.gz",
+      "sha256": "5e5789d61e4d991d27ca95762d10cb17b35c6b75099c1bddeb48d7aba01fab70",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_direction_before_20261014.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_direction_before_20261014.tar.gz",
+      "sha256": "2442fb9376c2a25ea76fa1aa16a8ff96cc4566f3311b7024053a96a0dfdb872c",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_direction_text.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_direction_text.tar.gz",
+      "sha256": "d901cf6409c06e1198bea117554dc1b4b20ab0503933a4ce93ec2968e9356b7d",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_display_fix.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_display_fix.tar.gz",
+      "sha256": "aeac86fe3276729924294d16ee5712a01d79fd908d30f1838340fddc1292ab63",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_hardware_pwm.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_hardware_pwm.tar.gz",
+      "sha256": "45bedc05583e7b5689dc7ef840a35098492285af83bb7ca0e9df9ca4e539dc67",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_simple_update.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_simple_update.tar.gz",
+      "sha256": "d68f0e7d15a27fee6da3956070f61ccde96e508a3e91c19e96c0dd2ef06bb2f2",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_sweep_update.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_sweep_update.tar.gz",
+      "sha256": "7cc6edc8714fa521e66876685d5e7dea668c542c3cb9e8ee36f72014c62aab18",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/servo_update.tar.gz",
+      "local": "archive/jetson_20261015/home_files/servo_update.tar.gz",
+      "sha256": "e94edda58b62cf86c504ff0b8a2c05d3c77073ffbd0ca767ee8f99c0233f631a",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/smoke_uart_loopback_20261014.json",
+      "local": "artifacts/jetson_20261015/smoke_uart/smoke_uart_loopback_20261014.json",
+      "sha256": "79426f2d40e1450a55a037cba2ec44792727cf555be803fa1fac00cda7a28f76",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "home_files/smoke_uart_probe_20261014.json",
+      "local": "artifacts/jetson_20261015/smoke_uart/smoke_uart_probe_20261014.json",
+      "sha256": "ea7363f94362d6258ae63e269adbab45520034b05e34f338ebf7927de17b47e0",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "home_files/StepperMotor_Xavier_NX_Demo.ipynb",
+      "local": "tools/notebooks/StepperMotor_Xavier_NX_Demo.ipynb",
+      "sha256": "7a580e528644dc880f8feba671e5b2e94cce6fb7d9a7a2f5e5a7900d5d25615a",
+      "role": "hardware-notebook"
+    },
+    {
+      "export": "home_files/test_device_bridge.py",
+      "local": "archive/jetson_20261015/home_files/test_device_bridge.py",
+      "sha256": "f705fe56bbae4497284d6c0fb636a86033356de0506546cd06e34e742976f6b5",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/test_dht11.py",
+      "local": "archive/jetson_20261015/home_files/test_dht11.py",
+      "sha256": "faa0d0ccb56f9089cae2a8c7dbaa8675b531750381c33c40007f28a338c4fc4d",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/test_proximity_alarm.py",
+      "local": "archive/jetson_20261015/home_files/test_proximity_alarm.py",
+      "sha256": "b4b1e1957998a220db68c4be82f788e5a1cf5c11378e98fef64f31184ebd9a81",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/Untitled.ipynb",
+      "local": "tools/notebooks/Untitled.ipynb",
+      "sha256": "c084739a19c47d77cee72525b0a6c9114297b09e53c9e9644c2493a29d2a0d49",
+      "role": "hardware-notebook"
+    },
+    {
+      "export": "home_files/Untitled1.ipynb",
+      "local": "tools/notebooks/Untitled1.ipynb",
+      "sha256": "b5beee965be4b88f0f9a72a896bc444b593e5759f283437632e31da6066b2130",
+      "role": "hardware-notebook"
+    },
+    {
+      "export": "home_files/voice_before_20261014.tar.gz",
+      "local": "archive/jetson_20261015/home_files/voice_before_20261014.tar.gz",
+      "sha256": "3435520236b63f1f54a8f57e7a10798a3657f813d4d8aa8ae289d31b6b701d77",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/voice_before_xfyun_20261014.tar.gz",
+      "local": "archive/jetson_20261015/home_files/voice_before_xfyun_20261014.tar.gz",
+      "sha256": "b172e8ff621d7af7ed7f3c48a7dd209956a5c72487213311ae3bbf1c0e198983",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/voice_update.tar.gz",
+      "local": "archive/jetson_20261015/home_files/voice_update.tar.gz",
+      "sha256": "f08957c6ee1df57710186afab8bc0b66804fa0bf8b0faeac42986ea1833a3955",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "home_files/xfyun_update.tar.gz",
+      "local": "archive/jetson_20261015/home_files/xfyun_update.tar.gz",
+      "sha256": "d5fdaa1d4d3cb4a29805ed3a14894ee8c9cff12ede8180bad249a1b9e8e7c882",
+      "role": "historical-home-file"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/actuator_checks-before-a0.py",
+      "local": "archive/jetson_20261015/usb-hub-test/actuator_checks-before-a0.py",
+      "sha256": "1bbc918f9ecc49f2ab703a95fbedcd7ad36e492201914732b0960057166feb75",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/ads-before-integration-20261014.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/ads-before-integration-20261014.tar.gz",
+      "sha256": "891021c4dbe4eb05e3ef4a62787d32f53993d368e559d6dfb82d7e1e15f45d88",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/ads-integration-update.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/ads-integration-update.tar.gz",
+      "sha256": "d04829833215c47b1427004b84e4f3c773409b6d3c0936431cbe77460c0af785",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/ads-live-readings.jsonl",
+      "local": "artifacts/jetson_20261015/usb-hub-test/ads-live-readings.jsonl",
+      "sha256": "ef3e3f54b2f30ce2930e385bb579a61b636883f0d35615d3e706a2cefa69ff58",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/ads-project-diagnostic.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/ads-project-diagnostic.json",
+      "sha256": "2dfaed4508d98c16b67d30106eb022f6abc1bcd2d02f10c871dbd8f9356b3e2d",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/audio-format.txt",
+      "local": "artifacts/jetson_20261015/usb-hub-test/audio-format.txt",
+      "sha256": "48e4ebd373dff4b229c25dc6d9ec5215c1dc9c6aef350986e9f77e4b64ed4927",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/audio.exit",
+      "local": "artifacts/jetson_20261015/usb-hub-test/audio.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/audio.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/audio.log",
+      "sha256": "490fd19e92811f0b140a9888f5fe5886496eda01b61498087f2cf286c13ea95b",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/audio.wav",
+      "local": "artifacts/jetson_20261015/usb-hub-test/audio.wav",
+      "sha256": "db8c44293cafe44ba7ffc326e3414ff394739c920a89dde101dfe07b8fff0aa0",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/before-buzzer-second-adc.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/before-buzzer-second-adc.tar.gz",
+      "sha256": "e329fc2fd2fe5a52bc73785bbf2c5bbd19e0db7ba5d4007612eb720b64336e44",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/buzzer-channel-probe.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/buzzer-channel-probe.json",
+      "sha256": "787ca3280591ac19e22d803ab89047cebe2cc3e27567dad8ac040ca89166bd4b",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/buzzer-diagnostics-regression.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/buzzer-diagnostics-regression.log",
+      "sha256": "7457e47a7e2a2aeda09fc4f7eed4edf9de1c28b2e1a95ad5f0f349947aa8b069",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/buzzer-second-adc-diagnostic.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/buzzer-second-adc-diagnostic.json",
+      "sha256": "9c51bec2345cc2cf8af8abc67f722d22ca123968b506e87075e244d884f8d8f3",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/buzzer-second-adc-update.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/buzzer-second-adc-update.tar.gz",
+      "sha256": "db42ec19f344536b1977207a4d5ff58bcb7c688d064ca2feb4ef35a92a585482",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/config-before-rgb-a3.py",
+      "local": "archive/jetson_20261015/usb-hub-test/config-before-rgb-a3.py",
+      "sha256": "6dee20dc50a2e4c0fd4c738953daaad288c8c460107c2f88ee814bfbc669002a",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/diagnostics-calibration-test.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/diagnostics-calibration-test.log",
+      "sha256": "63d5c9e36175b04b2c03b4a8108b541891dac16f0370fb4cfdabd588fd09501a",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/diagnostics-regression.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/diagnostics-regression.log",
+      "sha256": "63d5c9e36175b04b2c03b4a8108b541891dac16f0370fb4cfdabd588fd09501a",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-a3-first-test.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-a3-first-test.json",
+      "sha256": "653eaceb271c648cb46348efec5e797d1ab4fa6ffb356db167508e1bb96a9db9",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-a3-observe.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-a3-observe.log",
+      "sha256": "e70bde1eed5d41b081e2e8510dd70db7ac7bc87ed3c39bf7b0a2c86aa4066f85",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-a3-test.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-a3-test.json",
+      "sha256": "d1f8639a860d8f7f831e16ef59279810b435d80ac5bbefb1b494c47782bea4d0",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-a3-test.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-a3-test.log",
+      "sha256": "8f6bd21ad94fcd938dc26399df670c9339a2bd89a27cd57522c165ce119c96cb",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-all-adc-mapping.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-all-adc-mapping.json",
+      "sha256": "83a1d94f970e37cace6617f8073a3467d75fc9a770aa1ff1148b97f6dae5fc35",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-blue-only.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-blue-only.json",
+      "sha256": "93bd45cf397e248b92d478dbc2126c028a905589e5f13de61a8a07f3ca3fe46d",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/rgb-replacement-test.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/rgb-replacement-test.json",
+      "sha256": "304f8837028f1dc089b3278b35e8b018044f169f4deda762eb2e283c934d7646",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/sensor-regression.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/sensor-regression.log",
+      "sha256": "0e8a622cee994c81bc7e3c5ffc22b83e2d65bb9b1d65e357cde4f7634e761a9a",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-after-power-cycle-retest.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-after-power-cycle-retest.log",
+      "sha256": "229a7b2bae9a9861b530648ad1ed8a1ea58d519f322864332264686530c49c4b",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-after-power-cycle.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-after-power-cycle.json",
+      "sha256": "da455c2f058152aa5006d60a3c94298b84ac093bd029426b80062c72b923e411",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-after-power-cycle.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-after-power-cycle.log",
+      "sha256": "ab2b6769d6019ae71a991cbfe0cf8de1d55143df05184d82984b60269fc1f81c",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-before-calibration.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/servo-a0-before-calibration.tar.gz",
+      "sha256": "7b5c2a0b2a71db6a38815a66aa24afce3960e66698ebfff7a0b140f13d0e8e34",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-calibrated-diagnostic.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-calibrated-diagnostic.json",
+      "sha256": "5abc24236d4fe179f185bef566269c36a98ede0f446386e94d744b863bad74c5",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-calibration.tar.gz",
+      "local": "archive/jetson_20261015/usb-hub-test/servo-a0-calibration.tar.gz",
+      "sha256": "e43788608cdc609b68255fa4223189e0c54eba1930424adff07efe95f4757526",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-observe.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-observe.json",
+      "sha256": "f3146cdc5197b45fce13ea0a25f9a3cb84ab7e6214a2bd7da4fd5cec3c70ded5",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-observe.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-observe.log",
+      "sha256": "ed8128dfceaa6763924ab08f4c30cbb34e6adb28349cad582b25f491ebe24aee",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-project-diagnostic.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-project-diagnostic.json",
+      "sha256": "73821e00a36c2e23896d1dd80312be783c3ebce84f1e6cf7801fb79a32fbe57b",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-test.json",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-test.json",
+      "sha256": "f3146cdc5197b45fce13ea0a25f9a3cb84ab7e6214a2bd7da4fd5cec3c70ded5",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/servo-a0-test.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/servo-a0-test.log",
+      "sha256": "013cf65d0667182c559a507ad84dfc64d6378d0fdcb69a43b7a6e646916c638c",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/start-time.txt",
+      "local": "artifacts/jetson_20261015/usb-hub-test/start-time.txt",
+      "sha256": "a8d150749aabfd8810820e81166261ed85eda908c5a724b3bcff0fdd5f8c3cd9",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/test_sensor_architecture-before.py",
+      "local": "archive/jetson_20261015/usb-hub-test/test_sensor_architecture-before.py",
+      "sha256": "7e401e3d2cc42ed88a38c9229bb791cc2257502e9d0f7505e4f2dd45e0cb8379",
+      "role": "history"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/video.exit",
+      "local": "artifacts/jetson_20261015/usb-hub-test/video.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-hub-test/video.log",
+      "local": "artifacts/jetson_20261015/usb-hub-test/video.log",
+      "sha256": "026e244c9afc71771aa3158abe7942750f59cdcc1d8c854d6fd78fabca7c4d6f",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-camera-test/capture-720p.jpg",
+      "local": "artifacts/jetson_20261015/usb-camera-test/capture-720p.jpg",
+      "sha256": "b986cfa877f9ecc2fd326490fd0809ae1aadb0e1c743da05bf1cb14859115ba9",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-camera-test/capture-new-hub.jpg",
+      "local": "artifacts/jetson_20261015/usb-camera-test/capture-new-hub.jpg",
+      "sha256": "2be31093a3f743c6aa3c5b7c4e1bc092bb6c6e4f3aa4b16423283f3d9d1ede2e",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-camera-test/decode-720p.log",
+      "local": "artifacts/jetson_20261015/usb-camera-test/decode-720p.log",
+      "sha256": "6a9b05c9e85e45accef4794a323bdbf4d02bbe043f0399c883b1c7b73d0eef9e",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "diagnostics/usb-camera-test/stream-720p.log",
+      "local": "artifacts/jetson_20261015/usb-camera-test/stream-720p.log",
+      "sha256": "8590bb8e033e8857ff6d97a839f93e1b20afbce2ef161259193cef6c5fd06a28",
+      "role": "diagnostic-result"
+    },
+    {
+      "export": "runtime/data/faces.sqlite3",
+      "local": "artifacts/jetson_20261015/runtime/data/faces.sqlite3",
+      "sha256": "181c730ddf586d703815915154db172760d506996a91d1b454d16bacf75f29ab",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/data/voice_usage.sqlite3",
+      "local": "artifacts/jetson_20261015/runtime/data/voice_usage.sqlite3",
+      "sha256": "d75c53f92e7dcf128e8e04cb0f83723b67f9241539e39174b925e22dd750d43e",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/application.pid",
+      "local": "artifacts/jetson_20261015/runtime/logs/application.pid",
+      "sha256": "8756946b3643657fa62d5b7ec6e61398f2a47cfbaea1d7da4425de900b6c7839",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/deploy_20261013_202311.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/deploy_20261013_202311.log",
+      "sha256": "c18deb584f67073f3cbf8b2731bdef667d1bb2292baede5cdeb4f6fa2bb64c91",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/deploy_20261013_203242.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/deploy_20261013_203242.log",
+      "sha256": "f0bc7f219cc41da4e177c2f4af6c13f9f83f065a9359766242e432141c6344c1",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/deploy_20261013_203833.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/deploy_20261013_203833.log",
+      "sha256": "dc174f0cb1c4fdb42a8a897a52ddda75e10d023c1766e318458e686793b6a093",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/requirements_installed.txt",
+      "local": "artifacts/jetson_20261015/runtime/logs/requirements_installed.txt",
+      "sha256": "f7bb22076e178f5e75884bad4e3d757ed0be8e08a9b66da6071334863740527e",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_20261013.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_20261013.log",
+      "sha256": "a4c693fea7a397ee350426cae9aed8e444f0b8056d514188cee3c5bb147c289b",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_light_check_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_light_check_20261014.log",
+      "sha256": "bdeb8a55492a952fa1f86ebb8a11c3c671aa2963a01ee3e31f28ce2b69c080d3",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_light_retry_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_light_retry_20261014.log",
+      "sha256": "3fdd6e18c472f004619e459ab258ddbaa29f94c4df3355e7f8226b34785786ef",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_servo_direction_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_servo_direction_20261014.log",
+      "sha256": "78ada9bd64e567d3a80f54a5906d1c1584bdf14c8c734abb84568fb2bebdfe6c",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_servo_direction_swap_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_servo_direction_swap_20261014.log",
+      "sha256": "7435fb1e6c0b1618be0fefdcf3aeaf572591340e8a81934feb637eb4798f4d6f",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_smoke_check_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_smoke_check_20261014.log",
+      "sha256": "c831f1024340ec82aa9c5b0323ddb559e6ac6e6790e6e4e4ad7d4e020a7a921a",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_smoke_loopback_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_smoke_loopback_20261014.log",
+      "sha256": "1348a42f1d7922c4b5b0ee829978d78ef35e08b14f01675a2bc3d0326627b48c",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_smoke_probe_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_smoke_probe_20261014.log",
+      "sha256": "4d5473843c6136a56ac9a231160c44d724ac8fcbbb0fe6339d8b9a6b7fc6549c",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_smoke_retry_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_smoke_retry_20261014.log",
+      "sha256": "d15a90768419fff6399046fa52ea862b3a7763d93e4bce48b20b4cbc1b1d6169",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/runtime_smoke_wired_20261014.log",
+      "local": "artifacts/jetson_20261015/runtime/logs/runtime_smoke_wired_20261014.log",
+      "sha256": "dbb06b764b150624338d00898b561ee61e3af4c5bea0e999244001a31f1b32ad",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/logs/stepper_forward_test.json",
+      "local": "artifacts/jetson_20261015/runtime/logs/stepper_forward_test.json",
+      "sha256": "b4366f70c534c4a00d19c56c501fda986a1336d7d7eaf185f00c4d5e6cec7897",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/system/ningbo.service",
+      "local": "artifacts/jetson_20261015/runtime/system/ningbo.service",
+      "sha256": "46a769ca8bfd58b5e16444df5846635f42296f256c508874d0ef111eb2dc5d88",
+      "role": "runtime-snapshot"
+    },
+    {
+      "export": "runtime/system/service-status.txt",
+      "local": "artifacts/jetson_20261015/runtime/system/service-status.txt",
+      "sha256": "a4539277d76767feec81f524e368ab18065d508eb760edda51d12bf76d9e2bb4",
+      "role": "runtime-snapshot"
+    }
+  ],
+  "notes": [
+    "Remote service and source unchanged.",
+    "Local face database and IDE settings preserved.",
+    "Voice secrets, virtualenv, generated engines and shell history excluded.",
+    "Archived patch scripts are historical and must not be replayed on the active project."
+  ],
+  "local_cleanup_changes": [
+    {
+      "path": ".gitignore",
+      "remote_sha256": "736ecc5761df260dec0ba26232ec80ccfc8649578ea1d36d38c906a6f7241566",
+      "local_sha256": "c45753a28f50658ed240f6f063eb0bd6d734242bdd73fc2ddb3733b8be2cbb62"
+    },
+    {
+      "path": "README.md",
+      "remote_sha256": "6d3f330d3f64a3cb92477c33f6ff5f5e982eb4737ea0dd2b63d4615e4f6d4245",
+      "local_sha256": "a012accfa87d4c754cad0139cba2853dfccf487360f58da5efc9154d35e74de4"
+    },
+    {
+      "path": "tests/test_business_bridge.py",
+      "remote_sha256": "b09928ab8a5a52efa70eb3aafef59e4a60a38215b5ba8e965c990f3d37bcfc11",
+      "local_sha256": "d29c74467cd63c9267d33b5273bdd8ba0b68be5a2430094e390b075a1dabb5ea"
+    },
+    {
+      "path": "tests/test_servo_screen_read.py",
+      "remote_sha256": "071b7e0ce6048dd8c44c4e97cee45eb842a9a0693c6fc622a2354cd1e4f4f205",
+      "local_sha256": "83730c06bb4c852cd4a6988eb1206785d3f39f3ac106d1a4760fc210a12de0f8"
+    }
+  ],
+  "validation": {
+    "copied_files": 267,
+    "unchanged_from_export": 263,
+    "python38_syntax_files": 92,
+    "unittest": "201 passed",
+    "database_integrity": [
+      "faces.sqlite3",
+      "voice_usage.sqlite3"
+    ],
+    "original_local_faces_database": "unchanged",
+    "hardware_exercised_by_sync": false,
+    "note": "Unit tests use fake devices; no new physical-hardware validation was performed.",
+    "model_sha256": "3 required models passed",
+    "config_check": "main.py --check-config passed",
+    "final_remote_recheck": {
+      "project_files": 132,
+      "changed_since_export": 0,
+      "ningbo_service": "active"
+    }
+  }
+}

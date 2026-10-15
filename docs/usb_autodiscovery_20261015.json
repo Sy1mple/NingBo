@@ -1,0 +1,99 @@
+{
+  "status": "deployed",
+  "date": "2026-10-15",
+  "defaults": {
+    "screen": "auto",
+    "camera": "auto",
+    "voice": "auto"
+  },
+  "selected_screen": "/dev/ttyUSB1",
+  "screen_protocol_verified": true,
+  "live": {
+    "time": "2026-10-15T18:19:01.377755",
+    "config": {
+      "screen": "auto",
+      "camera": "auto",
+      "voice": "auto"
+    },
+    "video_nodes": [
+      {
+        "path": "/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera_SN0001-video-index0",
+        "target": "/dev/video0",
+        "name": "USB 2.0 Camera: USB Camera",
+        "driver": "uvcvideo",
+        "bus": "usb-3610000.xhci-2.2.4",
+        "usb": true,
+        "capture": true
+      },
+      {
+        "path": "/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera_SN0001-video-index1",
+        "target": "/dev/video1",
+        "name": "USB 2.0 Camera: USB Camera",
+        "driver": "uvcvideo",
+        "bus": "usb-3610000.xhci-2.2.4",
+        "usb": true,
+        "capture": false
+      }
+    ],
+    "camera": {
+      "passed": true,
+      "selected": "/dev/v4l/by-id/usb-Sonix_Technology_Co.__Ltd._USB_2.0_Camera_SN0001-video-index0",
+      "frame_shapes": [
+        [
+          480,
+          640,
+          3
+        ],
+        [
+          480,
+          640,
+          3
+        ],
+        [
+          480,
+          640,
+          3
+        ]
+      ]
+    },
+    "audio": {
+      "passed": true,
+      "selected": "AIMIC-M4: USB Audio (hw:2,0)",
+      "index": 24,
+      "sample_rate": 48000,
+      "pcm_block_sizes": [
+        3840,
+        3840,
+        3840
+      ],
+      "output_name": "AIMIC-M4: USB Audio (hw:2,0)",
+      "output_settings_passed": true,
+      "audio_saved": false
+    },
+    "service_active": true
+  },
+  "tests": {
+    "local": 213,
+    "jetson": 213
+  },
+  "source_sha256": {
+    "JETSON/Sensor/Config.py": "a7857504bd053202d63bc94b1c72e0607798ced5bcf2fde081e0e89bccc5fbd5",
+    "Serial_Screen/screen_service/screen/screen_sender.py": "e75e2cc917d5205e2e369f56797df9226201548a7c7dda7811d845de3f35df26",
+    "Serial_Screen/screen_service/screen/service.py": "431bffe2ae6af31b64cc2dc083fa18213dfa7e7bf59fb331f7e4f6b5f052d69f",
+    "Serial_Screen/screen_service/screen/serial_discovery.py": "966f4b2933592e6da6d12b2940a4efec40897344761f834ae44d89336b9b85e6",
+    "JETSON/Sensor/sensors/usb_camera.py": "78753a95fe98acc29b48bf0c29ef2c997cf64bcdc8ab8f269846633a1bc2af62",
+    "JETSON/Sensor/sensors/usb_microphone.py": "7750b94a70338f1d86eb710b9f0ff2e83a89a223d0eed28989cb55f90313dfc2",
+    "JETSON/Voice/service.py": "c458aad721b17b40b8b4e190bfa36ac3d72c2a8cc86b147cdd991b6a9d2b4b16",
+    "application.py": "801ab5ecb5059ed4c609b88ee05bc8ce1c7dc178a2ddc758efac178987f5e02e",
+    "main.py": "685fdf12ab69c911c97d2141ce806fd7aa36ba3f87cd1857f5bb1d566b3e0ddf",
+    "deploy/ningbo.service": "b3f1960b888d38e12e29a297906059d302216fbe2e8919d9fb147e0cadb116ca",
+    "tests/test_face.py": "932ff66b9063e894d1a8a4cae32b5c3c80b3157833fa6826ad97ba8d167f0998",
+    "tests/test_usb_discovery.py": "f9bfdb308732f370601b45673e20cfa58057b9c7e290cef0a90f7474877280b6"
+  },
+  "boot_enabled": true,
+  "service_has_fixed_device_arguments": false,
+  "whole_host_reboot_tested": false,
+  "renumbering_simulations_tested": true,
+  "local_backup": "C:\\Users\\ZZH\\Documents\\ChatGPT\\宁波开发\\usb_autodiscovery_20261015_180847\\source_before.tar.gz",
+  "remote_backup": "/opt/test/NingBo_Linux/backups/usb_autodiscovery_20261015_181808"
+}

@@ -1,0 +1,25 @@
+{
+  "host": "192.168.1.121",
+  "created": "2026-10-15T11:30:16.415134",
+  "remote_project": "/opt/test/NingBo_Linux",
+  "remote_export_sha256": "4fe288e38ee6beb58656c6f347b07c47ded224c94dcfa04b93d60fca0ac4f6e2",
+  "remote_project_files": 132,
+  "remote_source_changes_since_previous_sync": [],
+  "remote_home_changes_since_previous_sync": [],
+  "payload": [
+    "runtime/system/service-status.txt"
+  ],
+  "removed": [],
+  "local_cleanup_preserved": [
+    ".gitignore",
+    "README.md",
+    "tests/test_business_bridge.py",
+    "tests/test_servo_screen_read.py"
+  ],
+  "unexpected_local_changes": [],
+  "remote_service": "active",
+  "notes": [
+    "Source code was already current; no source files overwritten.",
+    "Prior 201-test result remains applicable; no hardware tests run."
+  ]
+}

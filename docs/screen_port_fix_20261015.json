@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-15",
+  "cause": "Two CH340 adapters share a by-id alias; service opened ttyUSB0 while HMI is ttyUSB1.",
+  "port": "/dev/serial/by-path/platform-3610000.xhci-usb-0:2.2.2:1.0-port0",
+  "tests": {
+    "local": 201,
+    "jetson": 201
+  },
+  "service": "active",
+  "user_confirmed_all_scenes_working": true,
+  "feedback_thresholds": {
+    "servo": [
+      0.01,
+      0.0115
+    ]
+  },
+  "remote_backup": "/opt/test/NingBo_Linux/backups/screen_port_fix_20261015_175933",
+  "probe": "artifacts/jetson_screen_20261015/screen-port-probe-20261015_175657.json",
+  "source_sha256": {
+    "JETSON/Sensor/Config.py": "3bed24e9144f742387d6c045dedbd0b3a39ca6a384116d8632eed07934c50edc",
+    "deploy/ningbo.service": "9fee471a00b08fb8519d76ef978ee4d3ef8ce92661018e5bb37b2cab1815a897",
+    "deploy/run_stepper_forward_test.py": "01a6ce3d64d8c0dc4d6b2f955c3b5a31ad97b93fe06cfa2aab830fbfcd19ae85"
+  }
+}
