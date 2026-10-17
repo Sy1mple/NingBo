@@ -18,7 +18,7 @@ usage() {
   --check-only 只检查已部署环境和实际模型前向；不安装
   --torch-wheel 指定已下载的官方 cp38 linux_aarch64 CUDA PyTorch wheel
 目标：Jetson Xavier NX，JetPack 5.1.1+ / L4T R35.3+，Ubuntu 20.04，系统 Python 3.8。
-脚本需要联网和 sudo；模型已经包含在部署包。旧 JetPack 必须先使用匹配的系统镜像。
+脚本需要联网和 sudo -A；模型已经包含在部署包。旧 JetPack 必须先使用匹配的系统镜像。
 USAGE
 }
 while (($#)); do
@@ -53,27 +53,27 @@ if ((EUID == 0)); then
   if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != root ]]; then
     ARGS=()
     [[ -z "$TORCH_WHEEL" ]] || ARGS+=(--torch-wheel "$TORCH_WHEEL")
-    exec sudo -H -u "$SUDO_USER" -- bash "$ROOT/deploy.sh" "${ARGS[@]}"
+    exec sudo -A -H -u "$SUDO_USER" -- bash "$ROOT/deploy.sh" "${ARGS[@]}"
   fi
-  die '请使用普通 Jetson 用户执行 bash deploy.sh，脚本会在需要时调用 sudo。'
+  die '请使用普通 Jetson 用户执行 bash deploy.sh，脚本会在需要时调用 sudo -A。'
 fi
-command -v sudo >/dev/null || die '需要 sudo 安装系统库。'
+command -v sudo -A >/dev/null || die '需要 sudo -A 安装系统库。'
 RUN_USER="$(id -un)"
 mkdir -p "$ROOT/logs" "$ROOT/.deploy-cache"
 LOG="$ROOT/logs/deploy_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$LOG") 2>&1
 echo "日志：$LOG"
 PHASE="获取系统安装权限"
-sudo -v
+sudo -A -v
 PHASE="安装 Ubuntu 与 NVIDIA JetPack 组件"
-sudo apt-get update
-sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+sudo -A apt-get update
+sudo -A env DEBIAN_FRONTEND=noninteractive apt-get install -y \
   python3-venv python3-pip python3-dev build-essential pkg-config ca-certificates curl unzip \
   libopenblas-dev libportaudio2 portaudio19-dev libsndfile1 ffmpeg alsa-utils v4l-utils \
   i2c-tools libgomp1 libjpeg-dev zlib1g-dev libgpiod2 libgpiod-dev
 # 这些组件从板上已有的 JetPack apt 软件源安装，不能换成桌面 NVIDIA 驱动。
-sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda nvidia-cudnn8 nvidia-tensorrt python3-libnvinfer cuda-nvtx-11-4
-sudo ldconfig
+sudo -A env DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda nvidia-cudnn8 nvidia-tensorrt python3-libnvinfer cuda-nvtx-11-4
+sudo -A ldconfig
 export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/local/cuda/targets/aarch64-linux/lib:${LD_LIBRARY_PATH:-}"
 PHASE="创建独立项目 Python 环境"
 if [[ ! -x "$VENV/bin/python" ]]; then
@@ -111,9 +111,9 @@ PHASE="安装 CUDA Whisper 依赖"
 "$VENV/bin/python" -m pip install 'openai-whisper==20231117' --no-deps
 PHASE="配置 GPIO 串口 I2C 摄像头与音频权限"
 for group in gpio i2c dialout video audio; do
-  getent group "$group" >/dev/null || sudo groupadd --system "$group"
+  getent group "$group" >/dev/null || sudo -A groupadd --system "$group"
 done
-sudo usermod -a -G gpio,i2c,dialout,video,audio "$RUN_USER"
+sudo -A usermod -a -G gpio,i2c,dialout,video,audio "$RUN_USER"
 GPIO_RULES="$("$VENV/bin/python" - <<'PY'
 from pathlib import Path
 import importlib.util
@@ -124,11 +124,11 @@ if not path.is_file():
 print(path)
 PY
 )"
-sudo install -m 0644 "$GPIO_RULES" /etc/udev/rules.d/99-gpio.rules
-sudo install -m 0644 "$ROOT/deploy/99-ningbo-i2c.rules" /etc/udev/rules.d/99-ningbo-i2c.rules
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=gpio
-sudo udevadm trigger --subsystem-match=i2c-dev
+sudo -A install -m 0644 "$GPIO_RULES" /etc/udev/rules.d/99-gpio.rules
+sudo -A install -m 0644 "$ROOT/deploy/99-ningbo-i2c.rules" /etc/udev/rules.d/99-ningbo-i2c.rules
+sudo -A udevadm control --reload-rules
+sudo -A udevadm trigger --subsystem-match=gpio
+sudo -A udevadm trigger --subsystem-match=i2c-dev
 PHASE="配置烟雾专用 UART"
 bash "$ROOT/deploy/configure_smoke_uart.sh"
 PHASE="编译 DHT11 原生 GPIO 采样器"
