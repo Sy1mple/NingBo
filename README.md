@@ -1,6 +1,6 @@
 # 宁波硬件工程
 
-> **当前运行版本（2026-10-19）**：[ningbo/](ningbo/) 是从 `192.168.1.106:/opt/ningbo` 同步的场景模块化工程，本地对应 `NingBo_Minimal_NoOLED_20261016/ningbo`。入口为 `ningbo/main.py`，配置为 `ningbo/config.py`；下文根目录工程保留为旧版参考。同步与验证记录见 [docs/SOURCE_SYNC_20261019.md](docs/SOURCE_SYNC_20261019.md)。
+> **当前运行版本（2026-10-19）**：[ningbo/](ningbo/) 是从 `192.168.1.106:/opt/ningbo` 同步的场景模块化工程，本地对应 `NingBo_Minimal_NoOLED_20261016/ningbo`。入口为 `ningbo/main.py`，配置为 `ningbo/config.py`；下文根目录工程保留为旧版参考。设备与串口屏现已拆为两个独立服务，见 [独立服务说明](ningbo/deploy/SCREEN_SERVICES.md)。同步与验证记录见 [docs/SOURCE_SYNC_20261019.md](docs/SOURCE_SYNC_20261019.md)。
 
 项目由开发板设备服务、业务桥接和 JGUS 串口屏服务组成。正式入口为 `main.py`，所有传感器、执行器和串口屏通信参数集中在 `JETSON/Sensor/Config.py`；屏幕的 VP 地址与按钮返回值集中在 `Serial_Screen/screen_service/screen/addresses.py`。
 

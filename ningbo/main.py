@@ -163,6 +163,8 @@ def main(argv=None):
         return 0
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    if args.port is not None or args.baudrate is not None:
+        parser.error('串口屏已拆为独立服务；--port/--baudrate 请传给 screen_daemon.py')
     previous_handlers = {}
     try:
         app = NingBoApplication(config)

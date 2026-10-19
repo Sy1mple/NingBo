@@ -1,6 +1,6 @@
 # 项目与调试资料索引
 
-> **当前运行版本（2026-10-19）**：[ningbo/](ningbo/) 是从 `192.168.1.106:/opt/ningbo` 同步的场景模块化工程，本地对应 `NingBo_Minimal_NoOLED_20261016/ningbo`。入口为 `ningbo/main.py`，配置为 `ningbo/config.py`；下文根目录工程保留为旧版参考。同步与验证记录见 [docs/SOURCE_SYNC_20261019.md](docs/SOURCE_SYNC_20261019.md)。
+> **当前运行版本（2026-10-19）**：[ningbo/](ningbo/) 是从 `192.168.1.106:/opt/ningbo` 同步的场景模块化工程，本地对应 `NingBo_Minimal_NoOLED_20261016/ningbo`。入口为 `ningbo/main.py`，配置为 `ningbo/config.py`；下文根目录工程保留为旧版参考。设备与串口屏现已拆为两个独立服务，见 [独立服务说明](ningbo/deploy/SCREEN_SERVICES.md)。同步与验证记录见 [docs/SOURCE_SYNC_20261019.md](docs/SOURCE_SYNC_20261019.md)。
 
 本地正式项目：`C:\Users\ZZH\PycharmProjects\NingBo`。2026-10-15 已从 `dianxin@192.168.1.121:/opt/test/NingBo_Linux` 同步运行代码和模型。
 

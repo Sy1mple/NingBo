@@ -1,4 +1,4 @@
-"""工程编排：串口屏与设备共用一套生命周期和业务桥接。"""
+"""设备业务编排；屏幕物理连接由独立服务拥有。"""
 import logging
 import time
 import threading
@@ -7,7 +7,7 @@ from device_service import DEFAULT_CONFIG, DeviceService
 from experiments.voice.jetson.service import VoiceService
 from experiments.access.jetson.service import FaceService
 from scene_router import ScreenDeviceBridge
-from screen_service import ScreenService
+from hardware.screen.ipc import RemoteScreenService
 
 LOGGER = logging.getLogger("ningbo")
 
@@ -16,8 +16,7 @@ class NingBoApplication:
                  access_service=None, camera_preview=None):
         self.config = (config or DEFAULT_CONFIG).validate()
         self.devices = devices or DeviceService(config=self.config)
-        self.screen = screen or ScreenService(config=self.config.screen, voice_config=self.config.voice,
-                                             excluded_ports=(self.config.smoke.port,) if self.config.smoke.enabled else ())
+        self.screen = screen or RemoteScreenService(voice_config=self.config.voice)
         self.voice = voice_service if voice_service is not None else (
             VoiceService(self.config.voice, self.config.thread_join_timeout) if voice_handler is None else None
         )
@@ -64,7 +63,7 @@ class NingBoApplication:
             except Exception:
                 LOGGER.exception("启动失败后的资源清理异常")
             raise
-        LOGGER.info("工程已启动，串口屏 %s；等待开始/停止按钮", self.config.screen.port)
+        LOGGER.info("设备工程已启动，串口屏由独立服务管理；等待开始/停止按钮")
 
     def process_once(self):
         """一次按钮处理和显示刷新，所有结果来自设备服务。"""

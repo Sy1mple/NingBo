@@ -37,7 +37,7 @@ class DiagnosticsScreenBridge:
             name = item.get("name", "").split(".", 1)[-1]
             result = report["results"].get(name)
             if result is not None:
-                LOGGER.info("状态检测写屏 %s: %s；VP=0x%04X；%s；帧=%s",
+                LOGGER.info("状态检测提交写屏 %s: %s；VP=0x%04X；%s；帧=%s",
                             name, result["status"], item["address"],
                             result.get("note", ""), item.get("hex", ""))
         self._last_revision = report["revision"]

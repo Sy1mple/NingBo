@@ -16,12 +16,12 @@
     "bytes": 7527
   },
   "README.md": {
-    "sha256": "998f5c6cbaac1750eb4f46182ee6ed1aa0b1dd0224de6f66301ea12f6588d8f8",
-    "bytes": 126861
+    "sha256": "bd5e71edd686cf48566f34ce58332c6ca5464a738107a3455654f027e329a784",
+    "bytes": 127132
   },
   "application.py": {
-    "sha256": "cd1922146ee7a14e5fdecb71f1481f3e8b303a5dd692120f5b4c9acdcc4bd3c4",
-    "bytes": 5522
+    "sha256": "fc33f0c2b2e6366ba4590925399b12be1df8cb7d1b828b6229ee4a2c2b88352f",
+    "bytes": 5375
   },
   "camera_preview.py": {
     "sha256": "98deac8407d3b52794edf58371411f1806c2ef81f08ae396b71e42c0c0cd4c35",
@@ -676,8 +676,8 @@
     "bytes": 1601
   },
   "main.py": {
-    "sha256": "3869d07bbccaebaa2677ccfb3d6802031e82f81da7ab487ed29bce58bc18a7ac",
-    "bytes": 11839
+    "sha256": "64bb85dbbf52c321ce82f86f414a48090e1eb6b77fd0692144d9383a6a7ec23e",
+    "bytes": 12000
   },
   "paths.py": {
     "sha256": "4eddf9782273171f527c1667a5f40cdd2fb4ed7348591547b2be2e5babc5d048",
@@ -720,8 +720,8 @@
     "bytes": 26
   },
   "system/diagnostics/bridge.py": {
-    "sha256": "2edf007eb61db4d4ee9c3c720ea85a44f2e407867029e276568f7cf3d6848e12",
-    "bytes": 1824
+    "sha256": "f89fb7a121524e6515f2cf42e7367009346479c704ce305747a388471d093977",
+    "bytes": 1830
   },
   "system/diagnostics/jetson/__init__.py": {
     "sha256": "ca951f5b4ccef926b83ed2f24deddde1113cf1553df5a307361e56897e4a72f5",
@@ -834,5 +834,29 @@
   "tests/test_voice_continuous.py": {
     "sha256": "abbe7a6c7112e32afa582e5a1cd67ae7140d5a4f59a9b86f991b4224694e74f6",
     "bytes": 14339
+  },
+  "hardware/screen/ipc.py": {
+    "sha256": "b3f63ee2ad8ffebec7b7f68d5cc6d34144c13c0127cd0b927b5af849ed6bf91b",
+    "bytes": 6146
+  },
+  "screen_daemon.py": {
+    "sha256": "6bfb5df877905ea9742180831ae0cc900ac1fca4e0e22b77fafa23f3e083d966",
+    "bytes": 6531
+  },
+  "tests/test_screen_isolation.py": {
+    "sha256": "b1ee14e40c62d9266e745a9b8141a454e77d3d6fe2fcd9cd65d610c29fbb5e7d",
+    "bytes": 6832
+  },
+  "deploy/ningbo-screen.service": {
+    "sha256": "23ab1f2ef5faedd1509b8b37731114c1b2603f6ff7e98589e2c433d0b9d40337",
+    "bytes": 576
+  },
+  "deploy/ningbo-new.service": {
+    "sha256": "d925770b17a4cf704dae8d4bc9222acb191aefc702971f96fb84ce82b3aae484",
+    "bytes": 545
+  },
+  "deploy/SCREEN_SERVICES.md": {
+    "sha256": "55888369a33aa4a1596c40e5f4b23f91d414804648c14e8fcdf16619fd969ec6",
+    "bytes": 2888
   }
 }

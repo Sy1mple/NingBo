@@ -1,0 +1,25 @@
+[Unit]
+Description=NingBo independent serial screen transport
+After=systemd-udev-trigger.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=nvidia
+Group=nvidia
+WorkingDirectory=/opt/ningbo
+RuntimeDirectory=ningbo-screen
+RuntimeDirectoryMode=0700
+DevicePolicy=closed
+DeviceAllow=char-ttyUSB rw
+DeviceAllow=char-ttyACM rw
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/ningbo/.venv/bin/python -B /opt/ningbo/screen_daemon.py --port auto
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

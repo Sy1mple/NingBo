@@ -1,0 +1,23 @@
+[Unit]
+Description=NingBo device sampling and experiment service
+After=network-online.target systemd-udev-trigger.service
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=nvidia
+Group=nvidia
+WorkingDirectory=/opt/ningbo
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONNOUSERSITE=1
+ExecStart=/bin/bash /opt/ningbo/run.sh --camera-device auto --voice-device auto
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
