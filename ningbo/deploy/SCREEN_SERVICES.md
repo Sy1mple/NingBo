@@ -1,6 +1,6 @@
 # 独立串口屏服务（2026-10-19）
 
-正式工程使用两个独立进程，没有 Requires、PartOf、BindsTo 或相互重启关系：
+正式工程使用两个独立业务进程，两者之间没有 Requires、PartOf、BindsTo 或相互重启关系：
 
 | 服务 | 职责 | 物理设备 |
 | --- | --- | --- |
@@ -18,6 +18,7 @@
 ```bash
 sudo install -m 644 deploy/ningbo-new.service /etc/systemd/system/ningbo-new.service
 sudo install -m 644 deploy/ningbo-screen.service /etc/systemd/system/ningbo-screen.service
+sudo install -m 644 deploy/ningbo-screen-modules.service /etc/systemd/system/ningbo-screen-modules.service
 sudo systemctl daemon-reload
 sudo systemctl enable ningbo-new.service ningbo-screen.service
 sudo systemctl restart ningbo-new.service ningbo-screen.service
@@ -32,6 +33,14 @@ sudo systemctl restart ningbo-screen.service
 该操作应保持设备服务 MainPID、烟雾 ttyTHS0 文件描述符不变；停止屏幕服务时烟雾 RX 计数仍应持续增加。重新烧录屏幕后可重启屏幕服务以重新探测。软件进程隔离不能隔离外部共用供电、共地或信号电平干扰，也不证明既有烟雾断流的根因已经解决。
 
 ## 手动运行
+
+### 开机 USB 串口权限
+
+屏幕服务启动前通过 `ningbo-screen-modules.service` 加载 `usbserial` 和 `cdc_acm`，注册 `ttyUSB` 和 `ttyACM` 设备组。此辅助单元由屏幕服务自动拉起，无需单独 enable。`DeviceAllow=char-ttyUSB/char-ttyACM` 只解析启动时已注册的设备组；若驱动晚于屏幕服务加载，服务虽然 active，却会持续报打开串口 `Operation not permitted`，手动重启才恢复。辅助单元保证先注册设备组，再创建屏幕服务的设备访问策略，继续禁止访问板载烟雾 UART。
+
+安装后可检查 `/sys/fs/cgroup/devices/system.slice/ningbo-screen.service/devices.list`（当前设备使用 cgroup v1），应包含 USB 串口设备组许可；本机为 `c 188:* rw` 和 `c 166:* rw`，不应包含烟雾 `ttyTHS` 设备组。完成修复后需另行断电上电验证启动顺序。
+
+### 终端运行
 
 Linux 中在一个终端运行屏幕进程，另一个运行设备进程。socket 所在目录应由运行用户拥有。
 

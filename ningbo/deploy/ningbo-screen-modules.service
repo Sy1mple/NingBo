@@ -1,0 +1,8 @@
+[Unit]
+Description=Register USB serial device groups before NingBo screen sandbox
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/modprobe usbserial
+ExecStart=/sbin/modprobe cdc_acm
+RemainAfterExit=yes

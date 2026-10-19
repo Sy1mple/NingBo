@@ -1,6 +1,7 @@
 [Unit]
 Description=NingBo independent serial screen transport
-After=systemd-udev-trigger.service
+Requires=ningbo-screen-modules.service
+After=systemd-udev-trigger.service ningbo-screen-modules.service
 StartLimitIntervalSec=0
 
 [Service]
