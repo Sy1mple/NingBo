@@ -24,3 +24,6 @@ archive/
 backups/
 JETSON/Voice/models/
 JETSON/Vision/models/
+
+# Blank face-service credential template for the current project.
+!ningbo/.env.face.example

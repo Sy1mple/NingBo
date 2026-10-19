@@ -1,0 +1,2 @@
+# BOARD 8/10 smoke UART; nvgetty.service must be disabled separately.
+SUBSYSTEM=="tty", KERNEL=="ttyTHS0", GROUP="dialout", MODE="0660"

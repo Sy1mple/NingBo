@@ -1,0 +1,136 @@
+"""Real FFAA parser/driver, freshness and original status VP, with fake UART."""
+from types import SimpleNamespace
+import unittest
+from unittest.mock import Mock
+
+from config import DEFAULT_CONFIG
+from experiments.smoke.jetson.driver import SmokeDriver
+from experiments.smoke.jetson.diagnostics import check_smoke
+from experiments.smoke.jetson.smoke_protocol import SmokeFrameParser
+from hardware.screen.sender import ScreenSender
+from screen_service import MessageParser
+from system.diagnostics.jetson.service import DiagnosticService
+from system.diagnostics.bridge import DiagnosticsScreenBridge
+
+
+class Uart:
+    def __init__(self):
+        self.data = bytearray()
+        self.closed = False
+    @property
+    def in_waiting(self): return len(self.data)
+    def read(self, count):
+        result = bytes(self.data[:count])
+        del self.data[:count]
+        return result
+    def close(self): self.closed = True
+
+
+class SmokeStatusTests(unittest.TestCase):
+    def setUp(self):
+        self.now = 100.0
+        self.uart = Uart()
+        self.factory = Mock(return_value=self.uart)
+        self.driver = SmokeDriver(DEFAULT_CONFIG.smoke, serial_factory=self.factory,
+            clock=lambda: self.now, wall_clock=lambda: self.now + 1000)
+
+    def manager(self):
+        def poll(name):
+            self.assertEqual(name, 'smoke')
+            return self.driver.read()
+        return SimpleNamespace(config=DEFAULT_CONFIG, _started=True, poll_sensor=Mock(side_effect=poll))
+
+    def test_complete_frame_is_normal_and_concentration_is_not_a_health_threshold(self):
+        for frame, value in [('ffaa00003c', 0), ('ffaa015b3c', 347), ('ffaaffff3c', 65535)]:
+            self.uart.data.extend(bytes.fromhex(frame))
+            result = check_smoke(self.manager())
+            self.assertEqual(result['status'], 'normal')
+            self.assertEqual(result['concentration'], value)
+            self.assertEqual(result['unit'], 'raw')
+        self.factory.assert_called_once()
+
+    def test_split_frame_requires_both_parts_and_resynchronizes_after_noise(self):
+        self.uart.data.extend(bytes.fromhex('1266ffaa01'))
+        self.assertNotEqual(check_smoke(self.manager())['status'], 'normal')
+        self.uart.data.extend(bytes.fromhex('5b3c'))
+        result = check_smoke(self.manager())
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual(result['concentration'], 347)
+        self.assertEqual(result['valid_frames'], 1)
+
+    def test_bad_tail_and_noise_cannot_be_accepted_as_valid_data(self):
+        self.driver.start()
+        self.now += DEFAULT_CONFIG.smoke.stale_after_seconds + .01
+        self.uart.data.extend(bytes.fromhex('ffaa015b001122334455'))
+        result = check_smoke(self.manager())
+        self.assertEqual(result['status'], 'error')
+        self.assertEqual(result['valid_frames'], 0)
+        self.assertGreater(result['tail_errors'], 0)
+
+    def test_multiple_frames_keep_the_newest_complete_value(self):
+        parser = SmokeFrameParser()
+        self.assertEqual(parser.feed(bytes.fromhex('ffaa00013cffaa015b3c')), [1, 347])
+        self.assertEqual(parser.last_frame, bytes.fromhex('ffaa015b3c'))
+
+    def test_short_gap_does_not_falsely_fail_but_stale_frames_cannot_stay_normal(self):
+        self.uart.data.extend(bytes.fromhex('ffaa015b3c'))
+        manager = self.manager()
+        first = check_smoke(manager)
+        self.now += 1
+        recent = check_smoke(manager)
+        self.assertEqual(recent['status'], 'normal')
+        self.assertEqual(recent['sample_time'], first['sample_time'])
+        self.now += DEFAULT_CONFIG.smoke.stale_after_seconds
+        stale = check_smoke(manager)
+        self.assertEqual(stale['status'], 'error')
+        self.assertIsNone(stale['concentration'])
+        self.assertIn('超时', stale['note'])
+        self.factory.assert_called_once()
+
+    def test_data_recovers_without_reopening_or_replugging_uart(self):
+        self.driver.start()
+        self.now += 6
+        manager = self.manager()
+        self.assertEqual(check_smoke(manager)['status'], 'error')
+        self.uart.data.extend(bytes.fromhex('ffaa015b3c'))
+        self.assertEqual(check_smoke(manager)['status'], 'normal')
+        self.factory.assert_called_once()
+        self.assertFalse(self.uart.closed)
+
+    def test_serial_error_cannot_pass_diagnostics(self):
+        self.uart.read = Mock(side_effect=OSError('UART read failed'))
+        result = DiagnosticService(self.manager()).check('smoke')
+        self.assertEqual(result['status'], 'error')
+        self.assertIn('UART read failed', result['note'])
+        self.assertTrue(self.uart.closed)
+
+    def test_6002_text_does_not_overwrite_adjacent_results(self):
+        memory = {0x6001: b'AA', 0x6003: b'BB'}
+        for status, glyph in [('checking', '检'), ('normal', '好'), ('error', '坏')]:
+            item = MessageParser().parse({'scene': 'diagnostics', 'statuses': {'smoke': status}})[0]
+            self.assertEqual(item['address'], 0x6002)
+            self.assertEqual(item['data'], glyph.encode('gb2312'))
+            self.assertEqual(ScreenSender.build_write_bytes_frame(item['address'], item['data']),
+                             bytes.fromhex('5aa505826002') + glyph.encode('gb2312'))
+            memory[item['address']] = item['data']
+        self.assertEqual(memory[0x6001], b'AA')
+        self.assertEqual(memory[0x6003], b'BB')
+
+    def test_one_manual_check_finishes_and_idle_ticks_do_not_repeat_sampling(self):
+        self.uart.data.extend(bytes.fromhex('ffaa015b3c'))
+        manager = self.manager()
+        service = DiagnosticService(manager)
+        screen = SimpleNamespace(handle_message=Mock(return_value=[]))
+        bridge = DiagnosticsScreenBridge(screen, SimpleNamespace(
+            request_diagnostics=service.request, diagnostic_snapshot=service.snapshot))
+        self.assertTrue(bridge.handle_event('diagnostics.smoke')['handled'])
+        service._worker.join(2)
+        self.assertFalse(service.snapshot()['busy'])
+        self.assertEqual(service.snapshot()['results']['smoke']['status'], 'normal')
+        for _ in range(10): bridge.tick()
+        manager.poll_sensor.assert_called_once_with('smoke')
+        screen.handle_message.assert_called_once()
+        service.stop()
+
+
+if __name__ == '__main__': unittest.main()

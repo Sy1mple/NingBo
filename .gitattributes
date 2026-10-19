@@ -3,3 +3,6 @@
 *.sh text eol=lf
 *.service text eol=lf
 *.rules text eol=lf
+
+# Preserve the byte-verified deployment snapshot.
+ningbo/** -text

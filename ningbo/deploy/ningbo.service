@@ -1,0 +1,19 @@
+[Unit]
+Description=NingBo touchscreen and device service
+After=systemd-udev-trigger.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=dianxin
+WorkingDirectory=/opt/test/ningbo
+ExecStart=/bin/bash /opt/test/ningbo/run.sh
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

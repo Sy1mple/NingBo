@@ -1,0 +1,26 @@
+"""body_temperature: the authoritative VP and button definitions for this screen page."""
+
+BODY_TEMPERATURE = 0x1030
+
+BODY_TEMP_DETECT_START_KEY_ADDR = 0x2030
+
+BODY_TEMP_DETECT_START_BACK_VALUE = 0x4030
+
+BODY_TEMP_DETECT_STOP_KEY_ADDR = 0x2040
+
+BODY_TEMP_DETECT_STOP_BACK_VALUE = 0x4040
+
+ADDRESS_MAP = {
+    'body.temperature': BODY_TEMPERATURE,
+}
+
+BUTTON_EVENT_MAP = {
+    (BODY_TEMP_DETECT_START_KEY_ADDR, BODY_TEMP_DETECT_START_BACK_VALUE): 'body_temperature.start',
+    (BODY_TEMP_DETECT_STOP_KEY_ADDR, BODY_TEMP_DETECT_STOP_BACK_VALUE): 'body_temperature.stop',
+}
+
+INPUT_EVENT_MAP = {
+}
+
+# Status result VP owned by this module.
+BODY_TEMP_STATUS_RESULT_ADDR = 0x6003

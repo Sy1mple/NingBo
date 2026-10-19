@@ -1,0 +1,26 @@
+"""smoke: the authoritative VP and button definitions for this screen page."""
+
+SMOKE_VALUE = 0x1050
+
+SMOKE_DETECT_START_KEY_ADDR = 0x2070
+
+SMOKE_DETECT_START_BACK_VALUE = 0x4070
+
+SMOKE_DETECT_STOP_KEY_ADDR  = 0x2080
+
+SMOKE_DETECT_STOP_BACK_VALUE = 0x4080
+
+ADDRESS_MAP = {
+    'smoke.value': SMOKE_VALUE,
+}
+
+BUTTON_EVENT_MAP = {
+    (SMOKE_DETECT_START_KEY_ADDR, SMOKE_DETECT_START_BACK_VALUE): 'smoke.start',
+    (SMOKE_DETECT_STOP_KEY_ADDR, SMOKE_DETECT_STOP_BACK_VALUE): 'smoke.stop',
+}
+
+INPUT_EVENT_MAP = {
+}
+
+# Status result VP owned by this module.
+SMOKE_STATUS_RESULT_ADDR = 0x6002

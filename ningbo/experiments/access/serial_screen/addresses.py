@@ -1,0 +1,25 @@
+"""access: the authoritative VP and button definitions for this screen page."""
+
+FACE_ENROLL_KEY_ADDR = 0x3010
+
+FACE_ENROLL_BACK_VALUE = 0x5010
+
+
+IDENTITY_AUTHENTICATION_KEY_ADDR = 0x3020
+
+IDENTITY_AUTHENTICATION_BACK_VALUE = 0x5020
+
+
+ADDRESS_MAP = {
+}
+
+BUTTON_EVENT_MAP = {
+    (FACE_ENROLL_KEY_ADDR, FACE_ENROLL_BACK_VALUE): 'access.face_enroll',
+    (IDENTITY_AUTHENTICATION_KEY_ADDR, IDENTITY_AUTHENTICATION_BACK_VALUE): 'access.start',
+}
+
+INPUT_EVENT_MAP = {
+}
+
+# Status result VP owned by this module.
+LOCK_STATUS_RESULT_ADDR = 0x6010

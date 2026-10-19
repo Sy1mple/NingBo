@@ -1,0 +1,23 @@
+"""fan: the authoritative VP and button definitions for this screen page."""
+
+FAN_SWITCH_START_KEY_ADDR = 0x2090
+
+FAN_SWITCH_START_BACK_VALUE = 0x4090
+
+FAN_SWITCH_STOP_KEY_ADDR  = 0x3000
+
+FAN_SWITCH_STOP_BACK_VALUE = 0x5000
+
+ADDRESS_MAP = {
+}
+
+BUTTON_EVENT_MAP = {
+    (FAN_SWITCH_START_KEY_ADDR, FAN_SWITCH_START_BACK_VALUE): 'fan.start',
+    (FAN_SWITCH_STOP_KEY_ADDR, FAN_SWITCH_STOP_BACK_VALUE): 'fan.stop',
+}
+
+INPUT_EVENT_MAP = {
+}
+
+# Status result VP owned by this module.
+FAN_STATUS_RESULT_ADDR = 0x6009

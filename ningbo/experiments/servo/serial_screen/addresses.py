@@ -1,0 +1,29 @@
+"""servo: the authoritative VP and button definitions for this screen page."""
+
+SERVO_ROTATION_DIRECTION = 0x10F0  # GB2312 方向文本，3 Word；避开角度和语音缓冲区。
+
+SERVO_TARGET_ANGLE = 0x1061  # 角度显示采用 10 倍缩放：900 -> 90°。
+
+SERVO_CONTROL_START_KEY_ADDR = 0x3040
+
+SERVO_CONTROL_START_BACK_VALUE = 0x5040
+
+SERVO_CONTROL_STOP_KEY_ADDR = 0x3050
+
+SERVO_CONTROL_STOP_BACK_VALUE = 0x5050
+
+ADDRESS_MAP = {
+    'servo.direction': SERVO_ROTATION_DIRECTION,
+    'servo.target_angle': SERVO_TARGET_ANGLE,
+}
+
+BUTTON_EVENT_MAP = {
+    (SERVO_CONTROL_START_KEY_ADDR, SERVO_CONTROL_START_BACK_VALUE): 'servo.start',
+    (SERVO_CONTROL_STOP_KEY_ADDR, SERVO_CONTROL_STOP_BACK_VALUE): 'servo.stop',
+}
+
+INPUT_EVENT_MAP = {
+}
+
+# Status result VP owned by this module.
+SERVO_STATUS_RESULT_ADDR = 0x6005

@@ -1,0 +1,838 @@
+{
+  ".env.face.example": {
+    "sha256": "2bd08ae8a0f657223ca1f82f6c7bcc112fd63bed6afacaaf5ada281b1ab7d184",
+    "bytes": 606
+  },
+  ".env.voice.example": {
+    "sha256": "7bc1392539b71164987817c5f29323d28beff1184ceeee456d0ca3a0c07d36e6",
+    "bytes": 209
+  },
+  ".gitignore": {
+    "sha256": "88467fd643def979552e6b1f155d0492c14cb02c8eb511663836707d57d43db0",
+    "bytes": 74
+  },
+  "FACE_API.md": {
+    "sha256": "ff35fc06a3865bc23f7a70b1759882833074591129e52dbb4b747090da19c947",
+    "bytes": 7527
+  },
+  "README.md": {
+    "sha256": "998f5c6cbaac1750eb4f46182ee6ed1aa0b1dd0224de6f66301ea12f6588d8f8",
+    "bytes": 126861
+  },
+  "application.py": {
+    "sha256": "cd1922146ee7a14e5fdecb71f1481f3e8b303a5dd692120f5b4c9acdcc4bd3c4",
+    "bytes": 5522
+  },
+  "camera_preview.py": {
+    "sha256": "98deac8407d3b52794edf58371411f1806c2ef81f08ae396b71e42c0c0cd4c35",
+    "bytes": 3617
+  },
+  "camera_view.py": {
+    "sha256": "0cfb61847d1b6b0b1a9787e9a6f9974510f73e3fbc6bb86c205b3efcb36787bb",
+    "bytes": 3381
+  },
+  "config.py": {
+    "sha256": "bbcb485baca040f9fba89773e1b25318dddafd54e160797f61a12c87bc6100c1",
+    "bytes": 4783
+  },
+  "constraints-jetson.txt": {
+    "sha256": "891247d9d266a10243675e3da0de6f60b7c815f7ee4ef821c925a02c222f4faa",
+    "bytes": 192
+  },
+  "deploy/99-ningbo-i2c.rules": {
+    "sha256": "f8fc64dcc6d03d3cc46a70c688bb40813c6d839456fdddcfb6f70165f5c14f68",
+    "bytes": 47
+  },
+  "deploy/99-ningbo-uart.rules": {
+    "sha256": "626434f09eb374926e592f638dd8fbeb07049ee7e426537448d64c8e3cc407fc",
+    "bytes": 136
+  },
+  "deploy/__init__.py": {
+    "sha256": "b50c05bcb240c8b648a3f03e181b63acf94de27f9e1c5abf0c5f0f61a52df70a",
+    "bytes": 14
+  },
+  "deploy/configure_face.py": {
+    "sha256": "aecc81692d35d5d79168cd9bb71366a0eec8c772035e69a2e9e482a02b1ec2a1",
+    "bytes": 2340
+  },
+  "deploy/configure_smoke_uart.sh": {
+    "sha256": "1e4c83bbd374167cd685d148c7daffde1e0587951f6d3bd6e709fbcf8945bd1e",
+    "bytes": 781
+  },
+  "deploy/configure_voice.py": {
+    "sha256": "4100709549dd7794cd1ce29f816d9b3b7b69efeb8d7b8ec81d6d81fe005b94ae",
+    "bytes": 1207
+  },
+  "deploy/ningbo.service": {
+    "sha256": "5e29705a9dd2d7ce980de43654ee04bf9cccce72f5dc27b98f5436ae5311da03",
+    "bytes": 382
+  },
+  "deploy/platform_check.py": {
+    "sha256": "40386d567c0188db484a97a7882d500d0776bd672e63d9d9ca9aeadd79fb7bda",
+    "bytes": 2425
+  },
+  "deploy/verify_models.py": {
+    "sha256": "58d11a7c25f853ac6075494d51dbdf760f4c7160011a0cf3a429e2c6ffecbd17",
+    "bytes": 1622
+  },
+  "deploy.sh": {
+    "sha256": "0220634c4b713fe222971700f7e72edba246f444ec16e6400962776a9b29e23c",
+    "bytes": 8548
+  },
+  "device_manager.py": {
+    "sha256": "a30487cc22f89dfd8da75e8aedadc7276c6d0fde0d670da563d164a094f68b6e",
+    "bytes": 10888
+  },
+  "device_service.py": {
+    "sha256": "04b8c00d2f7f279ab57efd7c19580d03e5c4242d42be3080e573849e9b019874",
+    "bytes": 3285
+  },
+  "experiments/__init__.py": {
+    "sha256": "624b70074556d6363c0fb400ffc28e4fffff8931a61ecc0b79bfd8c246177bd9",
+    "bytes": 575
+  },
+  "experiments/access/__init__.py": {
+    "sha256": "f462f52cc03abc661e78ab8be9dde5cd94289a7802cf17ba838f65c4b5cf149a",
+    "bytes": 25
+  },
+  "experiments/access/bridge.py": {
+    "sha256": "0f9ce40bb486403bf7c26d7cb53da316a72a16d01414becc2f79a7e712ee477e",
+    "bytes": 9715
+  },
+  "experiments/access/jetson/__init__.py": {
+    "sha256": "20175d5947ff1b3424621fe8329d198fc6c1c2169ff471c5fa21d9700efe300b",
+    "bytes": 180
+  },
+  "experiments/access/jetson/camera.py": {
+    "sha256": "78753a95fe98acc29b48bf0c29ef2c997cf64bcdc8ab8f269846633a1bc2af62",
+    "bytes": 4639
+  },
+  "experiments/access/jetson/camera_stream.py": {
+    "sha256": "2d743e53ec078751f68a330487b8982c31db27060943af26c991ec1d7376abf9",
+    "bytes": 5834
+  },
+  "experiments/access/jetson/checks.py": {
+    "sha256": "e9ea8490636966fccfbe446a2f6b18ff8530fe9568af9153e3577587720d2490",
+    "bytes": 1464
+  },
+  "experiments/access/jetson/cloud_library.py": {
+    "sha256": "140cb006b16ccb26a74ff607d8b23522705ef1b21c89d225c4b1a9c8a99ce04c",
+    "bytes": 2692
+  },
+  "experiments/access/jetson/cloud_service.py": {
+    "sha256": "0563b6457f48e28d726d4620a5af9fa05be25b6fb848d32375b6f68e5584c790",
+    "bytes": 8031
+  },
+  "experiments/access/jetson/config.py": {
+    "sha256": "d6b93e8a799f451784b2a3ef5ea0bc292cb8498ca36dba1941017e5e0158b10c",
+    "bytes": 9090
+  },
+  "experiments/access/jetson/controller.py": {
+    "sha256": "e60e1e756a66539d681a31b583ddd6412612983aca2c11193d8875b278e12652",
+    "bytes": 4689
+  },
+  "experiments/access/jetson/desktop_browser.py": {
+    "sha256": "7b068c9b830c199415bc3fca625af13642cf48819aabae2ae18c49b4b967218d",
+    "bytes": 5350
+  },
+  "experiments/access/jetson/diagnostics.py": {
+    "sha256": "d44b80fc1018f9a4c6aefaebf78399b4baec5387d6850d8a205d22a0df620dcc",
+    "bytes": 293
+  },
+  "experiments/access/jetson/engine.py": {
+    "sha256": "8f0b4bd41761275dc5e369088a32b7917c83b307db3b8219120faf22d24ae0e7",
+    "bytes": 3303
+  },
+  "experiments/access/jetson/features.py": {
+    "sha256": "a9d0dc35dbd81e7b6a2f5f5d47de4d395f6ae71c87c9d6338d71f6c36c227ba8",
+    "bytes": 1107
+  },
+  "experiments/access/jetson/library.py": {
+    "sha256": "18a83be103cee34df0e097f10e54ed0f80594ae80583abb638b6525ce3bb7d9b",
+    "bytes": 7225
+  },
+  "experiments/access/jetson/lock_control.py": {
+    "sha256": "b1ab47556b36135fb1fd7ddb75cd7fd4a39455a47713e61c91b0443090bc68a9",
+    "bytes": 2195
+  },
+  "experiments/access/jetson/lock_gpio.py": {
+    "sha256": "436a6df3de409cc814194455bdeef9d9e8fb41cf8081fdd69b3f52f50f0769c9",
+    "bytes": 817
+  },
+  "experiments/access/jetson/preview.html": {
+    "sha256": "59277084aaa2a4a596151c9c6d64e0fe87ed0da8aff071988cdc3b7e7bbb4d22",
+    "bytes": 6206
+  },
+  "experiments/access/jetson/preview.py": {
+    "sha256": "36611260ebb29d8305ca7a18557845fe8d7d1d4f17d55c8790ec5276818d2120",
+    "bytes": 9274
+  },
+  "experiments/access/jetson/service.py": {
+    "sha256": "2b5b415fe21ab9e043a3cc42f32af7b83372899fb98d3bc9740a35e7ea09d143",
+    "bytes": 14010
+  },
+  "experiments/access/jetson/tensorrt_models.py": {
+    "sha256": "fa54abe08413183203693c5e316db543ecf65b031ee46b252c44835ebfb98a16",
+    "bytes": 3995
+  },
+  "experiments/access/jetson/tensorrt_runner.py": {
+    "sha256": "cfeee171c3f400144aae1baf6789db4d4d54316a57b71f6e6f767ea02bdbb1a5",
+    "bytes": 9113
+  },
+  "experiments/access/jetson/xfyun_client.py": {
+    "sha256": "3de116846733ad7e14d09c97398d46ede7fd2b18cf842b0a61a56bb0cf331a2f",
+    "bytes": 8175
+  },
+  "experiments/access/serial_screen/__init__.py": {
+    "sha256": "3ddb39b7976f3c8baff3e3591fc610d3bbbacc0e69fa6282e9810ae2737b0ebf",
+    "bytes": 28
+  },
+  "experiments/access/serial_screen/addresses.py": {
+    "sha256": "95366fa6aae0494430b1100d2ccf0140f70d20ff1ce7055d47c63a5b2763e75f",
+    "bytes": 541
+  },
+  "experiments/access/serial_screen/screen.py": {
+    "sha256": "575e0a62a0b8b1a599c711903503b821d1bcc93962e71d2fe98ac6b37b4db1d0",
+    "bytes": 521
+  },
+  "experiments/body_temperature/__init__.py": {
+    "sha256": "767f5ac6cd101df539a2dcd9d48268a8b1f8ba1a7433f08ce4120170540b1e38",
+    "bytes": 35
+  },
+  "experiments/body_temperature/bridge.py": {
+    "sha256": "b7261197779f97fe0ad11a523342a952aa93af48e57a8c91117c92f605e8999a",
+    "bytes": 2326
+  },
+  "experiments/body_temperature/jetson/__init__.py": {
+    "sha256": "811943f7b8718a9cffdd5ecd03fd9b2f5b347a4bd896b6e53498b4149247eec7",
+    "bytes": 31
+  },
+  "experiments/body_temperature/jetson/config.py": {
+    "sha256": "c45f69419fd4d04864d63466778a4012746abf7bfb455f54943ce1b50c74b56d",
+    "bytes": 2162
+  },
+  "experiments/body_temperature/jetson/controller.py": {
+    "sha256": "b526bd1bcb0c20cb4ade94012b21ac3f836851f3fb4f5fc7eb00c35534bfe3c1",
+    "bytes": 4641
+  },
+  "experiments/body_temperature/jetson/diagnostics.py": {
+    "sha256": "086f8cac8836b777c342fd702985ee804eeede7f797e115ca64199a31f51faf8",
+    "bytes": 539
+  },
+  "experiments/body_temperature/jetson/driver.py": {
+    "sha256": "d55c43996eca8076234dfcdbf769ce11d843d074cdb8b1bee11f8130a4b02400",
+    "bytes": 2030
+  },
+  "experiments/body_temperature/jetson/feedback.py": {
+    "sha256": "27fba98613e3819ed1ffa2f6086b7cd7f2c6d4fced3a45886ffa556deea50f11",
+    "bytes": 452
+  },
+  "experiments/body_temperature/jetson/readings.py": {
+    "sha256": "59432bec105b911b7036119e056b47bddb9cf7bf77a0dab58374119ee19636a3",
+    "bytes": 1547
+  },
+  "experiments/body_temperature/serial_screen/__init__.py": {
+    "sha256": "d1c2bb7c801e5958f495099b9b3010d2d3d42cb8db556ff8d7e0e9e66568bf8a",
+    "bytes": 38
+  },
+  "experiments/body_temperature/serial_screen/addresses.py": {
+    "sha256": "c5c1c4aa992f1e87d148190cd9f108d9808763ce06e2343d861ecc2553e909a9",
+    "bytes": 672
+  },
+  "experiments/body_temperature/serial_screen/screen.py": {
+    "sha256": "605f7a5b57b4f0f5eaf11ba0ff3b90aaf855758908d517bf1ce3910efa8cc147",
+    "bytes": 1803
+  },
+  "experiments/environment/__init__.py": {
+    "sha256": "5c8467677ac82b58ae9a99af46b175298ff715ba4c9914ce83722965e22b7f54",
+    "bytes": 30
+  },
+  "experiments/environment/bridge.py": {
+    "sha256": "c21537c2806eb1b6bef4ab1f080ca101676433a557b7f8d8f340bef5b082d432",
+    "bytes": 2127
+  },
+  "experiments/environment/jetson/__init__.py": {
+    "sha256": "d0c0e69e729638590801ea95bd9b4fbfeda406a0d32b506507a552f1c9a7b0c2",
+    "bytes": 26
+  },
+  "experiments/environment/jetson/config.py": {
+    "sha256": "d2cd21ab73cce9528e817f585e12d6f9db9b1ddc340e652e550149336747674f",
+    "bytes": 2464
+  },
+  "experiments/environment/jetson/controller.py": {
+    "sha256": "4fe605de0d4d29bc9528f25eb1231a2c8cc7ae16669f7a4af82d9a45b9b14529",
+    "bytes": 3815
+  },
+  "experiments/environment/jetson/dht11.py": {
+    "sha256": "461d00df1ff89fd8af6f56e9b03cb353b9d6931c26b8756b92d63e6994adcaa7",
+    "bytes": 5034
+  },
+  "experiments/environment/jetson/diagnostics.py": {
+    "sha256": "13854323174dbf079d178ffe5f8c9444ad77c65df7f84d44d3d66b3073c55edc",
+    "bytes": 551
+  },
+  "experiments/environment/jetson/light.py": {
+    "sha256": "c89247ef81f3002766e2e46382f059bac9e12d59f8298ca0709dd392590da324",
+    "bytes": 609
+  },
+  "experiments/environment/jetson/native/dht11_gpiod": {
+    "sha256": "9935d0b2cf745fe68ff6f8acc142c301c43bd84b4857efc1ee0129a39caf4b9e",
+    "bytes": 14232
+  },
+  "experiments/environment/jetson/native/dht11_gpiod.c": {
+    "sha256": "1cd76a5f0e5713945cbfe850a9ff786aee34a66cc156dc4398143ad1bd456e64",
+    "bytes": 4506
+  },
+  "experiments/environment/jetson/readings.py": {
+    "sha256": "feb608915b456745cbdc884c7e57dbbbee0e4d0e6900bbff7a211e2eae6b274d",
+    "bytes": 936
+  },
+  "experiments/environment/serial_screen/__init__.py": {
+    "sha256": "83b6f8872ada99099c91e33f68049dff73f83b94bde3a33c8a16a23139fa645a",
+    "bytes": 33
+  },
+  "experiments/environment/serial_screen/addresses.py": {
+    "sha256": "6d3a2461aa1ee75eb14e1df60ee2524abcb50990a117820451bab5237e46dde7",
+    "bytes": 877
+  },
+  "experiments/environment/serial_screen/screen.py": {
+    "sha256": "e9d3bd7a465d158eed4a082339860edab1d0e3371898e4483a18fcbdd752ec28",
+    "bytes": 2806
+  },
+  "experiments/fan/__init__.py": {
+    "sha256": "1b2b77195af5018dd544448b7c7c429c6758b3ad9d06c2bf860d407a49da9143",
+    "bytes": 22
+  },
+  "experiments/fan/bridge.py": {
+    "sha256": "c7f0e7fdc394996873c2321ada49c3d5bddc5a1d5dd7089f1bcff11892ef61cf",
+    "bytes": 577
+  },
+  "experiments/fan/jetson/__init__.py": {
+    "sha256": "8202bd5ea8d265b9e776553f72009f1c3c332209c2ea6484325fbffaccdb3ba5",
+    "bytes": 18
+  },
+  "experiments/fan/jetson/config.py": {
+    "sha256": "d1361d639885c69682d67f39cf3e1a4c2f3bea6352e89059a85563f3722861b9",
+    "bytes": 1492
+  },
+  "experiments/fan/jetson/controller.py": {
+    "sha256": "9d81def811fa624e02f8b0cfd0933ebd7b9e566f4e9e7ce685c33ac740e2f909",
+    "bytes": 4676
+  },
+  "experiments/fan/jetson/diagnostics.py": {
+    "sha256": "525f02880e970be2b65b85e75d79b2b364b466537461f74487e4d5347ce01fb3",
+    "bytes": 5824
+  },
+  "experiments/fan/jetson/gpio.py": {
+    "sha256": "908669a3e20aa1efcfb7e298c4d67816447c78ff30c51dd74d6846c07645c564",
+    "bytes": 813
+  },
+  "experiments/fan/serial_screen/__init__.py": {
+    "sha256": "f0e8e529b5ddc3b53efb26cdc63d3ba3a33540915a5ccbbb2bb86fc67479b037",
+    "bytes": 25
+  },
+  "experiments/fan/serial_screen/addresses.py": {
+    "sha256": "af779e5649e33a036276a38611dadba66c66be42f5a6ee49f301b1da0fb02822",
+    "bytes": 511
+  },
+  "experiments/fan/serial_screen/screen.py": {
+    "sha256": "a8df5ff3ab57d0ac08defcb19b537432fd3b779ca24533c83228a0ac24980ffd",
+    "bytes": 1211
+  },
+  "experiments/servo/__init__.py": {
+    "sha256": "33327278c9498d997c3c8d8f73e4152d0b257132900e7b47360d710b5a2b08ae",
+    "bytes": 24
+  },
+  "experiments/servo/bridge.py": {
+    "sha256": "60e28ee237899460d42eb19054da7948eeff2c73712ee62f35ae1f0c74ff990d",
+    "bytes": 3464
+  },
+  "experiments/servo/jetson/__init__.py": {
+    "sha256": "9ef0998771baad92bb99d594ee7cbadd17480f187aafa3bc79d01657d55da07b",
+    "bytes": 20
+  },
+  "experiments/servo/jetson/config.py": {
+    "sha256": "5f385c94a9ba449c4b6bfa2bafbed8ddaab0b1c787e861a38d976ecc83a76a3f",
+    "bytes": 3260
+  },
+  "experiments/servo/jetson/controller.py": {
+    "sha256": "166f90eeb59263691e04a52bd70a04af33c09910a0e023e510ba630920def606",
+    "bytes": 4715
+  },
+  "experiments/servo/jetson/diagnostics.py": {
+    "sha256": "84c2360288ad36eb8544553e97ed46aa6c735fcf2979afc96518bf3b005f7919",
+    "bytes": 8336
+  },
+  "experiments/servo/jetson/gpio.py": {
+    "sha256": "d713a384b080fbd3f409741ba248b29b84f581c05fe8c53f4fceb75fdc97c628",
+    "bytes": 5638
+  },
+  "experiments/servo/serial_screen/__init__.py": {
+    "sha256": "db7b3766dba41436c5a35dd38571a5c5ed664b7152bf3a2ef56374402f483c66",
+    "bytes": 27
+  },
+  "experiments/servo/serial_screen/addresses.py": {
+    "sha256": "c77f4b43571fbc60ea6c6a92d15d9ae8a1de839648942fed97df90bde3145350",
+    "bytes": 821
+  },
+  "experiments/servo/serial_screen/config.py": {
+    "sha256": "da376a60e6b5ecd5aec075e663cd49f92889b05263d834fba09843d0f510153d",
+    "bytes": 645
+  },
+  "experiments/servo/serial_screen/screen.py": {
+    "sha256": "a9cd0efbd09ff19428ed7c88b5012e635336707ecb63a0d098f5378261ad1d2c",
+    "bytes": 2841
+  },
+  "experiments/smoke/__init__.py": {
+    "sha256": "d9f000b68a52acdc6b843cc171b9afe9377be4de873104c6eeaa12c82d66bebc",
+    "bytes": 24
+  },
+  "experiments/smoke/bridge.py": {
+    "sha256": "e2c05add151a30a1a243e2d9dd852161e0a4b505f55b79b62a79f882a53cd545",
+    "bytes": 2076
+  },
+  "experiments/smoke/jetson/__init__.py": {
+    "sha256": "a84369c1f918a3a82776ef09081b0e6b14fcb055d6f3722427ff7069e1c81992",
+    "bytes": 20
+  },
+  "experiments/smoke/jetson/config.py": {
+    "sha256": "4643d7ebfd00cfd5cb5e6eb6175a71a40f20abaa447395dcb927cbbb9bc58713",
+    "bytes": 1822
+  },
+  "experiments/smoke/jetson/controller.py": {
+    "sha256": "d14f2a793e06601ca62f4b33f7d6f9a1602c13d4d65202f77eb1aede719744b5",
+    "bytes": 4090
+  },
+  "experiments/smoke/jetson/diagnostics.py": {
+    "sha256": "24d725372d0280a3d38ec5407941b56f9ca40914890bb5b9d11818fd3c5cfd75",
+    "bytes": 1382
+  },
+  "experiments/smoke/jetson/driver.py": {
+    "sha256": "bf3ff92bdd08f94a3b4e73fe13a9b1f6815c87ac0cee425b5de277f0850b41ce",
+    "bytes": 5187
+  },
+  "experiments/smoke/jetson/readings.py": {
+    "sha256": "3416c155e0cc962e1960450932b5777c253212a2038eb7ac3e51448c0b349ef8",
+    "bytes": 2174
+  },
+  "experiments/smoke/jetson/smoke_protocol.py": {
+    "sha256": "04863909aa476e6f9f8203a6a8d592997369a8c7a6e435a726aa7f5f38764b12",
+    "bytes": 1611
+  },
+  "experiments/smoke/serial_screen/__init__.py": {
+    "sha256": "2fe3c7a55393f80aaf62adca5fa32ad8c0398fa975532b6a9439a12b42d7d73c",
+    "bytes": 27
+  },
+  "experiments/smoke/serial_screen/addresses.py": {
+    "sha256": "c71e95763ed2424892654afacc4d5a5a3a5d8d5489dac93ba911d2f6723c4881",
+    "bytes": 589
+  },
+  "experiments/smoke/serial_screen/screen.py": {
+    "sha256": "64e8e468f8ccac6fa9a5a60681c813657f02c20f87907bab81a330554548888f",
+    "bytes": 2494
+  },
+  "experiments/stepper/__init__.py": {
+    "sha256": "bb251ce58679564eed7817885dc135e43d23164c5f331d451b77e2a126900e49",
+    "bytes": 26
+  },
+  "experiments/stepper/bridge.py": {
+    "sha256": "783d321991f9c44fafc9bc4f391775b9a821175dcad9490c6fb7b94356e42072",
+    "bytes": 4792
+  },
+  "experiments/stepper/jetson/__init__.py": {
+    "sha256": "a171a922282bee080638d9e93dc7e623a64f0fb89e14dec7d981f94895e3df69",
+    "bytes": 22
+  },
+  "experiments/stepper/jetson/config.py": {
+    "sha256": "aaf154a6d97ab759aa7de3acc3a4ce19ea2a69a1221466c0feb41a525fe161e9",
+    "bytes": 3101
+  },
+  "experiments/stepper/jetson/controller.py": {
+    "sha256": "7b3aea703255d4c9870c3977a61463f7d9068c34fa06b1101571b31166d7d7bf",
+    "bytes": 5336
+  },
+  "experiments/stepper/jetson/diagnostics.py": {
+    "sha256": "f83664cc9a229246b9f0e1ba3da0f0f16b791d4f08eef38723b42f82342f859b",
+    "bytes": 8183
+  },
+  "experiments/stepper/jetson/gpio.py": {
+    "sha256": "a136f91cc3daec4e0b69d25cb3a7bfa95804bbd022162c84350553fc7aabf8df",
+    "bytes": 4078
+  },
+  "experiments/stepper/serial_screen/__init__.py": {
+    "sha256": "5f0f979f9a819145c1262eefa81f7937bbaf8c87785d68bce5f7b56a5e6882c4",
+    "bytes": 29
+  },
+  "experiments/stepper/serial_screen/addresses.py": {
+    "sha256": "d5802b8eb772124b99cc94e268ce6e4c70568bd81397130636fcca6089a22695",
+    "bytes": 785
+  },
+  "experiments/stepper/serial_screen/screen.py": {
+    "sha256": "77ecf7250456d38b0218826e684eb2235ae856f4d824c4bf4c80d73d517c3418",
+    "bytes": 2850
+  },
+  "experiments/ultrasonic/__init__.py": {
+    "sha256": "a0d9b7733c3281b381bafe0ac18fc9b0cd7e6f3512c90bdcf733677daa944cb9",
+    "bytes": 29
+  },
+  "experiments/ultrasonic/bridge.py": {
+    "sha256": "53209c8e2d24d235879ce57a1620576777dc381cef143c90b487765a9d81e365",
+    "bytes": 2091
+  },
+  "experiments/ultrasonic/jetson/__init__.py": {
+    "sha256": "c26ad5b000dec882f1b435dd8c206a6ad4e24db1d1d7b6f10f5cd904a789e83e",
+    "bytes": 25
+  },
+  "experiments/ultrasonic/jetson/alarm.py": {
+    "sha256": "69a4c8f3abc9ed979340163de0389afe5edbafebc79b4bbb7177833b2bb8b261",
+    "bytes": 1954
+  },
+  "experiments/ultrasonic/jetson/buzzer_gpio.py": {
+    "sha256": "7b049b6880e3c834fa0b4f7155499a80f19089a3b1aefd6ff4a4086e8c6a2670",
+    "bytes": 823
+  },
+  "experiments/ultrasonic/jetson/config.py": {
+    "sha256": "224ca253d9863a34006af96b743819395419c66f05a65f60fe2727eaa1bde6c8",
+    "bytes": 3520
+  },
+  "experiments/ultrasonic/jetson/controller.py": {
+    "sha256": "91cbd28df87ae01c492499ceaaa3ae4dabf1c40c149fbc7eb11f9ce16272cff2",
+    "bytes": 8014
+  },
+  "experiments/ultrasonic/jetson/diagnostics.py": {
+    "sha256": "61ad566b3e65ea7c218a9ca66a7ef1d1663c0c3a28aeeb3ed446ce22927bcbd7",
+    "bytes": 6520
+  },
+  "experiments/ultrasonic/jetson/feedback.py": {
+    "sha256": "6778cfe5e909f581c4f8504d345afd49d0793c4de0a4d423a59dd6983553d48a",
+    "bytes": 543
+  },
+  "experiments/ultrasonic/jetson/gpio.py": {
+    "sha256": "f54a10505b7101ae21fed3e603c9e6027e2cf0a504574d8d3dd70b17aeb758e5",
+    "bytes": 1824
+  },
+  "experiments/ultrasonic/jetson/readings.py": {
+    "sha256": "bd5d3927fb39ed2a6adcc0c08dcea1cca7bab3f6eadeda3122f732bcfd1126ca",
+    "bytes": 1522
+  },
+  "experiments/ultrasonic/serial_screen/__init__.py": {
+    "sha256": "e7560140a6f877d7797d735b363e42635b587f5c7d637e563b398f5807f3c0c1",
+    "bytes": 32
+  },
+  "experiments/ultrasonic/serial_screen/addresses.py": {
+    "sha256": "e4eed9112939004bf8f557944e4aea1b8bddfc9a7b312b1d7c4416a138eb7565",
+    "bytes": 708
+  },
+  "experiments/ultrasonic/serial_screen/screen.py": {
+    "sha256": "9c3559946a0643a59708610332080f30d99519b566a4d3b643a56459159518dd",
+    "bytes": 2675
+  },
+  "experiments/voice/__init__.py": {
+    "sha256": "f681042d0497381f8d39567c0169b98b0ff034d57d54034bd13cb9553dbe0201",
+    "bytes": 24
+  },
+  "experiments/voice/bridge.py": {
+    "sha256": "393d7bb3f6454c2ce9f7254d3fc525395714e5fc432dfad97b1f5eadd7174f1d",
+    "bytes": 5022
+  },
+  "experiments/voice/jetson/__init__.py": {
+    "sha256": "bb6109d1a6ac4ad773f06be7f84cf06fd84a55d07a85f2c3b5d3441b622d31ab",
+    "bytes": 163
+  },
+  "experiments/voice/jetson/checks.py": {
+    "sha256": "c79dd7b304e72013d49946919ab697cb2852cd8a9647a65c58b2c8dafbe8751f",
+    "bytes": 1199
+  },
+  "experiments/voice/jetson/config.py": {
+    "sha256": "986da4517b0d9b37e7d02fcfee2a03b57f66897b863131cf4893b5af9ad0795f",
+    "bytes": 6137
+  },
+  "experiments/voice/jetson/microphone.py": {
+    "sha256": "699356e6447d76fd174d87750046a333156ebde953ae4ad563452d60117b09a0",
+    "bytes": 6328
+  },
+  "experiments/voice/jetson/recognizer.py": {
+    "sha256": "b50b9d1afe6d3d880b5e4e66b93d20e4a5bfe5a58fb12a5fec65b0b5717b0163",
+    "bytes": 2166
+  },
+  "experiments/voice/jetson/service.py": {
+    "sha256": "0fe38f54b4cb595be364e2c82f7efbd0e0865a1127214f8254b0fe338a4d9c84",
+    "bytes": 7705
+  },
+  "experiments/voice/jetson/whisper_recognizer.py": {
+    "sha256": "0ac2d7582a12a1630c655294e7a1c4152fc36c87e03fd4de670a0b09eb9edf1d",
+    "bytes": 4365
+  },
+  "experiments/voice/jetson/xfyun_recognizer.py": {
+    "sha256": "0b016223c1afadd758a59e1159c5b9df6cd97982900e467600d0a5eca40351c3",
+    "bytes": 17251
+  },
+  "experiments/voice/serial_screen/__init__.py": {
+    "sha256": "1b19009b55fb8e181fb545b969923faa3005e1348ba17d54e01d3aa16d871c41",
+    "bytes": 27
+  },
+  "experiments/voice/serial_screen/addresses.py": {
+    "sha256": "3db358ab696eac0ce76495a6081a7665ebf7f123144186132837adc137c59042",
+    "bytes": 550
+  },
+  "experiments/voice/serial_screen/screen.py": {
+    "sha256": "8bd9e2567d308224643bb4f2b3075e793315096294a5eec497ffd676374ea64f",
+    "bytes": 2601
+  },
+  "hardware/__init__.py": {
+    "sha256": "82126efefb032b4dd2472b263c9468a7cd7636d0e14edc033102dc9e0579d447",
+    "bytes": 15
+  },
+  "hardware/adc/__init__.py": {
+    "sha256": "18f0b08743029056f4dc4d427934c6fe0250a73c34866c312304cb7eb4cc4a6a",
+    "bytes": 19
+  },
+  "hardware/adc/config.py": {
+    "sha256": "fe395ae866b5c023860bb3a550b1e1f2c34c74956938f6f09869700df54472dd",
+    "bytes": 5474
+  },
+  "hardware/adc/current.py": {
+    "sha256": "fe8afea58f26ff924c31acc6c108c37e6511418d0f7a932850fe180e4a566782",
+    "bytes": 973
+  },
+  "hardware/adc/diagnostics.py": {
+    "sha256": "d691fd7b45b1e0d160f342f1f49998214b3090216a7b106c89c33962ff1c24ec",
+    "bytes": 6892
+  },
+  "hardware/adc/voltage.py": {
+    "sha256": "0d65d59a4c931dcf6ebe302f4a42e387fa3f973f002d8605cd7115a589c19629",
+    "bytes": 2667
+  },
+  "hardware/diagnostics.py": {
+    "sha256": "3aa30eedd135521697b39a46ff0158a5d70a3e8073e36096c223c18e8e31071f",
+    "bytes": 5273
+  },
+  "hardware/gpio.py": {
+    "sha256": "f80e2039186d0dea23b9c225484250ebaa0a40beebc43f25e8f3973786ad6377",
+    "bytes": 2213
+  },
+  "hardware/i2c.py": {
+    "sha256": "b7f5ed058b3e914961d53de8580293cae0a7a51af31364c9b41c7380113ab15a",
+    "bytes": 1704
+  },
+  "hardware/pinmap.py": {
+    "sha256": "118f67ab312dce5ccaff2b1f3903e383cf4cf6597327ed3306d8c0305fe9f5fb",
+    "bytes": 1255
+  },
+  "hardware/rgb/__init__.py": {
+    "sha256": "72badb6b3501335d1fa83dd871c01dd2c8f7f3237bb4a7d2777db4793fee99a1",
+    "bytes": 19
+  },
+  "hardware/rgb/config.py": {
+    "sha256": "979335966411fc92d57065fcda3445e08e0b75011e54d95934f23af594ffa58a",
+    "bytes": 3129
+  },
+  "hardware/rgb/controller.py": {
+    "sha256": "3fb0a6b3b6df85f5727ffb2f6bee3762b7d42f33ba531cdcf6b2898959b87ae7",
+    "bytes": 4703
+  },
+  "hardware/rgb/diagnostics.py": {
+    "sha256": "3d663b38bd335d8d0134f54f76adb84522c5377ecb65f55133b7dd4362bf9843",
+    "bytes": 6008
+  },
+  "hardware/rgb/feedback.py": {
+    "sha256": "bfbed99f492639a88d0453aa3e18950c2f1d39bcf18801c85987f0fb800b4844",
+    "bytes": 2655
+  },
+  "hardware/rgb/gpio.py": {
+    "sha256": "f03edd8042c7e1464c03f8219a3ec5e5f2b37e915ffde79e59a61faf64c5f593",
+    "bytes": 2000
+  },
+  "hardware/rgb/status_addresses.py": {
+    "sha256": "b198ab36464cd30985cd84c00b0884a99d1f2798eb04e5933ac8bbfa88aefc5e",
+    "bytes": 119
+  },
+  "hardware/rgb/status_screen.py": {
+    "sha256": "63b88a6418754d9f64fb8bf13184529efc102f2a28daf1ff7e1591693cde4215",
+    "bytes": 699
+  },
+  "hardware/screen/__init__.py": {
+    "sha256": "1494a99545f31493fd839c308fecc5fe1b06606dcbcc7e15ec0390c708c855dd",
+    "bytes": 22
+  },
+  "hardware/screen/config.py": {
+    "sha256": "0854d56ab46ee4a1bc21f97293c3a96feda874f27ab01d208177e3393f2c21da",
+    "bytes": 1600
+  },
+  "hardware/screen/frames.py": {
+    "sha256": "a8566ef5c41a6b71f2f22a9ee2c3d78da797591ef90edd0da4a8b150960ccfa9",
+    "bytes": 2204
+  },
+  "hardware/screen/sender.py": {
+    "sha256": "f9af315135189ce85573450134656b200d4d66f7071102e38a0e3ca90c86c8bf",
+    "bytes": 5282
+  },
+  "hardware/screen/serial_discovery.py": {
+    "sha256": "966f4b2933592e6da6d12b2940a4efec40897344761f834ae44d89336b9b85e6",
+    "bytes": 4089
+  },
+  "hardware/validation.py": {
+    "sha256": "64c6e0c0ad32c16ea1bd70fd2937f677284e2c74e1e39e5e039f62cbe6941835",
+    "bytes": 1601
+  },
+  "main.py": {
+    "sha256": "3869d07bbccaebaa2677ccfb3d6802031e82f81da7ab487ed29bce58bc18a7ac",
+    "bytes": 11839
+  },
+  "paths.py": {
+    "sha256": "4eddf9782273171f527c1667a5f40cdd2fb4ed7348591547b2be2e5babc5d048",
+    "bytes": 145
+  },
+  "requirements-whisper.txt": {
+    "sha256": "f7837827596de343636a2dec6b36ec9f7c82648c58ec412c894a1867ad4a7b02",
+    "bytes": 276
+  },
+  "requirements.txt": {
+    "sha256": "df1b0f6f5ad677284115b8a1f38eafb748931b4c5e572efdba3dc78067b3ce9a",
+    "bytes": 231
+  },
+  "run.sh": {
+    "sha256": "4c147c91a037de4114e2c49d0bcbc00a54401d4797d69356153af8386b07f0be",
+    "bytes": 428
+  },
+  "scene_router.py": {
+    "sha256": "e2a01e81e12100beec64f6e3d37247441dc77fb5e06912c6b4934c9d57033244",
+    "bytes": 8156
+  },
+  "screen_registry.py": {
+    "sha256": "39905d60264337b32b33dda5f17c0f750953c4474dce73abe306a752f7041dc6",
+    "bytes": 1706
+  },
+  "screen_service.py": {
+    "sha256": "c9c63c7ac337665c64af5b0976412ba6a3ec66ca2ed5593dcf75d84e09d53afe",
+    "bytes": 3484
+  },
+  "system/__init__.py": {
+    "sha256": "ab89f1cf1c68000864ac2f11ada87257516f44f6cb481345fea64c7853ef0b45",
+    "bytes": 14
+  },
+  "system/diagnostics/SCENE_OWNERSHIP.md": {
+    "sha256": "446e1c6c071ee02fc95d346150eb559d2ae5289a3c91c7bde6279a67da6990f2",
+    "bytes": 3103
+  },
+  "system/diagnostics/__init__.py": {
+    "sha256": "f239e99371c698b36909c580ff6ed8c92b4b75f261b5de33d7d5fa2ca30facb6",
+    "bytes": 26
+  },
+  "system/diagnostics/bridge.py": {
+    "sha256": "2edf007eb61db4d4ee9c3c720ea85a44f2e407867029e276568f7cf3d6848e12",
+    "bytes": 1824
+  },
+  "system/diagnostics/jetson/__init__.py": {
+    "sha256": "ca951f5b4ccef926b83ed2f24deddde1113cf1553df5a307361e56897e4a72f5",
+    "bytes": 327
+  },
+  "system/diagnostics/jetson/actuator_checks.py": {
+    "sha256": "fd69d306688f3cb62470b1b354669bbfd8c6e3a0a56d1986cd3b9ad842b2fb39",
+    "bytes": 1065
+  },
+  "system/diagnostics/jetson/config.py": {
+    "sha256": "e7cf40986b4f98876bcb0b62f1276058af54af07ad8d5a1330738d98e6961b2e",
+    "bytes": 889
+  },
+  "system/diagnostics/jetson/definitions.py": {
+    "sha256": "54b813ede7c56389e3cc75bf8061bdaebc3e2a90e74f082a99d4d7c42cc046ea",
+    "bytes": 614
+  },
+  "system/diagnostics/jetson/sensor_checks.py": {
+    "sha256": "b4c0ce2d1ea4414aa0965ff94fc87eac4202ed4aaf53dab5e8ecf9b6dbe01c24",
+    "bytes": 813
+  },
+  "system/diagnostics/jetson/service.py": {
+    "sha256": "dfa3c04928957384462f055ae9093a1c69fddbd395dc5f8b8a833dedef10ae50",
+    "bytes": 4922
+  },
+  "system/diagnostics/serial_screen/__init__.py": {
+    "sha256": "e3d435ef7019f397037f12fb024dcc454005b3a35df6086de44ed767173c5f18",
+    "bytes": 40
+  },
+  "system/diagnostics/serial_screen/addresses.py": {
+    "sha256": "f1d46e52d27bb3b895979e22570b8d45374b5bd13ddeac342b711057526f56e4",
+    "bytes": 2587
+  },
+  "system/diagnostics/serial_screen/screen.py": {
+    "sha256": "dc3327084aa2f6544dcb51c9651e530a0d3bdfaa8460fd4e553182f32b8e8618",
+    "bytes": 6294
+  },
+  "system/pin_test.py": {
+    "sha256": "ae3a4cc0f0bfccf4ae53673c80330b4171e5e190e1c9d475dd2eca0d86f469a9",
+    "bytes": 3719
+  },
+  "tests/test_access_enrollment.py": {
+    "sha256": "ac10ab03f4ad945dbd1bad0c5acd9c24f0a102ed259aecf1d19565f112e199da",
+    "bytes": 9101
+  },
+  "tests/test_access_verification.py": {
+    "sha256": "cf800eb1c8143aa42170648edbbbab2b0140c4c756b432b7384b5b0f37d780ce",
+    "bytes": 11735
+  },
+  "tests/test_adc_mapping.py": {
+    "sha256": "087896bf2f916cfc23f2cd24a1806fc1fc0ebdacdfc5ffbeab61b126809e9f9f",
+    "bytes": 1482
+  },
+  "tests/test_buzzer_status.py": {
+    "sha256": "e987ed1893736d7ce99abb39d6225d990b6efe1b134931514d98eb9ef0d01443",
+    "bytes": 7237
+  },
+  "tests/test_camera_preview.py": {
+    "sha256": "de2bb79784bcdefebdbd04fef89bdc0731f69ca5cb61048572d27da1a9c7d2ce",
+    "bytes": 12096
+  },
+  "tests/test_dht11_native.py": {
+    "sha256": "1cba3a93a0fbb3eb077d5d84a78e3d175f9fc0eff150301745b2a14e056586b7",
+    "bytes": 6048
+  },
+  "tests/test_environment_status_text.py": {
+    "sha256": "cdab45c49ad0abe02539a6369f1241ebd60241aa76b3e098a2c75bf8140c99c1",
+    "bytes": 3865
+  },
+  "tests/test_face_cloud.py": {
+    "sha256": "2565362ed2bb38a1e2f3025268fc49073f77f471871e8310b571e35c3f0c2303",
+    "bytes": 11485
+  },
+  "tests/test_fan_status.py": {
+    "sha256": "3bd8b3e626b400fbbaff9f948e27886cb230080ed518ca9c3670cb384ff4f117",
+    "bytes": 7339
+  },
+  "tests/test_rgb_status.py": {
+    "sha256": "ff1f6a2f8d334c764a5fcc652863f2abae17620ed9710f4f049f92c88f201001",
+    "bytes": 6600
+  },
+  "tests/test_scene_diagnostics.py": {
+    "sha256": "a500cb264af77e97b13ef0019cd8e3e4cfdaecfb61c43b700625524ec72cf85a",
+    "bytes": 6232
+  },
+  "tests/test_servo_status.py": {
+    "sha256": "3fae121f0e4e58ab50ccc278403f8c60f85adec3b6870bf0dfc93065a60775f2",
+    "bytes": 7407
+  },
+  "tests/test_smoke_status.py": {
+    "sha256": "d29d130f563398f147a427b8fa7f75fd92fe1aaf87c45ee465e4e57f9f8f809c",
+    "bytes": 6302
+  },
+  "tests/test_startup_gpio.py": {
+    "sha256": "85dce7b0cc9a04f4529246d9ece7dbea9d6530245b0f4c9a25bbf918d293f4a6",
+    "bytes": 14456
+  },
+  "tests/test_stepper_display.py": {
+    "sha256": "c5dc3119b8ffb1dda03ec9f644b485c4f3ff67050cff5b255ba2f4382ea394ea",
+    "bytes": 7659
+  },
+  "tests/test_stepper_status.py": {
+    "sha256": "6e4acbe2090b75f3d6b2f16b8721f4a762910725fbecf0704b8cfce81fe83270",
+    "bytes": 8279
+  },
+  "tests/test_ultrasonic_status.py": {
+    "sha256": "27d65385e046697acb348002240e9b061587ac4881b04913905cd62db5c238f7",
+    "bytes": 7275
+  },
+  "tests/test_voice_continuous.py": {
+    "sha256": "abbe7a6c7112e32afa582e5a1cd67ae7140d5a4f59a9b86f991b4224694e74f6",
+    "bytes": 14339
+  }
+}
