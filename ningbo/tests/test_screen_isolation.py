@@ -8,6 +8,10 @@ from types import SimpleNamespace
 
 from hardware.screen.ipc import JsonChannel, RemoteScreenService, MAX_BUFFER
 from screen_daemon import ScreenDaemon
+from config import DEFAULT_CONFIG
+from experiments.smoke.jetson.driver import SmokeDriver
+from system.diagnostics.jetson.service import DiagnosticService
+from system.diagnostics.bridge import DiagnosticsScreenBridge
 
 
 class FakeScreen:
@@ -45,6 +49,82 @@ class FakeScreen:
 
 
 class ScreenIsolationTests(unittest.TestCase):
+    def test_smoke_diagnostic_request_after_screen_restart_keeps_same_uart(self):
+        class Uart:
+            def __init__(self):
+                self.data = bytearray()
+                self.closed = False
+
+            @property
+            def in_waiting(self):
+                return len(self.data)
+
+            def read(self, count):
+                result = bytes(self.data[:count])
+                del self.data[:count]
+                return result
+
+            def close(self):
+                self.closed = True
+
+        uart = Uart()
+        opens = []
+
+        def factory(**kwargs):
+            opens.append(kwargs)
+            return uart
+
+        smoke = SmokeDriver(DEFAULT_CONFIG.smoke, serial_factory=factory,
+                            clock=lambda: self.now)
+        self.addCleanup(smoke.close)
+        manager = SimpleNamespace(config=DEFAULT_CONFIG, _started=True,
+                                  poll_sensor=lambda name: smoke.read())
+        diagnostics = DiagnosticService(manager)
+        self.addCleanup(diagnostics.stop)
+        bridge = DiagnosticsScreenBridge(self.proxy, SimpleNamespace(
+            request_diagnostics=diagnostics.request,
+            diagnostic_snapshot=diagnostics.snapshot))
+        self.start_daemon()
+        self.proxy.start()
+        self.cycle()
+
+        for attempt in range(5):
+            if attempt:
+                self.daemon.close()
+                self.daemon = None
+                self.cycle()
+                self.start_daemon()
+                self.now += 2
+                self.cycle(30)
+            # Exercise the real driver from the sampling path first, then
+            # request diagnostics through the actual screen IPC event path.
+            uart.data.extend(bytes.fromhex('ffaa015b3c'))
+            self.assertEqual(smoke.read()['status'], 'normal')
+            self.screen.events.append({'event': 'diagnostics.smoke'})
+            events = self.cycle()
+            self.assertEqual(len(events), 1)
+            self.assertTrue(bridge.handle_event(events[0]['event'])['handled'])
+            diagnostics._worker.join(2)
+            self.assertFalse(diagnostics.snapshot()['busy'])
+            result = diagnostics.snapshot()['results']['smoke']
+            self.assertEqual(result['status'], 'normal')
+            bridge.tick()
+            self.cycle()
+            self.assertFalse(uart.closed)
+        self.assertEqual(len(opens), 1)
+        self.assertEqual(smoke.parser.valid_frames, 5)
+        # The diagnostic report is a manual-check snapshot. A stale sensor
+        # does not update it until another check is requested.
+        self.now += DEFAULT_CONFIG.smoke.stale_after_seconds + 1
+        self.assertEqual(smoke.read()['status'], 'error')
+        self.assertEqual(diagnostics.snapshot()['results']['smoke']['status'], 'normal')
+        self.screen.events.append({'event': 'diagnostics.smoke'})
+        events = self.cycle()
+        self.assertTrue(bridge.handle_event(events[0]['event'])['handled'])
+        diagnostics._worker.join(2)
+        self.assertEqual(diagnostics.snapshot()['results']['smoke']['status'], 'error')
+        self.assertEqual(len(opens), 1)
+
     def setUp(self):
         if not hasattr(socket, 'AF_UNIX'):
             self.skipTest('Unix-domain IPC tests run on the Linux device')
