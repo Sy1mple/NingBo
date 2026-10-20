@@ -15,10 +15,10 @@ class AdcMappingTests(unittest.TestCase):
                 current = config.current.channels[name]
                 self.assertEqual((current.address, current.channel), location)
 
-    def test_current_conversion_stays_disabled_until_calibrated(self):
+    def test_current_conversion_stays_disabled_while_lock_voltage_is_calibrated(self):
         config = Config()
         self.assertFalse(config.current.enabled)
-        self.assertNotIn('lock', config.ads1115.feedback_voltage_limits)
+        self.assertEqual(config.ads1115.feedback_voltage_limits['lock'], (0.010, 0.150))
 
     def test_config_instances_do_not_share_mutable_channel_maps(self):
         first, second = Config(), Config()

@@ -62,6 +62,19 @@ class DeviceService:
     def diagnostic_snapshot(self):
         return self.diagnostics.snapshot()
 
+    def acquire_sensor(self, name, client):
+        if not self._started:
+            raise RuntimeError("请先启动 DeviceService")
+        return self.manager.acquire_sensor(name, client)
+
+    def release_sensor(self, name, client):
+        return self.manager.release_sensor(name, client)
+
+    def reconnect_sensor(self, name, client):
+        if not self._started:
+            raise RuntimeError("请先启动 DeviceService")
+        return self.manager.reconnect_sensor(name, client)
+
     def control(self, name, **kwargs):
         if name not in ACTUATORS:
             raise ValueError(f"未知执行器: {name}")

@@ -183,6 +183,31 @@ class DeviceManager:
             return self._sensor_owners[name].poll_sensor(name, response_only=True)
         return self._sensor_owners[name].poll_sensor(name)
 
+    def acquire_sensor(self, name, client):
+        if not self._started:
+            raise RuntimeError("设备服务尚未启动")
+        owner = self._sensor_owners.get(name)
+        action = getattr(owner, "acquire_reader", None)
+        if action is None:
+            return self.poll_sensor(name)
+        return action(name, client)
+
+    def release_sensor(self, name, client):
+        owner = self._sensor_owners.get(name)
+        action = getattr(owner, "release_reader", None)
+        if action is None:
+            return None
+        return action(name, client)
+
+    def reconnect_sensor(self, name, client):
+        if not self._started:
+            raise RuntimeError("设备服务尚未启动")
+        owner = self._sensor_owners.get(name)
+        action = getattr(owner, "reconnect_reader", None)
+        if action is None:
+            raise ValueError(f"传感器不支持重连: {name}")
+        return action(name, client)
+
     def control(self, name, **kwargs):
         if name not in self._output_owners:
             raise ValueError(f"Unknown actuator: {name}")

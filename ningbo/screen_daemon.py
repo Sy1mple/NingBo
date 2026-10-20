@@ -12,6 +12,7 @@ from dataclasses import replace
 from config import DEFAULT_CONFIG
 from hardware.screen.ipc import DEFAULT_SOCKET, JsonChannel
 from screen_service import ScreenService
+from experiments.access.serial_screen.screen import normalize_legacy_status_frame
 
 LOGGER = logging.getLogger('ningbo.screen')
 
@@ -101,7 +102,7 @@ class ScreenDaemon:
                             raise ValueError('只接受合法的 JGUS 写变量帧')
                         if self.online:
                             try:
-                                self.screen.sender._write_frame(frame)
+                                self.screen.sender._write_frame(normalize_legacy_status_frame(frame))
                             except Exception as exc:
                                 self._screen_failed(exc)
                                 break

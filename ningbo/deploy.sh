@@ -73,7 +73,7 @@ sudo apt-get update
 sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y \
   python3-venv python3-pip python3-dev build-essential pkg-config ca-certificates curl unzip \
   libopenblas-dev libportaudio2 portaudio19-dev libsndfile1 ffmpeg alsa-utils v4l-utils \
-  i2c-tools libgomp1 libjpeg-dev zlib1g-dev libgpiod2 libgpiod-dev
+  i2c-tools libgomp1 libjpeg-dev zlib1g-dev libgpiod2 libgpiod-dev libcap2-bin
 # 这些组件从板上已有的 JetPack apt 软件源安装，不能换成桌面 NVIDIA 驱动。
 if [[ "$FACE_BACKEND" == tensorrt || "$VOICE_BACKEND" == whisper_cuda ]]; then
   sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-cuda nvidia-cudnn8 cuda-nvtx-11-4
@@ -145,8 +145,11 @@ PHASE="配置烟雾专用 UART"
 bash "$ROOT/deploy/configure_smoke_uart.sh"
 PHASE="编译 DHT11 原生 GPIO 采样器"
 gcc -O2 -Wall -Wextra -std=c11 "$ROOT/experiments/environment/jetson/native/dht11_gpiod.c" -lgpiod \
-  -o "$ROOT/experiments/environment/jetson/native/dht11_gpiod"
-chmod 0755 "$ROOT/experiments/environment/jetson/native/dht11_gpiod"
+  -o "$ROOT/experiments/environment/jetson/native/dht11_gpiod.next"
+sudo install -o root -g root -m 0755 "$ROOT/experiments/environment/jetson/native/dht11_gpiod.next" \
+  "$ROOT/experiments/environment/jetson/native/dht11_gpiod"
+rm -- "$ROOT/experiments/environment/jetson/native/dht11_gpiod.next"
+sudo setcap cap_sys_nice,cap_sys_rawio,cap_dac_read_search=ep "$ROOT/experiments/environment/jetson/native/dht11_gpiod"
 PHASE="工程检查与模型实际 GPU 推理"
 cd "$ROOT"
 "$VENV/bin/python" -B main.py --check-config

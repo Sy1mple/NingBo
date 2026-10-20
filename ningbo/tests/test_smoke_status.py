@@ -1,10 +1,13 @@
 """Real FFAA parser/driver, freshness and original status VP, with fake UART."""
+from dataclasses import replace
 from types import SimpleNamespace
+import threading
 import unittest
 from unittest.mock import Mock
 
 from config import DEFAULT_CONFIG
 from experiments.smoke.jetson.driver import SmokeDriver
+from experiments.smoke.jetson.controller import Hardware
 from experiments.smoke.jetson.diagnostics import check_smoke
 from experiments.smoke.jetson.smoke_protocol import SmokeFrameParser
 from hardware.screen.sender import ScreenSender
@@ -131,6 +134,96 @@ class SmokeStatusTests(unittest.TestCase):
         manager.poll_sensor.assert_called_once_with('smoke')
         screen.handle_message.assert_called_once()
         service.stop()
+
+    def test_managed_uart_opens_for_each_check_and_closes_after_each_check(self):
+        owner = SimpleNamespace(
+            config=DEFAULT_CONFIG, sensors={}, _lock=threading.RLock(),
+            _sampling_condition=threading.Condition(), _active_reads=0,
+            _pintest_mode=False, _stop=threading.Event(), _init_errors=[],
+        )
+        opened = []
+
+        def factory(**_kwargs):
+            uart = Uart()
+            uart.data.extend(bytes.fromhex('ffaa015b3c'))
+            opened.append(uart)
+            return uart
+
+        driver = SmokeDriver(DEFAULT_CONFIG.smoke, serial_factory=factory)
+        hardware = Hardware(owner, sensor_drivers={'smoke': driver})
+        manager = SimpleNamespace(
+            config=DEFAULT_CONFIG,
+            acquire_sensor=lambda name, client: hardware.acquire_reader(name, client),
+            release_sensor=lambda name, client: hardware.release_reader(name, client),
+            poll_sensor=lambda name: hardware.poll_sensor(name),
+        )
+
+        hardware.initialize_readers()
+        self.assertEqual(opened, [])
+        for expected_opens in (1, 2):
+            result = check_smoke(manager)
+            self.assertEqual(result['status'], 'normal')
+            self.assertEqual(len(opened), expected_opens)
+            self.assertTrue(opened[-1].closed)
+            self.assertIsNone(driver.serial)
+            self.assertEqual(owner.sensors['smoke']['status'], 'idle')
+        hardware.close_readers()
+
+    def test_manual_check_keeps_uart_open_past_stale_error_until_valid_frame(self):
+        events = []
+        states = iter([
+            {'protocol': 'ffaa', 'status': 'unknown', 'note': '等待完整帧'},
+            {'protocol': 'ffaa', 'status': 'error', 'note': '烟雾有效帧超时'},
+            {'protocol': 'ffaa', 'status': 'normal', 'concentration': 347},
+        ])
+        smoke_config = replace(DEFAULT_CONFIG.smoke, diagnostic_timeout_seconds=6.0)
+        config = replace(DEFAULT_CONFIG, smoke=smoke_config)
+
+        def poll(name):
+            events.append('poll')
+            return next(states)
+
+        manager = SimpleNamespace(
+            config=config,
+            acquire_sensor=lambda name, client: events.append('open'),
+            release_sensor=lambda name, client: events.append('close'),
+            poll_sensor=poll,
+        )
+        result = check_smoke(manager)
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual(events, ['open', 'poll', 'poll', 'poll', 'close'])
+
+    def test_manual_check_reconnects_without_finishing_then_accepts_frame(self):
+        events = []
+        recovered = {'value': False}
+        smoke_config = replace(
+            DEFAULT_CONFIG.smoke,
+            diagnostic_timeout_seconds=1.0,
+            diagnostic_reconnect_interval_seconds=0.05,
+        )
+        config = replace(DEFAULT_CONFIG, smoke=smoke_config)
+
+        def poll(name):
+            events.append('poll')
+            if recovered['value']:
+                return {'protocol': 'ffaa', 'status': 'normal', 'concentration': 412}
+            return {'protocol': 'ffaa', 'status': 'unknown', 'note': '等待完整帧'}
+
+        def reconnect(name, client):
+            events.append('reopen')
+            recovered['value'] = True
+
+        manager = SimpleNamespace(
+            config=config,
+            acquire_sensor=lambda name, client: events.append('open'),
+            release_sensor=lambda name, client: events.append('close'),
+            reconnect_sensor=reconnect,
+            poll_sensor=poll,
+        )
+        result = check_smoke(manager)
+        self.assertEqual(result['status'], 'normal')
+        self.assertIn('reopen', events)
+        self.assertEqual(events[-1], 'close')
 
 
 if __name__ == '__main__': unittest.main()

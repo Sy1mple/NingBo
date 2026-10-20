@@ -78,11 +78,30 @@ class LockConfig:
     pin: int = 29
     active_high: bool = True
     enabled: bool = True
+    diagnostic_full_scale_volts: float = 0.512
+    diagnostic_on_settle_seconds: float = 0.4
+    diagnostic_off_settle_seconds: float = 0.3
+    diagnostic_sample_count: int = 15
+    diagnostic_minimum_delta_volts: float = 0.150
+    diagnostic_maximum_baseline_drift_volts: float = 0.005
 
 import math
 
 
 def validate(self):
+    lock = self.lock
+    if lock.diagnostic_full_scale_volts not in (6.144, 4.096, 2.048, 1.024, 0.512, 0.256):
+        raise ValueError("门锁状态检测 ADC 量程无效")
+    if (isinstance(lock.diagnostic_sample_count, bool)
+            or not isinstance(lock.diagnostic_sample_count, int)
+            or not 3 <= lock.diagnostic_sample_count <= 31):
+        raise ValueError("门锁状态检测采样次数必须为 3~31")
+    if any(not math.isfinite(value) or not 0 < value <= 2 for value in
+           (lock.diagnostic_on_settle_seconds, lock.diagnostic_off_settle_seconds)):
+        raise ValueError("门锁状态检测稳定时间无效")
+    if any(not math.isfinite(value) or not 0 < value < lock.diagnostic_full_scale_volts for value in
+           (lock.diagnostic_minimum_delta_volts, lock.diagnostic_maximum_baseline_drift_volts)):
+        raise ValueError("门锁状态检测电压差阈值无效")
     camera = self.camera
     if (isinstance(camera.device, bool) or not isinstance(camera.device, (int, str))
             or (isinstance(camera.device, int) and camera.device < 0)

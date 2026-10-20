@@ -7,6 +7,7 @@ from typing import Callable, Optional
 from config import DEFAULT_CONFIG
 from hardware.rgb.feedback import RgbFeedback
 from experiments.ultrasonic.jetson.alarm import ProximityAlarm
+from experiments.smoke.jetson.alarm import SmokeAlarm
 from experiments.access.bridge import AccessScreenBridge
 from experiments.voice.bridge import VoiceScreenBridge
 from system.diagnostics.bridge import DiagnosticsScreenBridge
@@ -54,6 +55,7 @@ class ScreenDeviceBridge:
         self.active_scenes = {}
         self.feedback = RgbFeedback(devices, self.config, wall_clock=wall_clock)
         self.proximity_alarm = ProximityAlarm(devices, self.config, wall_clock=wall_clock)
+        self.smoke_alarm = SmokeAlarm(devices, self.config, self.clock, wall_clock)
         self.access = AccessScreenBridge(self.feedback, access_handler, access_service,
                                          devices, self.config.face, self.clock)
         self.controls = ControlScreenBridge(devices, self.config, screen=screen)
@@ -83,6 +85,7 @@ class ScreenDeviceBridge:
         self.voice.reset()
         self.feedback.reset()
         self.proximity_alarm.reset()
+        self.smoke_alarm.reset()
 
     def stop(self):
         """通知已接入的识别服务停止；执行器资源由 application 统一关闭。"""
@@ -97,6 +100,8 @@ class ScreenDeviceBridge:
             except Exception as exc:
                 errors.append(str(exc))
             try:
+                self.smoke_alarm.release()
+                self.smoke_alarm.flush()
                 self.proximity_alarm.release()
                 self.proximity_alarm.flush()
             except Exception as exc:
@@ -150,6 +155,11 @@ class ScreenDeviceBridge:
         self.proximity_alarm.observe(snapshot.get("sensors", {}))
         self._flush_proximity_alarm(snapshot)
         self.access.tick()
+        try:
+            self.smoke_alarm.observe(snapshot.get("sensors", {}))
+            self.smoke_alarm.flush(snapshot)
+        except Exception:
+            LOGGER.exception("烟雾蜂鸣器输出失败，下次循环重试")
         self._flush_feedback(snapshot)
         try:
             sent.extend(self.voice.tick())

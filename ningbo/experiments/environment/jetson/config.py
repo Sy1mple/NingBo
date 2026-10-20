@@ -14,8 +14,8 @@ class Dht11Config:
     line_offset: int = 151  # BOARD 37 / PY.02 在当前 Xavier NX 系统上的 GPIO line。
     native_timeout_seconds: float = 0.5
     interval: float = 2.0
-    attempts: int = 5
-    retry_interval: float = 1.1
+    attempts: int = 10
+    retry_interval: float = 2.0
     start_low_seconds: float = 0.020
     edge_timeout_seconds: float = 0.005
     one_bit_threshold_us: float = 50.0

@@ -1,6 +1,0 @@
-# 先按 README 安装并验证 JetPack 对应的 CUDA PyTorch，再安装以下 Whisper 依赖。
-# 本文件安装识别依赖；随后单独安装 openai-whisper==20231117 --no-deps，保留 NVIDIA torch。
-numba>=0.57,<0.59
-tiktoken>=0.3,<0.6
-tqdm>=4.64
-more-itertools>=8

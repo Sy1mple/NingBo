@@ -15,22 +15,25 @@ class SnapshotReader:
     def values(self, snapshot):
         sensors = snapshot.get("sensors", {})
         smoke = sensors.get("smoke") or {}
-        if smoke.get("protocol") == "ffaa":
-            value = valid_number(smoke, "concentration", self.wall_clock(),
-                                 self.config.smoke.stale_after_seconds, 0, 0xFFFF)
-            if value is None:
-                return {}
-            if value > 0x7FFF:
-                if not self._smoke_display_overflow:
-                    LOGGER.warning("烟雾浓度超过当前屏幕有符号 Word 显示范围，未截断数值")
-                self._smoke_display_overflow = True
-                return {}
-            self._smoke_display_overflow = False
-            return {"value": value}
-        # Actual UART payload is only raw bytes. Only send a percent after a
-        # separate sensor-protocol parser + calibration provides it.
-        percent = smoke.get("percent")
-        return {"value": max(0, min(100, round(percent)))} if percent is not None else {}
+        value = display_percent(smoke, self.config, self.wall_clock())
+        return {"value": value} if value is not None else {}
+
+
+def display_percent(state, config, now):
+    """教学演示百分比；写屏、RGB 和蜂鸣器统一使用取整后的结果。"""
+    if state.get("protocol") == "ffaa":
+        raw = valid_number(state, "concentration", now,
+                           config.smoke.stale_after_seconds, 0, 65535)
+        if raw is None:
+            return None
+        value = raw * 100 / config.smoke.display_full_scale_raw
+    else:
+        value = valid_number(state, "percent", now,
+                             config.smoke.stale_after_seconds, 0, 100)
+        if value is None:
+            return None
+    return max(0, min(100, int(value + 0.5)))
+
 
 
 def valid_number(state, field, now, max_age, low, high):

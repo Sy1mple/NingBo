@@ -6,7 +6,7 @@ from experiments.ultrasonic.jetson.config import DANGER_DISTANCE_CM, CAUTION_DIS
 
 @dataclass(frozen=True)
 class RgbConfig:
-    pins: tuple = (12, 35, 38)  # 红、绿、蓝；用户确认的 BOARD 物理引脚。
+    pins: tuple = (38, 35, 12)  # 红、绿、蓝；用户确认的 BOARD 物理引脚。
     active_high: bool = True
     enabled: bool = True
     # 2026-10-19: 0x48/AIN3, four normal-load calibration cycles.
@@ -16,7 +16,7 @@ class RgbConfig:
     diagnostic_sample_count: int = 9
     diagnostic_maximum_baseline_drift_volts: float = 0.000060
     diagnostic_minimum_delta_volts: dict = field(default_factory=lambda: {
-        "red": 0.000090, "green": 0.000120, "blue": 0.000180,
+        "red": 0.000180, "green": 0.000120, "blue": 0.000090,
     })
 
 

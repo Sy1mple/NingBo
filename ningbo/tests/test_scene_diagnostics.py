@@ -85,7 +85,7 @@ class SceneDiagnosticsTests(unittest.TestCase):
         cancel = threading.Event()
         cancel.set()
         result = ActuatorStatusChecker(manager).check('lock', cancel_event=cancel)
-        self.assertEqual(result['feedback']['status'], 'unknown')
+        self.assertEqual(result['status'], 'unknown')
         manager.adc_monitor.read_channel.assert_not_called()
 
     def test_alias_and_async_sensor_request_keep_report_contract(self):

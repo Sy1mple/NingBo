@@ -23,3 +23,4 @@ INPUT_EVENT_MAP = {
 
 # Status result VP owned by this module.
 LOCK_STATUS_RESULT_ADDR = 0x6010
+LOCK_STATUS_RESULT_TEXT_BYTES = 2

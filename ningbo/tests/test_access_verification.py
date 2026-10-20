@@ -65,7 +65,7 @@ class VerificationTests(unittest.TestCase):
         self.assertEqual(self.hardware.snapshot()['actuators']['rgb']['color'], color)
         levels = {'off': (0, 0, 0), 'red': (1, 0, 0),
                   'green': (0, 1, 0), 'blue': (0, 0, 1)}
-        self.assertEqual(tuple(self.gpio.levels[pin] for pin in (12, 35, 38)), levels[color])
+        self.assertEqual(tuple(self.gpio.levels[pin] for pin in (38, 35, 12)), levels[color])
 
     def test_success_uses_local_photo_and_powers_lock_for_two_seconds_once(self):
         result = self.verify()

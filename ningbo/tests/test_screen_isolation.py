@@ -192,6 +192,16 @@ class ScreenIsolationTests(unittest.TestCase):
         self.assertEqual(replay, self.proxy.latest)
         self.assertNotEqual(expected, self.proxy.latest)
 
+    def test_legacy_lock_words_use_phrase_font_without_backend_restart(self):
+        self.start_daemon()
+        self.proxy.start()
+        for legacy, expected in (("正", "好"), ("异", "坏"), ("检", "检")):
+            self.proxy.latest[0x6010] = int.from_bytes(legacy.encode('gb2312'), 'big')
+            self.proxy.dirty.add(0x6010)
+            self.cycle()
+            self.assertEqual(self.screen.frames[-1],
+                             bytes.fromhex('5aa505826010') + expected.encode('gb2312'))
+
     def test_screen_read_failure_reconnects_only_screen_and_resends_display(self):
         self.start_daemon()
         self.proxy.start()

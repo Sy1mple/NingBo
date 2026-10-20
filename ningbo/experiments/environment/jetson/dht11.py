@@ -98,10 +98,14 @@ class Dht11Driver:
             last_error = None
             for attempt in range(self.config.attempts):
                 if attempt:
-                    if self.stop_event is None:
-                        time.sleep(self.config.retry_interval)
-                    elif self.stop_event.wait(self.config.retry_interval):
-                        raise RuntimeError("DHT11 采样已取消")
+                    # Failed transactions need the same recovery time as
+                    # successful ones; include time already spent sampling.
+                    wait = max(self.config.interval, self.config.retry_interval) - (time.monotonic() - self._last_attempt)
+                    if wait > 0:
+                        if self.stop_event is None:
+                            time.sleep(wait)
+                        elif self.stop_event.wait(wait):
+                            raise RuntimeError("DHT11 采样已取消")
                 self._last_attempt = time.monotonic()
                 try:
                     self._last_value = self._read_once()

@@ -1,6 +1,0 @@
-# JetPack 5 / Python 3.8~3.10，避免 OpenCV 新版强制 NumPy 2 与旧 JetPack 依赖冲突。
-numpy>=1.23,<1.26
-opencv-python-headless>=4.8,<4.12
-scipy>=1.8,<1.12
-
-websocket-client==1.8.0

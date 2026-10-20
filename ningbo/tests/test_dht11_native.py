@@ -42,6 +42,22 @@ class Dht11NativeTests(unittest.TestCase):
         self.assertEqual(driver.read(), {'temp': 28.5, 'humidity': 60.0})
         self.assertEqual(self.run.call_count, 2)
 
+    def test_retry_respects_normal_sampling_interval_after_failed_transaction(self):
+        clock = {'now': 100.0}
+        driver = Dht11Driver(None, replace(self.config, attempts=3, interval=2.0, retry_interval=1.1))
+        starts = []
+        def sample():
+            starts.append(clock['now'])
+            clock['now'] += .05
+            if len(starts) < 3:
+                raise RuntimeError('incomplete frame')
+            return {'temp': 26.0, 'humidity': 54.0}
+        with patch('experiments.environment.jetson.dht11.time.monotonic', side_effect=lambda: clock['now']), \
+                patch('experiments.environment.jetson.dht11.time.sleep', side_effect=lambda seconds: clock.update(now=clock['now'] + seconds)), \
+                patch.object(driver, '_read_once', side_effect=sample):
+            self.assertEqual(driver.read(), {'temp': 26.0, 'humidity': 54.0})
+        self.assertEqual(starts, [100.0, 102.0, 104.0])
+
     def test_incomplete_or_extra_native_output_is_rejected(self):
         for output in ('28.5', '', '28.5 60.0 diagnostic', 'bad 60.0'):
             with self.subTest(output=output):

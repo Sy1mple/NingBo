@@ -1,15 +1,16 @@
 """体温、距离与识别结果的 RGB 联动，独立于屏幕 VP 和 GPIO 驱动。"""
 import time
+from experiments.smoke.jetson.alarm import color_for as smoke_color
 from experiments.body_temperature.jetson.feedback import color_for as body_color
 from experiments.ultrasonic.jetson.feedback import color_for as distance_color
 
-SENSOR_COLOR_RULES = {"body_temperature": body_color, "ultrasonic": distance_color}
+SENSOR_COLOR_RULES = {"body_temperature": body_color, "ultrasonic": distance_color, "smoke": smoke_color}
 
 
 
 
 class RgbFeedback:
-    SOURCES = ("body_temperature", "ultrasonic", "access", "face_enroll")
+    SOURCES = ("body_temperature", "ultrasonic", "access", "face_enroll", "smoke")
 
     def __init__(self, devices, config, wall_clock=None):
         self.devices = devices

@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from .addresses import STATUS_CHECK_BINDINGS, STATUS_RESULT_ADDRESS_MAP, STATUS_META_ADDRESS_MAP
 from experiments.environment.serial_screen.addresses import (
     STATUS_RESULT_TEXT_BYTES, STATUS_RESULT_TEXT_TARGETS)
+from experiments.access.serial_screen.addresses import LOCK_STATUS_RESULT_TEXT_BYTES
 from experiments.environment.serial_screen.screen import build_status_update as environment_status_update
 from experiments.ultrasonic.serial_screen.screen import build_status_update as ultrasonic_status_update
 from hardware.rgb.status_screen import build_status_update as rgb_status_update
@@ -10,6 +11,7 @@ from experiments.smoke.serial_screen.screen import build_status_update as smoke_
 from experiments.servo.serial_screen.screen import build_status_update as servo_status_update
 from experiments.stepper.serial_screen.screen import build_status_update as stepper_status_update
 from experiments.fan.serial_screen.screen import build_status_update as fan_status_update
+from experiments.access.serial_screen.screen import build_status_update as access_status_update
 
 
 MAX_SCREEN_VALUE = 0x7FFF
@@ -22,6 +24,7 @@ STATUS_TEXT_BUILDERS = {
     "servo": servo_status_update,
     "stepper": stepper_status_update,
     "fan": fan_status_update,
+    "lock": access_status_update,
 }
 
 def make_update(name, address, value, scale=1):
@@ -78,7 +81,12 @@ def validate_status_result_addresses():
             continue
         if isinstance(address, bool) or not isinstance(address, int) or not 0 <= address <= 0xFFFF:
             raise ValueError(f"{name} 的状态 VP 地址无效")
-        words = STATUS_RESULT_TEXT_BYTES // 2 if name in STATUS_RESULT_TEXT_TARGETS else 1
+        if name in STATUS_RESULT_TEXT_TARGETS:
+            words = STATUS_RESULT_TEXT_BYTES // 2
+        elif name == "lock":
+            words = LOCK_STATUS_RESULT_TEXT_BYTES // 2
+        else:
+            words = 1
         if address + words > 0x10000:
             raise ValueError(f"{name} 的状态文本超出 VP 范围")
         span = set(range(address, address + words))

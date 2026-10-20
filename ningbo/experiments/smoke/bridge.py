@@ -18,9 +18,11 @@ class SmokeBridge:
             return None
         context = self.context
         if name.endswith(".start"):
+            # 先确认 UART 已成功打开，再把页面标记为运行，避免打开失败后
+            # 留下一个无法停止的假活动场景。
+            self.on_start()
             context.active_scenes[self.scene] = context.clock()
             context.feedback.activate(self.scene)
-            self.on_start()
             sent = context.tick()
             return {"event": name, "handled": True, "sent": sent,
                     "note": self.start_note(self.devices.snapshot())}
@@ -32,10 +34,13 @@ class SmokeBridge:
         return {"event": name, "handled": True, "sent": sent, "note": "采集已停止"}
 
     def on_start(self):
-        """Optional additional hardware linkage supplied by a scene."""
+        self.devices.acquire_sensor("smoke", "smoke-scene")
+        self.context.smoke_alarm.activate()
 
     def on_stop(self):
-        """Optional additional hardware linkage supplied by a scene."""
+        self.context.smoke_alarm.release()
+        self.context.smoke_alarm.flush()
+        self.devices.release_sensor("smoke", "smoke-scene")
 
     def start_note(self, snapshot):
         return "采集已启动"

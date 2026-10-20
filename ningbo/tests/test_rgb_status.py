@@ -27,7 +27,7 @@ class RgbStatusTests(unittest.TestCase):
         manager.control = Mock(side_effect=control)
         manager.actuator_output_levels = Mock(side_effect=lambda name: {
             pin: value for pin, value in zip(DEFAULT_CONFIG.rgb.pins, RgbDriver.COLORS[state['color']])})
-        readings = {'off': -.00054, 'red': -.00039, 'green': -.00034, 'blue': -.00027}
+        readings = {'off': -.00054, 'red': -.00027, 'green': -.00034, 'blue': -.00039}
         manager.adc_monitor = SimpleNamespace(read_channel=Mock(side_effect=lambda *a, **kw: {
             'volts': readings[state['color']], 'saturated': False}))
         return manager, readings
