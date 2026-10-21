@@ -19,7 +19,11 @@ class SmokeConfig:
     stale_after_seconds: float = 5.0
     diagnostic_timeout_seconds: float = 30.0  # 状态检测整轮等待上限；5 秒仅表示旧数据失效。
     diagnostic_reconnect_interval_seconds: float = 5.0  # 检测中无帧时重建 UART，不结束检测。
-    display_full_scale_raw: int = 700  # 教学演示量程，不是气体浓度标定。
+    # 2026-10-21 正常空气 40 帧：1644~1695，中位数 1655。
+    # 固定参考，不随开始按钮归零。相对演示指数，不是气体浓度百分比。
+    display_baseline_raw: int = 1655
+    display_normal_value: int = 20
+    display_full_scale_raw: int = 3310  # 参考值翻倍时显示 100。
     alarm_threshold: int = 80  # 与屏幕相同的演示百分比。
     alarm_period_seconds: float = 3.0
     alarm_on_seconds: float = 0.4
@@ -34,6 +38,12 @@ def validate(self):
             or isinstance(cfg.display_full_scale_raw, bool)
             or not isinstance(cfg.display_full_scale_raw, int)
             or not 1 <= cfg.display_full_scale_raw <= 65535
+            or isinstance(cfg.display_baseline_raw, bool)
+            or not isinstance(cfg.display_baseline_raw, int)
+            or not 0 <= cfg.display_baseline_raw < cfg.display_full_scale_raw
+            or isinstance(cfg.display_normal_value, bool)
+            or not isinstance(cfg.display_normal_value, int)
+            or not 0 <= cfg.display_normal_value < cfg.alarm_threshold
             or not math.isfinite(cfg.alarm_period_seconds)
             or not math.isfinite(cfg.alarm_on_seconds)
             or not 0 < cfg.alarm_on_seconds < cfg.alarm_period_seconds):

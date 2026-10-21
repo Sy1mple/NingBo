@@ -11,22 +11,31 @@ class SnapshotReader:
         self.wall_clock = wall_clock or time.time
         self.light_full_scale_lux = light_full_scale_lux or config.light.display_full_scale_lux
         self._smoke_display_overflow = False
+        self._next_log = 0
 
     def values(self, snapshot):
         sensors = snapshot.get("sensors", {})
         smoke = sensors.get("smoke") or {}
         value = display_percent(smoke, self.config, self.wall_clock())
+        if value is not None and time.monotonic() >= self._next_log:
+            LOGGER.info('烟雾演示换算：raw=%s；参考=%d；满量程=%d；显示=%d',
+                        smoke.get('concentration', smoke.get('percent')),
+                        self.config.smoke.display_baseline_raw,
+                        self.config.smoke.display_full_scale_raw, value)
+            self._next_log = time.monotonic() + 5
         return {"value": value} if value is not None else {}
 
 
 def display_percent(state, config, now):
-    """教学演示百分比；写屏、RGB 和蜂鸣器统一使用取整后的结果。"""
+    """固定正常空气参考的演示指数；写屏、RGB 和蜂鸣器共用。"""
     if state.get("protocol") == "ffaa":
         raw = valid_number(state, "concentration", now,
                            config.smoke.stale_after_seconds, 0, 65535)
         if raw is None:
             return None
-        value = raw * 100 / config.smoke.display_full_scale_raw
+        cfg = config.smoke
+        value = cfg.display_normal_value + (raw - cfg.display_baseline_raw) * (
+            100 - cfg.display_normal_value) / (cfg.display_full_scale_raw - cfg.display_baseline_raw)
     else:
         value = valid_number(state, "percent", now,
                              config.smoke.stale_after_seconds, 0, 100)
