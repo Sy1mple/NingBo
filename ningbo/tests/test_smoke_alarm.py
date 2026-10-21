@@ -80,8 +80,8 @@ class SmokeAlarmTests(unittest.TestCase):
         for raw in (1644, 1655, 1695, 1716):
             state = self.sample(raw)
             displayed = reader.values({'sensors': {'smoke': state}})['value']
-            self.assertGreaterEqual(displayed, 19)
-            self.assertLessEqual(displayed, 23)
+            self.assertGreaterEqual(displayed, 17)
+            self.assertLessEqual(displayed, 21)
             alarm.observe({'smoke': state})
             self.assertFalse(alarm.desired)
             self.assertEqual(color_for(state, DEFAULT_CONFIG, self.now), 'green')
@@ -90,8 +90,8 @@ class SmokeAlarmTests(unittest.TestCase):
     def test_relative_display_and_alarm_use_the_same_fixed_reference(self):
         alarm = SmokeAlarm(self.devices, DEFAULT_CONFIG, lambda: self.now, lambda: self.now)
         alarm.activate()
-        for raw, expected in ((0, 0), (1655, 20), (2482, 60), (2800, 75),
-                              (3000, 85), (3310, 100), (65535, 100)):
+        for raw, expected in ((0, 100), (400, 81), (800, 61), (1200, 42),
+                              (1447, 30), (1655, 20), (1716, 17), (3310, 0), (65535, 0)):
             state = self.sample(raw)
             self.assertEqual(display_percent(state, DEFAULT_CONFIG, self.now), expected)
             alarm.observe({'smoke': state})
@@ -102,11 +102,25 @@ class SmokeAlarmTests(unittest.TestCase):
 
     def test_invalid_relative_ranges_are_rejected(self):
         from experiments.smoke.jetson.config import validate
-        for changes in ({'display_baseline_raw': -1}, {'display_baseline_raw': 3310},
+        for changes in ({'display_baseline_raw': -1}, {'display_full_scale_raw': 1655},
                         {'display_normal_value': 80}, {'display_normal_value': True}):
             cfg = replace(DEFAULT_CONFIG, smoke=replace(DEFAULT_CONFIG.smoke, **changes))
             with self.assertRaises(ValueError):
                 validate(cfg)
+
+    def test_reverse_demo_is_monotonic_and_faults_do_not_become_high_values(self):
+        raw_values = (2000, 1716, 1655, 1447, 1200, 800, 400, 0)
+        displayed = [display_percent(self.sample(raw), DEFAULT_CONFIG, self.now)
+                     for raw in raw_values]
+        self.assertEqual(displayed, sorted(displayed))
+        self.assertEqual(displayed[2], 20)
+        self.assertGreater(displayed[3], displayed[2])
+        alarm = SmokeAlarm(self.devices, DEFAULT_CONFIG, lambda: self.now, lambda: self.now)
+        alarm.activate()
+        for state in (self.sample(0, age=6), {**self.sample(0), 'status': 'error'}):
+            self.assertIsNone(display_percent(state, DEFAULT_CONFIG, self.now))
+            alarm.observe({'smoke': state})
+            self.assertFalse(alarm.desired)
 
 
 if __name__ == "__main__":

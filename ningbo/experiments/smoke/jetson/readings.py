@@ -27,7 +27,7 @@ class SnapshotReader:
 
 
 def display_percent(state, config, now):
-    """固定正常空气参考的演示指数；写屏、RGB 和蜂鸣器共用。"""
+    """参考点到满量程点的演示指数；满量程原始值较低时反向映射。"""
     if state.get("protocol") == "ffaa":
         raw = valid_number(state, "concentration", now,
                            config.smoke.stale_after_seconds, 0, 65535)

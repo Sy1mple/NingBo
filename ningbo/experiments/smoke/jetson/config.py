@@ -23,8 +23,8 @@ class SmokeConfig:
     # 固定参考，不随开始按钮归零。相对演示指数，不是气体浓度百分比。
     display_baseline_raw: int = 1655
     display_normal_value: int = 20
-    display_full_scale_raw: int = 3310  # 参考值翻倍时显示 100。
-    alarm_threshold: int = 80  # 与屏幕相同的演示百分比。
+    display_full_scale_raw: int = 0  # 反向演示：原始值越低，指数越高；降到 0 显示 100。
+    alarm_threshold: int = 80  # 与屏幕相同的演示指数。
     alarm_period_seconds: float = 3.0
     alarm_on_seconds: float = 0.4
 
@@ -37,10 +37,11 @@ def validate(self):
             or not 0 <= cfg.alarm_threshold <= 100
             or isinstance(cfg.display_full_scale_raw, bool)
             or not isinstance(cfg.display_full_scale_raw, int)
-            or not 1 <= cfg.display_full_scale_raw <= 65535
+            or not 0 <= cfg.display_full_scale_raw <= 65535
             or isinstance(cfg.display_baseline_raw, bool)
             or not isinstance(cfg.display_baseline_raw, int)
-            or not 0 <= cfg.display_baseline_raw < cfg.display_full_scale_raw
+            or not 0 <= cfg.display_baseline_raw <= 65535
+            or cfg.display_baseline_raw == cfg.display_full_scale_raw
             or isinstance(cfg.display_normal_value, bool)
             or not isinstance(cfg.display_normal_value, int)
             or not 0 <= cfg.display_normal_value < cfg.alarm_threshold
