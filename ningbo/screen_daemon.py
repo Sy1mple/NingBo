@@ -26,6 +26,7 @@ class ScreenDaemon:
         self.channel = None
         self.online = False
         self.next_open = 0
+        self.next_smoke_log = 0
         self.stop_event = threading.Event()
 
     def start(self):
@@ -102,7 +103,17 @@ class ScreenDaemon:
                             raise ValueError('只接受合法的 JGUS 写变量帧')
                         if self.online:
                             try:
-                                self.screen.sender._write_frame(normalize_legacy_status_frame(frame))
+                                written_frame = normalize_legacy_status_frame(frame)
+                                self.screen.sender._write_frame(written_frame)
+                                address = int.from_bytes(written_frame[4:6], 'big')
+                                words = (len(written_frame) - 6) // 2
+                                now = self.clock()
+                                if address <= 0x1050 < address + words and now >= self.next_smoke_log:
+                                    offset = 6 + 2 * (0x1050 - address)
+                                    smoke_value = int.from_bytes(written_frame[offset:offset + 2], 'big')
+                                    LOGGER.info('烟雾数值帧已提交串口：VP=0x1050；value=%d；帧=%s',
+                                                smoke_value, written_frame.hex(' ').upper())
+                                    self.next_smoke_log = now + 1
                             except Exception as exc:
                                 self._screen_failed(exc)
                                 break
