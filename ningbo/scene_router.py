@@ -6,6 +6,8 @@ import time
 from typing import Callable, Optional
 from config import DEFAULT_CONFIG
 from hardware.rgb.feedback import RgbFeedback
+from hardware.buzzer_feedback import BuzzerFeedback
+from experiments.body_temperature.jetson.alarm import BodyTemperatureAlarm
 from experiments.ultrasonic.jetson.alarm import ProximityAlarm
 from experiments.smoke.jetson.alarm import SmokeAlarm
 from experiments.access.bridge import AccessScreenBridge
@@ -54,10 +56,15 @@ class ScreenDeviceBridge:
         self.clock = clock or time.monotonic
         self.active_scenes = {}
         self.feedback = RgbFeedback(devices, self.config, wall_clock=wall_clock)
-        self.proximity_alarm = ProximityAlarm(devices, self.config, wall_clock=wall_clock)
-        self.smoke_alarm = SmokeAlarm(devices, self.config, self.clock, wall_clock)
+        self.buzzer_feedback = BuzzerFeedback(devices)
+        self.proximity_alarm = ProximityAlarm(self.buzzer_feedback.source("ultrasonic"), self.config,
+                                             wall_clock=wall_clock)
+        self.smoke_alarm = SmokeAlarm(self.buzzer_feedback.source("smoke"), self.config,
+                                      self.clock, wall_clock)
+        self.body_temperature_alarm = BodyTemperatureAlarm(
+            self.buzzer_feedback.source("body_temperature"), self.config, self.clock, wall_clock)
         self.access = AccessScreenBridge(self.feedback, access_handler, access_service,
-                                         devices, self.config.face, self.clock)
+                                         self.buzzer_feedback.source("access"), self.config.face, self.clock)
         self.controls = ControlScreenBridge(devices, self.config, screen=screen)
         self.voice = VoiceScreenBridge(screen, service=voice_service, handler=voice_handler)
         self.diagnostics = DiagnosticsScreenBridge(screen, devices)
@@ -86,6 +93,8 @@ class ScreenDeviceBridge:
         self.feedback.reset()
         self.proximity_alarm.reset()
         self.smoke_alarm.reset()
+        self.body_temperature_alarm.reset()
+        self.buzzer_feedback.reset()
 
     def stop(self):
         """通知已接入的识别服务停止；执行器资源由 application 统一关闭。"""
@@ -104,6 +113,8 @@ class ScreenDeviceBridge:
                 self.smoke_alarm.flush()
                 self.proximity_alarm.release()
                 self.proximity_alarm.flush()
+                self.body_temperature_alarm.release()
+                self.body_temperature_alarm.flush()
             except Exception as exc:
                 errors.append(str(exc))
         finally:
@@ -142,6 +153,12 @@ class ScreenDeviceBridge:
         except Exception:
             LOGGER.exception("测距蜂鸣器输出失败，将在下次循环重试")
 
+    def _flush_body_temperature_alarm(self, snapshot=None):
+        try:
+            self.body_temperature_alarm.flush(snapshot)
+        except Exception:
+            LOGGER.exception("测温蜂鸣器输出失败，将在下次循环重试")
+
     def tick(self):
         """Send updated values only for scenes started on the actual HMI."""
         sent = []
@@ -160,6 +177,12 @@ class ScreenDeviceBridge:
             self.smoke_alarm.flush(snapshot)
         except Exception:
             LOGGER.exception("烟雾蜂鸣器输出失败，下次循环重试")
+        self.body_temperature_alarm.observe(snapshot.get("sensors", {}))
+        self._flush_body_temperature_alarm(snapshot)
+        try:
+            self.buzzer_feedback.flush()
+        except Exception:
+            LOGGER.exception("共享蜂鸣器输出失败，下次循环重试")
         self._flush_feedback(snapshot)
         try:
             sent.extend(self.voice.tick())

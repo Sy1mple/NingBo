@@ -64,6 +64,8 @@ class CameraStream:
                 import cv2 as module
             camera = self.camera_factory(self.config)
             camera.start()
+            self.hub.capture_backend = getattr(camera, 'backend', 'opencv-v4l2')
+            self.hub.capture_fps = getattr(camera, 'output_fps', self.config.fps)
             while not self._stop.is_set():
                 started = time.monotonic()
                 frame = camera.read()
@@ -71,19 +73,22 @@ class CameraStream:
                     break
                 if frame is None or frame.ndim != 3 or frame.shape[2] != 3 or frame.size == 0:
                     raise RuntimeError('摄像头返回空图像或无效彩色帧')
-                ok, jpeg = module.imencode('.jpg', frame, [module.IMWRITE_JPEG_QUALITY, 80])
-                if not ok:
-                    raise RuntimeError('摄像头预览 JPEG 编码失败')
+                jpeg = getattr(camera, 'preview_jpeg', None)
+                if jpeg is None:
+                    ok, encoded = module.imencode('.jpg', frame, [module.IMWRITE_JPEG_QUALITY, 80])
+                    if not ok:
+                        raise RuntimeError('摄像头预览 JPEG 编码失败')
+                    jpeg = encoded.tobytes()
                 # 同一把锁让停止后不会重新发布迟到画面。
                 with self._lock:
                     if self._stop.is_set():
                         break
                     self._frame = frame.copy()
                     self._frame_time = time.monotonic()
-                    self.hub.publish(jpeg.tobytes(), frame.shape[1], frame.shape[0],
+                    self.hub.publish(jpeg, frame.shape[1], frame.shape[0],
                                      getattr(camera, 'selected_device', self.config.device))
                 self._ready.set()
-                if self._stop.wait(max(0, 1 / self.config.fps - (time.monotonic() - started))):
+                if self._stop.wait(max(0, 1 / self.hub.capture_fps - (time.monotonic() - started))):
                     break
         except Exception as exc:
             error = str(exc)

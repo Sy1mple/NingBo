@@ -46,11 +46,11 @@ class EnvironmentStatusTextTests(unittest.TestCase):
                 self.assertEqual(len(item["data"]), 2)
                 self.assertEqual(len(item["data"].decode("gb2312")), 1)
 
-    def test_other_devices_keep_their_existing_word_encoding(self):
+    def test_body_temperature_uses_the_same_status_font_encoding(self):
         item = self.updates({"body_temperature": "normal"})[0]
         self.assertEqual(item["address"], 0x6003)
-        self.assertEqual(item["value"], 1)
-        self.assertNotIn("data", item)
+        self.assertEqual(item["data"], "好".encode("gb2312"))
+        self.assertNotIn("value", item)
 
     def test_duplicate_status_vp_is_rejected(self):
         changed = dict(addresses.STATUS_RESULT_ADDRESS_MAP, bh1750=0x6000)

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jetson 摄像头</title>
+  <style>
+    body{margin:0;padding:20px;background:#101827;color:#e5edf7;font:16px "Microsoft YaHei",sans-serif}
+    main{max-width:960px;margin:auto} h1{font-size:22px}
+    .panel{background:#1b2738;border:1px solid #35465d;border-radius:12px;padding:16px}
+    img{display:block;width:100%;min-height:220px;max-height:75vh;object-fit:contain;background:#080d14;border-radius:8px}
+    button,a{display:inline-block;margin:10px 8px 0 0;padding:9px 14px;border:1px solid #52647c;border-radius:8px;background:#26364b;color:#fff;text-decoration:none;cursor:pointer}
+    #state{color:#a9bdd5;margin:10px 0}
+  </style>
+</head>
+<body><main>
+  <h1>Jetson 摄像头实时画面</h1>
+  <section class="panel">
+    <div id="state">正在申请摄像头……</div>
+    <img id="video" alt="摄像头画面尚未到达">
+    <button id="stop">停止并释放摄像头</button>
+    <button id="start">重新启动</button>
+    <a href="/api/camera/status" target="_blank">查看状态 JSON</a>
+    <a href="/api/camera/snapshot.jpg" target="_blank">打开单帧图片</a>
+  </section>
+</main>
+<script>
+  const state=document.getElementById('state');
+  const video=document.getElementById('video');
+  const bytes=crypto.getRandomValues(new Uint8Array(16));
+  const lease_id=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+  let timer=null, active=false;
+  async function lease(on){
+    const r=await fetch('/api/camera/lease',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lease_id,active:on})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);
+    return d;
+  }
+  async function start(){
+    if(active)return;
+    try{
+      state.textContent='正在连接摄像头……';
+      await lease(true); active=true;
+      video.src='/api/camera/stream.mjpg?ts='+Date.now();
+      timer=setInterval(()=>lease(true).catch(e=>state.textContent='摄像头续租失败：'+e.message),5000);
+      state.textContent='采集中；关闭页面或点“停止”会释放摄像头。';
+    }catch(e){state.textContent='启动失败：'+e.message;}
+  }
+  async function stop(){
+    if(timer){clearInterval(timer);timer=null;}
+    video.removeAttribute('src');
+    if(active){try{await lease(false);}catch(e){state.textContent='已停止画面；租约将自动过期：'+e.message;} active=false;}
+    state.textContent='摄像头已停止。';
+  }
+  document.getElementById('start').onclick=start;
+  document.getElementById('stop').onclick=stop;
+  window.addEventListener('pagehide',()=>{
+    if(active)navigator.sendBeacon('/api/camera/lease',new Blob([JSON.stringify({lease_id,active:false})],{type:'application/json'}));
+  });
+  video.onerror=()=>{state.textContent='视频流暂不可用；请稍后重试或检查摄像头。';};
+  video.onload=()=>{state.textContent='摄像头画面已连接。';};
+  start();
+</script>
+</body></html>

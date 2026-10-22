@@ -19,6 +19,9 @@ class FaceService:
         self.camera_factory = camera_factory or UsbCamera
         self.preview = preview
         self._camera_stream = None
+        self._camera_factory_lock = threading.Lock()
+        if self.preview is not None:
+            self.preview.camera_control = self
         self.engine_factory = engine_factory or FaceEngine
         if config.backend == 'xfyun':
             from experiments.access.jetson.cloud_library import CloudFaceLibrary
@@ -52,7 +55,8 @@ class FaceService:
                 return {"accepted": False, "note": "人脸功能在 config.py 中未启用"}
             if self._worker is not None and self._worker.is_alive():
                 return {"accepted": False, "note": "摄像头任务正在进行，请先停止当前识别/录入"}
-            if self._camera_stream is not None and self._camera_stream.snapshot()['worker_alive']:
+            if (self._camera_stream is not None and self._camera_stream.snapshot()['worker_alive']
+                    and self._camera_stream.snapshot().get('face_lease', True)):
                 return {"accepted": False, "note": "上一轮摄像头采集尚未释放，请等待读取返回后重试"}
             with self._lock:
                 self._generation += 1
@@ -72,13 +76,31 @@ class FaceService:
             return {"accepted": True, "note": "已启动人脸录入" if mode == "enroll" else "已启动门禁识别"}
 
     def camera_for_task(self):
-        if self.preview is None:
-            return self.camera_factory(self.camera_config)
-        if self._camera_stream is None:
-            from experiments.access.jetson.camera_stream import CameraStream
-            self._camera_stream = CameraStream(self.camera_config, self.preview.hub,
-                                               camera_factory=self.camera_factory, join_timeout=self.join_timeout)
-        return self._camera_stream
+        with self._camera_factory_lock:
+            if self.preview is None:
+                return self.camera_factory(self.camera_config)
+            if self._camera_stream is None:
+                from experiments.access.jetson.shared_camera import SharedCameraStream
+                self._camera_stream = SharedCameraStream(self.camera_config, self.preview.hub,
+                                                        camera_factory=self.camera_factory,
+                                                        join_timeout=self.join_timeout)
+            return self._camera_stream
+
+    def external_camera_lease(self, lease_id, release=False):
+        with self._lifecycle_lock:
+            if self.preview is None:
+                raise RuntimeError('当前未启用摄像头共享通道')
+            camera = self.camera_for_task()
+            owner = 'iic:' + lease_id
+            if release:
+                camera.release(owner)
+            else:
+                camera.acquire(owner, ttl=8.0)
+            return camera.snapshot()
+
+    def shutdown_shared_camera(self):
+        if self._camera_stream is not None:
+            self._camera_stream.shutdown()
 
     def start_camera(self, camera, cancel):
         if camera is self._camera_stream:

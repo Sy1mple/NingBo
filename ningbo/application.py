@@ -57,6 +57,16 @@ class NingBoApplication:
             if discard is not None:
                 discard()
             self._started = True
+            try:
+                from gateway import GatewaySettings, start_gateway
+                self.gateway = start_gateway(
+                    self.devices, GatewaySettings(),
+                    camera_preview=self.camera_preview,
+                    camera_control=self.face,
+                )
+            except Exception:
+                LOGGER.exception("Web 网关启动失败（主程序继续运行）")
+                self.gateway = None
         except Exception:
             try:
                 self.stop()

@@ -50,9 +50,24 @@ class UsbCamera:
         self._capture = None
         self._first_frame = None
         self.selected_device = None
+        self._hardware = None
 
     def start(self):
         if self._capture is not None:
+            return
+        if self.module is None and os.environ.get('NINGBO_CAMERA_BACKEND') == 'nvidia':
+            if self._hardware is None:
+                from .gst_camera import GstUsbCamera
+                self._hardware = GstUsbCamera(self.config)
+                try:
+                    self._hardware.start()
+                except Exception:
+                    self._hardware.close()
+                    self._hardware = None
+                    raise
+            self.selected_device = self._hardware.selected_device
+            self.backend = self._hardware.backend
+            self.output_fps = self._hardware.output_fps
             return
         if self.module is None:
             import cv2
@@ -94,6 +109,10 @@ class UsbCamera:
         raise OSError('USB 摄像头无法采集：' + '; '.join(errors))
 
     def read(self):
+        if self._hardware is not None:
+            frame = self._hardware.read()
+            self.preview_jpeg = self._hardware.preview_jpeg
+            return frame
         if self._capture is None:
             raise RuntimeError("请先启动 USB 摄像头")
         if self._first_frame is not None:
@@ -105,6 +124,10 @@ class UsbCamera:
         return frame
 
     def close(self):
+        if self._hardware is not None:
+            self._hardware.close()
+            self._hardware = None
+            self.preview_jpeg = None
         capture, self._capture = self._capture, None
         self._first_frame = None
         self.selected_device = None

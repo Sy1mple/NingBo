@@ -1,6 +1,7 @@
 """body_temperature hardware and model defaults."""
-HIGH_TEMPERATURE_C = 37.5
-FEEDBACK_VALID_RANGE = (35.0, 45.0)
+# 表面测温演示：25～28℃ 绿灯，超过 28℃ 红灯并短鸣；不是医学发热阈值。
+HIGH_TEMPERATURE_C = 28.0
+FEEDBACK_VALID_RANGE = (25.0, 380.0)
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -13,6 +14,8 @@ class BodyTemperatureConfig:
     model: str = "mlx90614"  # GY-906，与 BH1750 共用 I2C8。
     address: int = 0x5A
     interval: float = 1.0
+    alarm_period_seconds: float = 1.0
+    alarm_on_seconds: float = 0.2
     temperature_range: tuple = (-70.0, 380.0)
     ambient_range: tuple = (-40.0, 125.0)
     display_range: tuple = (0.0, 100.0)  # 屏幕显示范围；RGB 的人体温度范围单独判断。
@@ -28,6 +31,10 @@ def validate(self):
     if self.body_temperature.enabled and (not self.body_temperature.model or self.body_temperature.model == "unconfigured"):
         raise ValueError("启用人体温度前需填写 mlx90614 型号，或为 DeviceService 注入真实驱动")
     body = self.body_temperature
+    if (any(isinstance(value, bool) or not math.isfinite(value)
+            for value in (body.alarm_period_seconds, body.alarm_on_seconds))
+            or not 0 < body.alarm_on_seconds < body.alarm_period_seconds):
+        raise ValueError("人体温度蜂鸣周期和鸣响时长无效")
     if isinstance(body.address, bool) or not isinstance(body.address, int) or not 0x08 <= body.address <= 0x77:
         raise ValueError("人体温度 I2C 地址必须是有效的 7 位地址")
     for label, limits in (("测量", body.temperature_range), ("环境", body.ambient_range), ("显示", body.display_range)):

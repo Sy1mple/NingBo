@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>宁波实验箱网关</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --line: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #0b1220;
+      position: sticky; top: 0; z-index: 5;
+    }
+    h1 { margin: 0; font-size: 18px; font-weight: 600; }
+    .meta { color: var(--muted); font-size: 12px; }
+    main { padding: 16px; max-width: 1100px; margin: 0 auto; }
+    .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .card h2 {
+      margin: 0 0 10px; font-size: 14px; color: var(--muted); font-weight: 500;
+      letter-spacing: .5px;
+    }
+    .value { font-size: 28px; font-weight: 700; }
+    .sub { color: var(--muted); font-size: 12px; margin-top: 6px; word-break: break-all; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    button, .btn {
+      appearance: none; border: 1px solid var(--line); background: #0b1220;
+      color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover { border-color: var(--accent); color: var(--accent); }
+    button.primary { background: #0369a1; border-color: #0284c7; }
+    button.danger { background: #7f1d1d; border-color: #b91c1c; }
+    input, select {
+      background: #0b1220; color: var(--text); border: 1px solid var(--line);
+      border-radius: 8px; padding: 7px 10px; font-size: 13px; width: 100%;
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
+    .status-ok { color: var(--ok); }
+    .status-err { color: var(--err); }
+    .status-warn { color: var(--warn); }
+    .pill {
+      display: inline-block; padding: 2px 8px; border-radius: 999px;
+      font-size: 12px; border: 1px solid var(--line); color: var(--muted);
+    }
+    .pill.on { color: var(--ok); border-color: #14532d; background: #052e16; }
+    .pill.off { color: var(--muted); }
+    #toast {
+      position: fixed; right: 16px; bottom: 16px; max-width: 320px;
+      background: #0b1220; border: 1px solid var(--line); border-radius: 10px;
+      padding: 10px 12px; font-size: 13px; display: none; z-index: 20;
+    }
+    .token-box { display: flex; gap: 8px; align-items: center; }
+    .token-box input { width: 220px; }
+    .rgb-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>宁波实验箱 Web 网关</h1>
+      <div class="meta" id="meta">连接中…</div>
+    </div>
+    <div class="token-box">
+      <button class="danger" id="estop">急停全部</button>
+    </div>
+  </header>
+  <main>
+    <div class="row" id="sensors"></div>
+    <div style="height:16px"></div>
+    <div class="row" id="adc"></div>
+    <div style="height:16px"></div>
+    <div class="row" id="actuators"></div>
+  </main>
+  <div id="toast"></div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function toast(msg, ok = true) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.style.borderColor = ok ? "#14532d" : "#7f1d1d";
+      el.style.color = ok ? "#86efac" : "#fca5a5";
+      el.style.display = "block";
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.style.display = "none", 2600);
+    }
+
+    function headers() {
+      return { "Content-Type": "application/json" };
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, { ...opts, headers: { ...headers(), ...(opts.headers || {}) } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || res.status);
+      return data;
+    }
+
+    function field(obj, keys) {
+      for (const k of keys) if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+      return null;
+    }
+
+    function renderSensors(sensors) {
+      const box = $("sensors");
+      const cards = [];
+      const dht = sensors.dht11 || {};
+      const light = sensors.bh1750 || sensors.light || {};
+      const ultra = sensors.ultrasonic || {};
+      const smoke = sensors.smoke || {};
+      const body = sensors.body_temperature || {};
+
+      cards.push(sensorCard("DHT11 温湿度",
+        `${num(field(dht, ["temp", "temperature"]))} °C / ${num(field(dht, ["humidity"]))} %`,
+        dht));
+      cards.push(sensorCard("光照 BH1750",
+        `${num(field(light, ["lux"]))} lx`,
+        light));
+      cards.push(sensorCard("超声波测距",
+        `${num(field(ultra, ["distance", "distance_cm"]))} cm`,
+        ultra));
+      const smokeSt = String(smoke.status || "").toLowerCase();
+      let smokeVal;
+      if (smokeSt === "idle" || smokeSt === "waiting") smokeVal = "待启动";
+      else if (field(smoke, ["concentration"]) !== null && field(smoke, ["concentration"]) !== undefined)
+        smokeVal = `${num(field(smoke, ["concentration"]))}`;
+      else if (field(smoke, ["percent"]) !== null && field(smoke, ["percent"]) !== undefined)
+        smokeVal = `${num(field(smoke, ["percent"]))} %`;
+      else if (field(smoke, ["raw"]) !== null && field(smoke, ["raw"]) !== undefined)
+        smokeVal = String(field(smoke, ["raw"]));
+      else smokeVal = "--";
+      const smokeUnit = field(smoke, ["concentration"]) !== null && field(smoke, ["concentration"]) !== undefined
+        ? " · 浓度(未标定)" : "";
+      cards.push(sensorCard("烟雾传感器", smokeVal + smokeUnit, smoke));
+      cards.push(sensorCard("人体温度 MLX90614",
+        `${num(field(body, ["temperature", "object_c"]))} °C`,
+        body));
+      box.innerHTML = cards.join("");
+      renderAdc(window.__lastAdc);
+    }
+
+    function adcLabels(address) {
+      const a = String(address || "").toLowerCase();
+      // 主片 0x48：舵机/门锁/风扇/RGB；反馈片 0x49：蜂鸣器/步进/5V
+      if (a === "0x48" || a === "72" || a === "0x30") {
+        return {
+          0: "舵机 Servo",
+          1: "门锁 Lock",
+          2: "风扇 Fan",
+          3: "RGB 三色灯",
+        };
+      }
+      if (a === "0x49" || a === "73") {
+        return {
+          0: "蜂鸣器 Buzzer",
+          1: "步进 Stepper",
+          2: "5V 电源",
+          3: "备用 CH3",
+        };
+      }
+      return { 0: "CH0", 1: "CH1", 2: "CH2", 3: "CH3" };
+    }
+
+    function adcTitle(address) {
+      const a = String(address || "").toLowerCase();
+      if (a === "0x48") return "主反馈板 0x48 · 舵机/锁/风扇/RGB";
+      if (a === "0x49") return "反馈板 0x49 · 蜂鸣器/步进/5V";
+      return "ADS1115 @ " + address;
+    }
+
+    function renderAdc(adc) {
+      const box = document.getElementById("adc");
+      if (!box) return;
+      if (!adc || adc.enabled === false) {
+        box.innerHTML = `<div class="card"><h2>ADC ADS1115</h2><div class="sub">未启用</div></div>`;
+        return;
+      }
+      const chips = adc.chips || [];
+      if (adc.error) {
+        box.innerHTML = `<div class="card"><h2>ADC ADS1115</h2>
+          <div class="value status-err">读取失败</div>
+          <div class="sub">${esc(adc.error)}</div></div>`;
+        return;
+      }
+      box.innerHTML = chips.map(chip => {
+        if (!chip.ok) {
+          return `<div class="card">
+            <h2>${esc(adcTitle(chip.address))}</h2>
+            <div class="value status-err">离线</div>
+            <div class="sub">${esc(chip.error || "")}</div>
+          </div>`;
+        }
+        const fmtVolts = (v, unit) => {
+          if (v === null || v === undefined || Number.isNaN(+v)) return "--";
+          if (unit === "uV") return Math.round((+v) * 1e6);
+          return Math.round((+v) * 1000);
+        };
+        const unitOf = (address, channel) => {
+          const a = String(address || "").toLowerCase();
+          // 三色灯反馈电压很小（百 µV 级），用 µV 更直观
+          if (a === "0x48" && channel === 3) return "uV";
+          return "mV";
+        };
+        const labels = adcLabels(chip.address);
+        const rows = (chip.channels || []).map(ch => {
+          const name = labels[ch.channel] || `CH${ch.channel}`;
+          const unit = unitOf(chip.address, ch.channel);
+          const unitText = unit === "uV" ? "µV" : "mV";
+          return `<div class="sub">${name}: <b>${fmtVolts(ch.volts, unit)}</b> ${unitText}${ch.saturated ? " (饱和)" : ""}</div>`;
+        }).join("");
+        const ch0 = chip.channels && chip.channels[0] ? chip.channels[0].volts : null;
+        const first = labels[0] || "CH0";
+        return `<div class="card">
+          <h2>${esc(adcTitle(chip.address))}</h2>
+          <div class="value">${fmtVolts(ch0, "mV")} mV</div>
+          <div class="sub">${esc(first)} 预览 · 量程 ${num(chip.full_scale_volts)} V</div>
+          ${rows}
+        </div>`;
+      }).join("") || `<div class="card"><h2>ADC</h2><div class="sub">无数据</div></div>`;
+    }
+
+    function num(v) {
+      if (v === null || v === undefined || v === "") return "--";
+      if (typeof v === "number") return Number.isInteger(v) ? String(v) : v.toFixed(1);
+      return String(v);
+    }
+
+    function statusClass(st) {
+      const s = String(st || "").toLowerCase();
+      if (s === "ok" || s === "online" || s === "active") return "status-ok";
+      if (s === "error" || s === "offline") return "status-err";
+      return "status-warn";
+    }
+
+    function sensorCard(title, value, raw) {
+      const st = raw.status || (raw.ok === false ? "error" : raw.ok === true ? "ok" : "");
+      return `<div class="card">
+        <h2>${title}</h2>
+        <div class="value">${value}</div>
+        <div class="sub">
+          <span class="pill ${statusClass(st) === "status-ok" ? "on" : "off"} ${statusClass(st)}">${st || "n/a"}</span>
+          ${raw.sample_time ? " " + new Date(raw.sample_time * 1000).toLocaleTimeString() : ""}
+          ${raw.note ? `<div>${esc(raw.note)}</div>` : ""}
+        </div>
+      </div>`;
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function renderActuators(actuators) {
+      const box = $("actuators");
+      const parts = [];
+      parts.push(`
+        <div class="card">
+          <h2>开关类</h2>
+          ${toggleCard("buzzer", "蜂鸣器", actuators.buzzer)}
+          ${toggleCard("lock", "门锁继电器", actuators.lock)}
+          ${toggleCard("fan", "风扇继电器", actuators.fan)}
+        </div>
+      `);
+      parts.push(`
+        <div class="card">
+          <h2>舵机 Servo</h2>
+          <div class="sub">当前：${fmtServo(actuators.servo)}</div>
+          <label>角度 0–180</label>
+          <input id="servoAngle" type="number" min="0" max="180" value="90" />
+          <div class="actions">
+            <button class="primary" onclick="ctrl('servo',{angle:+$('servoAngle').value})">转到角度</button>
+            <button onclick="ctrl('servo',{sweep:true})">扫描</button>
+          </div>
+        </div>
+      `);
+      parts.push(`
+        <div class="card">
+          <h2>步进电机 Stepper</h2>
+          <div class="sub">${fmtStepper(actuators.stepper)}</div>
+          <label>步数</label>
+          <input id="stepN" type="number" min="1" max="100000" value="200" />
+          <label>速度 ms/步 (2–20)</label>
+          <input id="stepSpd" type="number" min="2" max="20" value="8" />
+          <div class="actions">
+            <button class="primary" onclick="stepper('fwd')">正转</button>
+            <button class="primary" onclick="stepper('rev')">反转</button>
+            <button class="danger" onclick="stepper('stop')">停止</button>
+          </div>
+        </div>
+      `);
+      const color = (actuators.rgb && actuators.rgb.color) || "off";
+      parts.push(`
+        <div class="card">
+          <h2>三色灯 RGB</h2>
+          <div class="sub">当前颜色：<b>${esc(color)}</b></div>
+          <div class="rgb-row actions">
+            <button onclick="ctrl('rgb',{color:'red'})">红</button>
+            <button onclick="ctrl('rgb',{color:'green'})">绿</button>
+            <button onclick="ctrl('rgb',{color:'blue'})">蓝</button>
+            <button onclick="ctrl('rgb',{color:'yellow'})">黄</button>
+            <button onclick="ctrl('rgb',{color:'white'})">白</button>
+            <button onclick="ctrl('rgb',{off:true})">熄灭</button>
+          </div>
+        </div>
+      `);
+      box.innerHTML = parts.join("");
+    }
+
+    function fmtServo(s) {
+      s = s || {};
+      if (s.sweeping) return "扫描中";
+      if (s.sweep) return "扫描模式";
+      const angle = s.angle;
+      const on = s.on;
+      if (angle === null || angle === undefined) return on ? "已使能" : "待机";
+      return `${on ? "已使能" : "待机"} · 角度 ${num(angle)}°`;
+    }
+
+    function fmtStepper(s) {
+      s = s || {};
+      const dirMap = { fwd: "正转", rev: "反转", stop: "停止" };
+      const dir = dirMap[s.dir] || s.dir || "未知";
+      const running = s.running ? "运行中" : "空闲";
+      const n = s.n != null ? ` · 剩余 ${num(s.n)} 步` : "";
+      const spd = s.spd != null && s.dir !== "stop" ? ` · ${num(s.spd)} ms/步` : "";
+      return `${running} · ${dir}${n}${spd}`;
+    }
+
+    function toggleCard(name, label, state) {
+      const on = state && state.on;
+      return `<div style="margin:10px 0">
+        <div><b>${label}</b> <span class="pill ${on ? "on" : "off"}">${on ? "开" : "关"}</span></div>
+        <div class="actions">
+          <button class="primary" onclick="ctrl('${name}',{on:true})">打开</button>
+          <button onclick="ctrl('${name}',{on:false})">关闭</button>
+        </div>
+      </div>`;
+    }
+
+    async function ctrl(name, body) {
+      try {
+        await api("/api/actuators/" + name, { method: "POST", body: JSON.stringify(body) });
+        toast(name + " 控制成功");
+        refresh();
+      } catch (e) {
+        toast(name + " 失败: " + e.message, false);
+      }
+    }
+
+    async function stepper(dir) {
+      if (dir === "stop") return ctrl("stepper", { dir: "stop" });
+      return ctrl("stepper", {
+        dir,
+        n: +$("stepN").value,
+        spd: +$("stepSpd").value,
+      });
+    }
+
+    $("estop").onclick = async () => {
+      try {
+        await api("/api/emergency_stop", { method: "POST", body: "{}" });
+        toast("已急停");
+        refresh();
+      } catch (e) {
+        toast("急停失败: " + e.message, false);
+      }
+    };
+
+    async function refresh() {
+      try {
+        const data = await api("/api/state");
+        $("meta").textContent = `模式 ${data.meta.mode} · ${new Date(data.meta.time * 1000).toLocaleString()}`;
+        window.__lastAdc = data.adc;
+        renderSensors(data.sensors || {});
+        renderAdc(data.adc);
+        renderActuators(data.actuators || {});
+      } catch (e) {
+        $("meta").textContent = "获取失败: " + e.message + "（请检查令牌）";
+      }
+    }
+    refresh();
+    setInterval(refresh, 2000);
+  </script>
+</body>
+</html>

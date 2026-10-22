@@ -6,6 +6,25 @@ from . import addresses
 
 MAX_SCREEN_VALUE = 0x7FFF
 
+# 与其他状态框一致：字库 100 把单个汉字码显示为完整状态词。
+# 只写一个 Word，保持 0x6002 烟雾和 0x6004 超声波结果不受影响。
+STATUS_TEXT = {
+    "unknown": "坏", "normal": "好", "error": "坏", "unconfigured": "坏",
+    "disabled": "坏", "checking": "检", "idle": "坏",
+}
+
+
+def build_status_update(name, address, status):
+    if name != "body_temperature" or address != addresses.BODY_TEMP_STATUS_RESULT_ADDR:
+        raise ValueError("人体测温状态结果设备或地址不匹配")
+    if status not in STATUS_TEXT:
+        raise ValueError("未知人体测温状态: " + status)
+    text = STATUS_TEXT[status]
+    return {"name": "diagnostics.body_temperature", "address": address,
+            "data": text.encode("gb2312"), "text": text}
+
+
+
 def make_update(name, address, value, scale=1):
     """生成统一的屏幕更新数据。"""
 

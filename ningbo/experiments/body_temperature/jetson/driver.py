@@ -42,8 +42,12 @@ class Mlx90614Driver:
 
     def read(self):
         # 两个寄存器使用同一个共享 RLock，避免与其他 I2C 驱动交错。
-        with self.i2c.lock:
+        if not self.i2c.lock.acquire(timeout=0.5):
+            raise TimeoutError("MLX90614 等待共享 I2C 总线超过 0.5 秒")
+        try:
             ambient = self._read_temperature(self.AMBIENT_REGISTER, self.config.ambient_range)
             target = self._read_temperature(self.OBJECT_REGISTER, self.config.temperature_range)
+        finally:
+            self.i2c.lock.release()
         return {"temperature": target, "ambient_temperature": ambient,
                 "model": "mlx90614", "address": self.config.address}

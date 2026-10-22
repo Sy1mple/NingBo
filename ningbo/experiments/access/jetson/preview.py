@@ -2,6 +2,7 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import logging
+import re
 from pathlib import Path
 import threading
 import time
@@ -54,7 +55,9 @@ class FrameHub:
                 state, note = 'stalled', '画面暂未更新，请检查摄像头连接'
             return {'service': 'ningbo-camera-preview', 'state': state, 'note': note,
                     'device': self.device, 'width': self.width, 'height': self.height,
-                    'sequence': self.sequence, 'frame_age_seconds': age, 'task': self.task}
+                    'sequence': self.sequence, 'frame_age_seconds': age, 'task': self.task,
+                    'capture_backend': getattr(self, 'capture_backend', 'opencv-v4l2'),
+                    'capture_fps': getattr(self, 'capture_fps', None)}
 
     def wait_frame(self, after=0, timeout=1.0):
         with self.condition:
@@ -78,6 +81,7 @@ class CameraPreview:
         if isinstance(port, bool) or not isinstance(port, int) or not 0 <= port <= 65535:
             raise ValueError('预览端口须为 0~65535 的整数')
         self.port, self.hub = port, hub or FrameHub()
+        self.camera_control = None
         self.open_browser = open_browser
         if browser_launcher is None:
             from .desktop_browser import launch_local_firefox
@@ -129,12 +133,53 @@ class CameraPreview:
                         data = json.dumps(owner.hub.snapshot(), ensure_ascii=False).encode()
                         self.send_preview_headers(200, 'application/json; charset=utf-8', len(data))
                         self.wfile.write(data)
+                    elif path == '/snapshot.jpg':
+                        record = owner.hub.wait_frame(after=0, timeout=0.2)
+                        if record is None:
+                            self.send_preview_headers(503, 'text/plain', 0)
+                        else:
+                            sequence, jpeg = record
+                            self.send_preview_headers(200, 'image/jpeg', len(jpeg))
+                            self.wfile.write(jpeg)
                     elif path == '/stream.mjpg':
                         self.stream()
                     else:
                         self.send_preview_headers(404, 'text/plain', 0)
                 except (OSError, TimeoutError):
                     pass  # 浏览器关闭或读流超时，不影响相机及其他客户端。
+
+            def do_POST(self):
+                path = urlsplit(self.path).path
+                if path not in ('/iic/camera/lease', '/iic/camera/release'):
+                    self.send_preview_headers(404, 'text/plain', 0)
+                    return
+                try:
+                    # Non-browser local control: reject simple cross-origin form requests.
+                    if self.headers.get('Content-Type','').split(';')[0] != 'application/json':
+                        raise ValueError('需要 application/json')
+                    if self.headers.get('Origin') is not None:
+                        raise ValueError('仅供本机服务调用')
+                    size = int(self.headers.get('Content-Length','0'))
+                    if not 0 < size <= 4096:
+                        raise ValueError('请求体长度无效')
+                    data = json.loads(self.rfile.read(size))
+                    lease_id = data.get('lease_id','')
+                    if not isinstance(lease_id,str) or re.fullmatch(r'[a-f0-9]{32}',lease_id) is None:
+                        raise ValueError('lease_id 无效')
+                    if owner._stop.is_set() or owner.camera_control is None:
+                        raise RuntimeError('摄像头共享控制器不可用')
+                    status = owner.camera_control.external_camera_lease(lease_id,release=path.endswith('/release'))
+                    body = json.dumps({'ok':True,'camera':status},ensure_ascii=False).encode()
+                    self.send_preview_headers(200,'application/json; charset=utf-8',len(body))
+                    self.wfile.write(body)
+                except (ValueError, TypeError, AttributeError, json.JSONDecodeError) as exc:
+                    body = json.dumps({'ok':False,'error':str(exc)},ensure_ascii=False).encode()
+                    self.send_preview_headers(400,'application/json; charset=utf-8',len(body))
+                    self.wfile.write(body)
+                except Exception as exc:
+                    body = json.dumps({'ok':False,'error':str(exc)},ensure_ascii=False).encode()
+                    self.send_preview_headers(503,'application/json; charset=utf-8',len(body))
+                    self.wfile.write(body)
 
             def stream(self):
                 if not owner._streams.acquire(blocking=False):
@@ -197,6 +242,11 @@ class CameraPreview:
 
     def stop(self):
         self._stop.set()
+        if self.camera_control is not None:
+            try:
+                self.camera_control.shutdown_shared_camera()
+            except Exception:
+                LOGGER.exception('共享摄像头清理失败')
         self.hub.close()
         server, self.server = self.server, None
         if server is not None:

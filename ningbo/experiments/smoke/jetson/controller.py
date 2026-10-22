@@ -35,8 +35,21 @@ class Hardware:
                 states[name].update(status="disabled", note="config.py 中未启用")
 
     def initialize_readers(self):
-        # 烟雾 UART 按需打开。应用启动时不得长期占用 ttyTHS0；烟雾页面或
-        # 状态检测显式 acquire 后才打开，最后一个使用方 release 后立即关闭。
+        # 独立检测：启动即打开 ttyTHS0 并保持 auto 会话，不依赖串口屏。
+        for name in list(self._readers):
+            if name != 'smoke':
+                continue
+            try:
+                self.acquire_reader(name, 'auto')
+                with self.owner._lock:
+                    self.owner.sensors[name].update(
+                        status='unknown',
+                        note='烟雾已独立启动，等待有效数据',
+                        sample_time=None,
+                    )
+                LOGGER.info('烟雾 UART 已独立启动（auto），不再等待串口屏')
+            except Exception:
+                LOGGER.exception('烟雾独立启动失败')
         return None
 
     def acquire_reader(self, name, client):

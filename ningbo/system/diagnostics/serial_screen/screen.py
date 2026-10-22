@@ -12,6 +12,7 @@ from experiments.servo.serial_screen.screen import build_status_update as servo_
 from experiments.stepper.serial_screen.screen import build_status_update as stepper_status_update
 from experiments.fan.serial_screen.screen import build_status_update as fan_status_update
 from experiments.access.serial_screen.screen import build_status_update as access_status_update
+from experiments.body_temperature.serial_screen.screen import build_status_update as body_temperature_status_update
 
 
 MAX_SCREEN_VALUE = 0x7FFF
@@ -25,6 +26,7 @@ STATUS_TEXT_BUILDERS = {
     "stepper": stepper_status_update,
     "fan": fan_status_update,
     "lock": access_status_update,
+    "body_temperature": body_temperature_status_update,
 }
 
 def make_update(name, address, value, scale=1):

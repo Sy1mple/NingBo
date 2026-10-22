@@ -32,10 +32,11 @@ class BodyTemperatureBridge:
         return {"event": name, "handled": True, "sent": sent, "note": "采集已停止"}
 
     def on_start(self):
-        """Optional additional hardware linkage supplied by a scene."""
+        self.context.body_temperature_alarm.activate()
 
     def on_stop(self):
-        """Optional additional hardware linkage supplied by a scene."""
+        self.context.body_temperature_alarm.release()
+        self.context._flush_body_temperature_alarm()
 
     def start_note(self, snapshot):
         state = snapshot.get("sensors", {}).get("body_temperature") or {}
