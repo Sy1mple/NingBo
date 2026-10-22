@@ -12,7 +12,7 @@ class LockStatusCheck(ActuatorCheck):
     def check(self, name, cancel_event=None):
         if name != "lock":
             raise ValueError("门锁检测设备名称不匹配")
-        with self.manager._control_lock:
+        with self.control_session(name, cancel_event):
             adc = self.manager.config.ads1115
             if (getattr(self.manager, "_pintest_mode", False)
                     or name not in self.manager._outputs or not adc.enabled

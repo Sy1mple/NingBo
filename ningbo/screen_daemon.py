@@ -27,6 +27,8 @@ class ScreenDaemon:
         self.online = False
         self.next_open = 0
         self.next_smoke_log = 0
+        self._lock_status_pending = None
+        self._lock_status_verified = None
         self.stop_event = threading.Event()
 
     def start(self):
@@ -56,6 +58,8 @@ class ScreenDaemon:
     def _screen_failed(self, exc):
         LOGGER.warning('屏幕断开，稍后仅重连屏幕：%s', exc)
         self.online = False
+        self._lock_status_verified = None
+        self._lock_status_pending = None
         self.next_open = self.clock() + 2
         try:
             self.screen.stop()
@@ -106,6 +110,12 @@ class ScreenDaemon:
                                 written_frame = normalize_legacy_status_frame(frame)
                                 self.screen.sender._write_frame(written_frame)
                                 address = int.from_bytes(written_frame[4:6], 'big')
+                                if address == 0x6010:
+                                    value = int.from_bytes(written_frame[6:8], 'big')
+                                    if value != self._lock_status_verified:
+                                        self._lock_status_pending = {
+                                            'frame': written_frame, 'value': value,
+                                            'attempts': 0, 'next': self.clock()}
                                 words = (len(written_frame) - 6) // 2
                                 now = self.clock()
                                 if address <= 0x1050 < address + words and now >= self.next_smoke_log:
@@ -123,6 +133,7 @@ class ScreenDaemon:
                 self._drop_client()
         if self.online:
             try:
+                self._verify_lock_status()
                 events = self.screen.read_screen_events()
             except Exception as exc:
                 self._screen_failed(exc)
@@ -137,6 +148,30 @@ class ScreenDaemon:
                     except (OSError, ValueError) as exc:
                         LOGGER.warning('按钮 IPC 发送失败，丢弃旧事件：%s', exc)
                         self._drop_client()
+
+    def _verify_lock_status(self):
+        pending = self._lock_status_pending
+        if pending is None or self.clock() < pending['next']:
+            return
+        sender = self.screen.sender
+        read = getattr(sender, 'read_value', None)
+        if read is None:
+            return
+        observed = read(0x6010)
+        pending['attempts'] += 1
+        if observed == pending['value']:
+            self._lock_status_verified = observed
+            self._lock_status_pending = None
+            LOGGER.info('门锁状态屏幕读回确认：VP=0x6010；Word=0x%04X', observed)
+        elif pending['attempts'] < 3:
+            LOGGER.warning('门锁状态屏幕读回不符，重发：期望=0x%04X；实际=%s',
+                           pending['value'], '无应答' if observed is None else hex(observed))
+            sender._write_frame(pending['frame'])
+            pending['next'] = self.clock() + .2
+        else:
+            LOGGER.error('门锁状态屏幕读回未确认：期望=0x%04X；实际=%s',
+                         pending['value'], '无应答' if observed is None else hex(observed))
+            self._lock_status_pending = None
 
     def run(self):
         self.start()

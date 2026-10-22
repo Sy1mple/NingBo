@@ -17,12 +17,13 @@ class DiagnosticService:
         self.manager = manager
         self.sensor_checker = SensorStatusChecker(manager)
         self.actuator_checker = ActuatorStatusChecker(manager)
-        self._check_lock = threading.RLock()
+        self._check_locks = {name: threading.RLock() for name in ACTUATOR_TARGETS}
         self._job_lock = threading.Lock()
         self._state_lock = threading.Lock()
         self._cancel = threading.Event()
         self._worker = None
         self._sensor_jobs = {}
+        self._actuator_jobs = {}
         self._sensor_jobs_lock = threading.Lock()
         self._report = {"revision": 0, "busy": False, "phase": "idle", "results": {},
                         "progress": 0, "overall": "unknown"}
@@ -46,9 +47,11 @@ class DiagnosticService:
         # 传感器不得共用执行器检测锁，否则烟雾无响应会阻塞全部传感器。
         if name in SENSOR_TARGETS:
             return self._checked_sensor(name)
-        with self._check_lock:
+        with self._check_locks[name]:
             try:
                 state = self.actuator_checker.check(name, cancel_event=cancel_event)
+                if not isinstance(state, dict) or "status" not in state:
+                    raise ValueError("执行器未返回有效状态结果")
             except Exception as exc:
                 state = {"status": "error", "note": str(exc)}
             return {**state, "name": name, "category": "actuator", "checked_at": time.time()}
@@ -71,28 +74,38 @@ class DiagnosticService:
             return cfg.attempts * (max(cfg.interval, cfg.retry_interval) + cfg.native_timeout_seconds) + 3.0
         return 3.0
 
+    def _check_timeout(self, name):
+        if name in SENSOR_TARGETS:
+            return self._sensor_timeout(name)
+        # 各项独立计时；保留真实动作/采样时间，超时不会让其它结果停在检测中。
+        return 15.0
+
     def _start_sensor(self, name):
         with self._sensor_jobs_lock:
-            previous = self._sensor_jobs.get(name)
+            jobs = self._sensor_jobs if name in SENSOR_TARGETS else self._actuator_jobs
+            previous = jobs.get(name)
             if previous is not None and previous["thread"].is_alive():
                 # Python 无法强杀阻塞的驱动调用；每项最多保留一个读取线程。
                 return None
             job = {"done": threading.Event(), "result": None,
-                   "started": time.monotonic(), "timeout": self._sensor_timeout(name)}
+                   "started": time.monotonic(), "timeout": self._check_timeout(name),
+                   "cancel": threading.Event()}
             def collect():
                 try:
-                    job["result"] = self._checked_sensor(name)
+                    job["result"] = self.check(name, cancel_event=job["cancel"])
+                except Exception as exc:
+                    job["result"] = self._sensor_failure(name, str(exc))
                 finally:
                     job["finished"] = time.monotonic()
                     job["done"].set()
             worker = threading.Thread(target=collect, name="diagnostic-" + name, daemon=True)
             job["thread"] = worker
-            self._sensor_jobs[name] = job
+            jobs[name] = job
             worker.start()
             return job
 
     def _sensor_failure(self, name, note):
-        return {"name": name, "category": "sensor", "status": "error",
+        return {"name": name, "category": "sensor" if name in SENSOR_TARGETS else "actuator", "status": "error",
                 "note": note, "checked_at": time.time()}
 
     def _run_sensors(self, targets, publish):
@@ -113,6 +126,7 @@ class DiagnosticService:
                 if done and job["finished"] - job["started"] <= job["timeout"]:
                     result = job["result"] or self._sensor_failure(name, "检测线程结束但没有返回结果")
                 elif now - job["started"] >= job["timeout"]:
+                    job["cancel"].set()
                     result = self._sensor_failure(name,
                         f"{job['timeout']:g} 秒内未取得有效检测结果，读取或资源等待超时")
                 else:
@@ -121,17 +135,17 @@ class DiagnosticService:
                 del pending[name]
             if pending:
                 self._cancel.wait(.02)
+        if self._cancel.is_set():
+            for job in pending.values():
+                job["cancel"].set()
 
     def check_all(self, group="all"):
         if not self.manager._started:
             raise RuntimeError("请先启动设备服务")
         targets = self.targets(group)
         results = {}
-        self._run_sensors(tuple(name for name in targets if name in SENSOR_TARGETS),
+        self._run_sensors(targets,
                           lambda name, result: results.update({name: result}))
-        for name in targets:
-            if name not in SENSOR_TARGETS:
-                results[name] = self.check(name)
         return {"results": results, "overall": overall_status(results), "busy": False, "progress": 100}
 
     def request(self, group="all", target=None):
@@ -160,13 +174,7 @@ class DiagnosticService:
                 self._report["revision"] += 1
             LOGGER.info("状态检测完成 %s: %s；%s", name, result["status"], result.get("note", ""))
         try:
-            self._run_sensors(tuple(name for name in targets if name in SENSOR_TARGETS), publish)
-            # 执行器保留逐项动作，避免同时启动电机/门锁造成相互干扰。
-            for name in targets:
-                if self._cancel.is_set():
-                    break
-                if name not in SENSOR_TARGETS:
-                    publish(name, self.check(name, cancel_event=self._cancel))
+            self._run_sensors(targets, publish)
         except Exception:
             LOGGER.exception("状态检测任务异常退出")
         finally:
@@ -196,9 +204,12 @@ class DiagnosticService:
                     raise RuntimeError("状态检测线程尚未结束，设备资源保持打开")
                 self._worker = None
             with self._sensor_jobs_lock:
-                workers = [job["thread"] for job in self._sensor_jobs.values()]
+                jobs = list(self._sensor_jobs.values()) + list(self._actuator_jobs.values())
+                for job in jobs:
+                    job["cancel"].set()
+                workers = [job["thread"] for job in jobs]
             deadline = time.monotonic() + self.manager.config.thread_join_timeout
             for worker in workers:
                 worker.join(max(0, deadline - time.monotonic()))
             if any(worker.is_alive() for worker in workers):
-                raise RuntimeError("传感器读取线程尚未退出，硬件资源保持打开")
+                raise RuntimeError("状态检测读取线程尚未退出，硬件资源保持打开")

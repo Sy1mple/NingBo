@@ -14,6 +14,8 @@ class DiagnosticsScreenBridge:
         self.clock = clock or time.monotonic
         self._checking_until = 0
         self._holding_checking = False
+        self._refresh_remaining = 0
+        self._next_refresh = 0
 
     def handle_event(self, name):
         selection = name[len("diagnostics."):]
@@ -28,6 +30,7 @@ class DiagnosticsScreenBridge:
             self._checking_until = None
             self._holding_checking = True
             self._last_revision = -1
+            self._refresh_remaining = 0
         return {"event": name, "handled": result["accepted"], "sent": [],
                 "note": result["note"], "result": result}
 
@@ -40,7 +43,8 @@ class DiagnosticsScreenBridge:
         if self._holding_checking and self._checking_until is None:
             self._checking_until = now + .5
         checking_expired = self._holding_checking and now >= self._checking_until
-        if report["revision"] == self._last_revision and not checking_expired:
+        refresh_due = self._refresh_remaining > 0 and now >= self._next_refresh
+        if report["revision"] == self._last_revision and not checking_expired and not refresh_due:
             return []
         if checking_expired:
             self._holding_checking = False
@@ -62,4 +66,7 @@ class DiagnosticsScreenBridge:
                             name, statuses[name], item["address"],
                             "" if self._holding_checking else result.get("note", ""), item.get("hex", ""))
         self._last_revision = report["revision"]
+        if not report["busy"] and not self._holding_checking:
+            self._refresh_remaining = self._refresh_remaining - 1 if refresh_due else 2
+            self._next_refresh = now + .75
         return sent

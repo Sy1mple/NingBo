@@ -10,7 +10,7 @@ class RgbStatusCheck(ActuatorCheck):
     def check(self, name, cancel_event=None):
         if name != "rgb":
             raise ValueError("RGB 检测设备名称不匹配")
-        with self.manager._control_lock:
+        with self.control_session(name, cancel_event):
             state = self.manager.actuator_state(name)
             if (getattr(self.manager, "_pintest_mode", False)
                     or name not in self.manager._outputs or not state.get("initialized", False)):

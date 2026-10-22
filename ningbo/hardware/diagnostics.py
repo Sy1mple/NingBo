@@ -20,8 +20,12 @@ class ActuatorCheck(AdcFeedbackChecks):
     def __init__(self, manager):
         self.manager = manager
 
+    def control_session(self, name, cancel_event=None):
+        session = getattr(self.manager, "diagnostic_session", None)
+        return session(name, cancel_event) if session is not None else self.manager._control_lock
+
     def check(self, name, cancel_event=None):
-        with self.manager._control_lock:
+        with self.control_session(name, cancel_event):
             if getattr(self.manager, "_pintest_mode", False):
                 return {"status": "unknown", "note": "引脚维护模式下暂停执行器状态检测"}
             if name not in self.manager._outputs:

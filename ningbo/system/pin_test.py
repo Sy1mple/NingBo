@@ -10,6 +10,8 @@ class PinTest:
         if not manager._started:
             raise RuntimeError("设备服务尚未启动")
         with manager._control_lock:
+            if manager._diagnostic_owners:
+                return {"mode": "blocked", "ok": False, "error": "状态检测尚未结束，无法进入引脚测试"}
             # 引脚测试本身是显式维护操作；进入时才准备执行器以便退出/急停能恢复关闭电平。
             if not manager._pintest_mode:
                 for name, scene in manager._output_owners.items():

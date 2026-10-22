@@ -14,6 +14,7 @@ Length = 0x05
 
 from config import DEFAULT_CONFIG
 from hardware.screen.serial_discovery import discover_screen
+import time
 
 
 class ScreenSender:
@@ -117,6 +118,29 @@ class ScreenSender:
             raise OSError("串口屏数据帧未完整写入")
         self.ser.flush()
         return frame
+
+    def read_value(self, address, timeout=.15):
+        """通过本服务持有的串口回读一个 VP；保留同时收到的按钮帧。"""
+        query = bytes((0x5A, 0xA5, 4, 0x83, address >> 8, address & 255, 1))
+        prefix = bytes((0x5A, 0xA5, 6, 0x83, address >> 8, address & 255, 1))
+        if self.ser.write(query) != len(query):
+            raise OSError("串口屏读回请求未完整写入")
+        pending = bytearray()
+        old_timeout = self.ser.timeout
+        deadline = time.monotonic() + timeout
+        try:
+            self.ser.timeout = .02
+            while time.monotonic() < deadline:
+                pending.extend(self.ser.read(min(self.ser.in_waiting or 1, 4096)))
+                index = pending.find(prefix)
+                if index >= 0 and len(pending) >= index + 9:
+                    value = int.from_bytes(pending[index + 7:index + 9], "big")
+                    del pending[index:index + 9]
+                    return value
+            return None
+        finally:
+            self.ser.timeout = old_timeout
+            self._pending_input += bytes(pending)
 
     def write_value(self, address, value):
         """

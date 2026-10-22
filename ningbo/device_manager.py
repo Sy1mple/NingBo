@@ -1,5 +1,6 @@
 """Lifecycle and dispatch ONLY; driver construction and operations are scene-owned."""
 from copy import deepcopy
+from contextlib import contextmanager
 from importlib import import_module
 import threading
 import time
@@ -26,6 +27,8 @@ class DeviceManager:
         self.config = (config or DEFAULT_CONFIG).validate()
         self.mode, self.version = "hw", "3.1.0"
         self._lock, self._control_lock = threading.RLock(), threading.RLock()
+        self._diagnostic_locks = {name: threading.RLock() for name in ACTUATORS}
+        self._diagnostic_owners = {}
         self._sampling_condition = threading.Condition()
         self._active_reads = 0
         self._stop = threading.Event()
@@ -138,6 +141,7 @@ class DeviceManager:
     def prepare_actuator(self, name):
         """仅供显式控制/引脚维护调用；快照和状态检测不得隐式初始化输出。"""
         with self._control_lock:
+            self._assert_actuator_available(name, allow_cancelled=True)
             if not self._started:
                 raise RuntimeError("设备服务尚未启动")
             if self._pintest_mode:
@@ -212,6 +216,8 @@ class DeviceManager:
         if name not in self._output_owners:
             raise ValueError(f"Unknown actuator: {name}")
         with self._control_lock:
+            self._assert_actuator_available(name, allow_cancelled=(
+                kwargs.get("on") is False or kwargs.get("color") == "off"))
             self.prepare_actuator(name)
             return self._output_owners[name].control(name, **kwargs)
 
@@ -219,6 +225,7 @@ class DeviceManager:
         if name not in self._output_owners:
             raise ValueError(f"Unknown actuator: {name}")
         with self._control_lock:
+            self._assert_actuator_available(name, allow_cancelled=True)
             self.prepare_actuator(name)
             return self._output_owners[name].stop_actuator(name)
 
@@ -232,8 +239,37 @@ class DeviceManager:
         with self._control_lock:
             return self.snapshot()["actuators"][name]
 
+    def _assert_actuator_available(self, name, allow_cancelled=False):
+        owner = self._diagnostic_owners.get(name)
+        if owner is None:
+            return
+        if owner[0] != threading.get_ident():
+            raise RuntimeError(f"执行器 {name} 正在独立状态检测，请等待该项结束")
+        if owner[1].is_set() and not allow_cancelled:
+            raise InterruptedError("状态检测已取消，禁止重新启动执行器")
+
+    @contextmanager
+    def diagnostic_session(self, name, cancel_event=None):
+        # 只保留本设备的检测锁；动作等待和 ADC 转换不得占用全局控制锁。
+        with self._diagnostic_locks[name]:
+            with self._control_lock:
+                if not self._started or self._pintest_mode:
+                    raise RuntimeError("当前设备未运行或处于引脚维护模式")
+                previous = self._diagnostic_owners.get(name)
+                if previous is None:
+                    self._diagnostic_owners[name] = (
+                        threading.get_ident(), cancel_event or threading.Event())
+            try:
+                yield
+            finally:
+                if previous is None:
+                    with self._control_lock:
+                        self._diagnostic_owners.pop(name, None)
+
     def emergency_stop(self, resume_sampling=True):
         with self._control_lock:
+            for _, cancel in self._diagnostic_owners.values():
+                cancel.set()
             errors = {}
             for scene in self.scenes.values():
                 if hasattr(scene, "stop_outputs"):
