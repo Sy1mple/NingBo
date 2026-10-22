@@ -78,9 +78,6 @@ class DiagnosticService:
     def _check_timeout(self, name):
         if name in SENSOR_TARGETS:
             return self._sensor_timeout(name)
-        if name == "rgb":
-            # 三色各允许一次完整复测，不因瞬时漂移丢失后续颜色。
-            return 25.0
         # 各项独立计时；保留真实动作/采样时间，超时不会让其它结果停在检测中。
         return 15.0
 

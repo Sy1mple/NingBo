@@ -1,4 +1,4 @@
-"""跨场景共用 RGB 的颜色及三路输出状态检查。"""
+"""RGB 三路同时点亮，检查输出电平及总电气反馈。"""
 import math
 from statistics import median
 import time
@@ -29,40 +29,33 @@ class RgbStatusCheck(ActuatorCheck):
                 raise ValueError("RGB 控制颜色状态无效")
             channel = adc.feedback_channels[name]
             address = adc.feedback_addresses.get(name, adc.address)
-            checks = {}
             result = {"status": "error", "check_scope": "electrical_response",
-                      "address": hex(address), "channel": channel, "colors": checks,
+                      "address": hex(address), "channel": channel,
+                      "test_mode": "simultaneous", "test_color": "white",
                       "cmd_on": bool(state.get("on")), "command": {"color": previous},
-                      "calibration_basis": "normal_load_samples; disconnected_load_not_verified"}
+                      "calibration_basis": "sum_of_existing_color_minima; simultaneous_load_not_calibrated"}
             changed = False
             try:
-                for color in ("red", "green", "blue"):
+                attempts = []
+                for attempt in range(2):
                     self._cancel(cancel_event)
                     changed = True
-                    attempts = []
-                    for attempt in range(2):
-                        try:
-                            measurement = self._measure_color(color, address, channel, cancel_event)
-                        except _FeedbackUnavailable as exc:
-                            measurement = {"status": "unknown", "reason": "adc_unavailable", "note": str(exc)}
-                        attempts.append(measurement)
-                        if measurement["status"] == "normal":
-                            break
-                    # 一次稳定失败、另一次不稳定，仍不足以确定灯的状态。
-                    selected = next((item for item in reversed(attempts) if item["status"] == "normal"), None)
-                    if selected is None:
-                        selected = next((item for item in reversed(attempts) if item["status"] == "unknown"), attempts[-1])
-                    checks[color] = {**selected, "attempts": attempts}
-                status = ("error" if any(item["status"] == "error" for item in checks.values()) else
-                          "unknown" if any(item["status"] == "unknown" for item in checks.values()) else "normal")
-                summary = "，".join(
-                    (f"{color}={item['delta_volts'] * 1000:.3f}mV"
-                     f"(基线漂移{item['baseline_drift_volts'] * 1000:.3f}mV，{item['status']})")
-                    if "delta_volts" in item else f"{color}: {item.get('note', item['status'])}"
-                    for color, item in checks.items())
-                verdict = {"normal": "三色电气反馈通过", "error": "稳定采样仍有颜色反馈不足",
-                           "unknown": "反馈测量未能确认；不能据此判定指示灯损坏"}[status]
-                result.update(status=status, note=f"ADC 0x{address:02X}/AIN{channel} {verdict}；{summary}")
+                    try:
+                        measurement = self._measure_all_on(address, channel, cancel_event)
+                    except _FeedbackUnavailable as exc:
+                        measurement = {"status": "error", "reason": "adc_unavailable", "note": str(exc)}
+                    attempts.append(measurement)
+                    if measurement["status"] == "normal":
+                        break
+                selected = attempts[-1]
+                summary = (
+                    f"总反馈={selected['conservative_delta_volts'] * 1000:.3f}mV，"
+                    f"阈值={selected['minimum_delta_volts'] * 1000:.3f}mV，"
+                    f"基线变化={selected['baseline_drift_volts'] * 1000:.3f}mV"
+                    if "conservative_delta_volts" in selected else selected["note"])
+                verdict = "同时点亮电气反馈通过" if selected["status"] == "normal" else "同时点亮电气反馈异常"
+                result.update(status=selected["status"], feedback=selected, attempts=attempts,
+                              note=f"ADC 0x{address:02X}/AIN{channel} {verdict}；{summary}")
             except InterruptedError:
                 result.update(status="unknown", note="指示灯状态检测已取消")
             except Exception as exc:
@@ -81,9 +74,9 @@ class RgbStatusCheck(ActuatorCheck):
             self.manager.record_actuator_diagnostic(name, result)
             return result
 
-    def _measure_color(self, color, address, channel, cancel_event):
+    def _measure_all_on(self, address, channel, cancel_event):
         samples, errors = [], []
-        for output in ("off", color, "off"):
+        for output in ("off", "white", "off"):
             try:
                 samples.append(self._sample(output, address, channel, cancel_event))
             except _FeedbackUnavailable as exc:
@@ -94,15 +87,12 @@ class RgbStatusCheck(ActuatorCheck):
         baseline = median((before["volts"], after["volts"]))
         delta = running["volts"] - baseline
         drift = abs(after["volts"] - before["volts"])
-        minimum = self.manager.config.rgb.diagnostic_minimum_delta_volts[color]
-        stable = drift <= self.manager.config.rgb.diagnostic_maximum_baseline_drift_volts
-        # 漂移略超常规范围时，须相对前后两个熄灯基线都达到原阈值。
-        # 漂移本身不得超过该颜色的最小响应，避免大幅变化被当作灯的反馈。
+        # 同时点亮使用三路既有最小反馈之和，不再分别轮测颜色。
+        minimum = sum(self.manager.config.rgb.diagnostic_minimum_delta_volts.values())
+        # 必须高于前后两次熄灯基线，不能仅靠基线平均值制造有效反馈。
         conservative_delta = running["volts"] - max(before["volts"], after["volts"])
-        bounded_response = drift <= minimum and conservative_delta >= minimum
-        status = ("normal" if bounded_response else "unknown" if not stable else
-                  "normal" if delta >= minimum else "error")
-        return {"status": status, "reason": "baseline_unstable" if status == "unknown" else "response",
+        status = "normal" if conservative_delta >= minimum else "error"
+        return {"status": status, "reason": "response",
                 "before": before, "running": running, "after": after,
                 "delta_volts": delta, "minimum_delta_volts": minimum,
                 "conservative_delta_volts": conservative_delta,
@@ -122,6 +112,8 @@ class RgbStatusCheck(ActuatorCheck):
         elif cancel_event.wait(config.diagnostic_settle_seconds):
             raise InterruptedError("检测已取消")
         state = self.manager.actuator_state("rgb")
+        if state.get("color") != color:
+            raise RuntimeError(f"{color} RGB 状态与控制指令不一致")
         expected = self.expected_levels(state, color != "off")
         observed = self.manager.actuator_output_levels("rgb")
         if observed != expected:
