@@ -68,7 +68,8 @@ class DiagnosticService:
     def _sensor_timeout(self, name):
         # 保留已有设备的正常重试窗口，每个期限从该项启动时独立计时。
         if name == "smoke":
-            return self.manager.config.smoke.diagnostic_timeout_seconds + 2.0
+            # 单次 UART 读取结束即判定；锁/驱动卡住也不能长期停在检测中。
+            return max(1.0, self.manager.config.smoke.timeout + 0.5)
         if name == "dht11":
             cfg = self.manager.config.dht11
             return cfg.attempts * (max(cfg.interval, cfg.retry_interval) + cfg.native_timeout_seconds) + 3.0

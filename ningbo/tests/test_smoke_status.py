@@ -75,13 +75,14 @@ class SmokeStatusTests(unittest.TestCase):
         self.assertEqual(parser.feed(bytes.fromhex('ffaa00013cffaa015b3c')), [1, 347])
         self.assertEqual(parser.last_frame, bytes.fromhex('ffaa015b3c'))
 
-    def test_short_gap_does_not_falsely_fail_but_stale_frames_cannot_stay_normal(self):
+    def test_diagnostic_rejects_cached_frame_before_background_stale_timeout(self):
         self.uart.data.extend(bytes.fromhex('ffaa015b3c'))
         manager = self.manager()
         first = check_smoke(manager)
         self.now += 1
         recent = check_smoke(manager)
-        self.assertEqual(recent['status'], 'normal')
+        self.assertEqual(recent['status'], 'error')
+        self.assertFalse(recent['fresh_frame_received'])
         self.assertEqual(recent['sample_time'], first['sample_time'])
         self.now += DEFAULT_CONFIG.smoke.stale_after_seconds
         stale = check_smoke(manager)
@@ -135,7 +136,7 @@ class SmokeStatusTests(unittest.TestCase):
         screen.handle_message.assert_called_once()
         service.stop()
 
-    def test_managed_uart_opens_for_each_check_and_closes_after_each_check(self):
+    def test_auto_session_survives_diagnostic_and_recovers_on_new_frame(self):
         owner = SimpleNamespace(
             config=DEFAULT_CONFIG, sensors={}, _lock=threading.RLock(),
             _sampling_condition=threading.Condition(), _active_reads=0,
@@ -159,17 +160,20 @@ class SmokeStatusTests(unittest.TestCase):
         )
 
         hardware.initialize_readers()
-        self.assertEqual(opened, [])
-        for expected_opens in (1, 2):
+        self.assertEqual(len(opened), 1)
+        for attempt in (1, 2):
+            if attempt == 2:
+                self.assertEqual(check_smoke(manager)['status'], 'error')
+                opened[-1].data.extend(bytes.fromhex('ffaa015b3c'))
             result = check_smoke(manager)
             self.assertEqual(result['status'], 'normal')
-            self.assertEqual(len(opened), expected_opens)
-            self.assertTrue(opened[-1].closed)
-            self.assertIsNone(driver.serial)
-            self.assertEqual(owner.sensors['smoke']['status'], 'idle')
+            self.assertEqual(len(opened), 1)
+            self.assertFalse(opened[-1].closed)
+            self.assertIsNotNone(driver.serial)
+            self.assertEqual(hardware._reader_clients['smoke'], {'auto'})
         hardware.close_readers()
 
-    def test_manual_check_keeps_uart_open_past_stale_error_until_valid_frame(self):
+    def test_manual_check_reports_no_frame_without_waiting_for_later_frame(self):
         events = []
         states = iter([
             {'protocol': 'ffaa', 'status': 'unknown', 'note': '等待完整帧'},
@@ -190,10 +194,10 @@ class SmokeStatusTests(unittest.TestCase):
             poll_sensor=poll,
         )
         result = check_smoke(manager)
-        self.assertEqual(result['status'], 'normal')
-        self.assertEqual(events, ['open', 'poll', 'poll', 'poll', 'close'])
+        self.assertEqual(result['status'], 'error')
+        self.assertEqual(events, ['open', 'poll', 'close'])
 
-    def test_manual_check_reconnects_without_finishing_then_accepts_frame(self):
+    def test_no_frame_does_not_reconnect_or_wait_in_manual_check(self):
         events = []
         recovered = {'value': False}
         smoke_config = replace(
@@ -221,9 +225,45 @@ class SmokeStatusTests(unittest.TestCase):
             poll_sensor=poll,
         )
         result = check_smoke(manager)
-        self.assertEqual(result['status'], 'normal')
-        self.assertIn('reopen', events)
+        self.assertEqual(result['status'], 'error')
+        self.assertNotIn('reopen', events)
         self.assertEqual(events[-1], 'close')
+
+    def test_blocked_driver_publishes_error_and_error_glyph_within_one_second(self):
+        import time
+        gate = threading.Event()
+        manager = SimpleNamespace(config=DEFAULT_CONFIG, _started=True,
+            poll_sensor=lambda name: (gate.wait(3), {'status': 'error'})[1])
+        service = DiagnosticService(manager)
+        screen = SimpleNamespace(handle_message=lambda message: MessageParser().parse(message))
+        bridge = DiagnosticsScreenBridge(screen, SimpleNamespace(
+            request_diagnostics=service.request, diagnostic_snapshot=service.snapshot))
+        try:
+            started = time.monotonic()
+            bridge.handle_event('diagnostics.smoke')
+            bridge.tick()
+            service._worker.join(1.5)
+            self.assertFalse(service.snapshot()['busy'])
+            self.assertLess(time.monotonic() - started, 1.5)
+            self.assertEqual(service.snapshot()['results']['smoke']['status'], 'error')
+            items = bridge.tick()
+            smoke = next(item for item in items if item['address'] == 0x6002)
+            self.assertEqual(smoke['data'], '坏'.encode('gb2312'))
+        finally:
+            gate.set()
+            service.stop()
+
+    def test_current_missing_or_invalid_payload_always_returns_error(self):
+        for state in ({'protocol': 'ffaa', 'status': 'normal', 'concentration': None},
+                      {'protocol': 'ffaa', 'status': 'normal', 'concentration': True},
+                      {'protocol': 'ffaa', 'status': 'checking', 'concentration': None},
+                      {'online': True, 'percent': None, 'decoder_configured': True}):
+            with self.subTest(state=state):
+                release = Mock()
+                manager = SimpleNamespace(config=DEFAULT_CONFIG, acquire_sensor=Mock(),
+                    release_sensor=release, poll_sensor=Mock(return_value=state))
+                self.assertEqual(check_smoke(manager)['status'], 'error')
+                release.assert_called_once_with('smoke', 'smoke-diagnostics')
 
 
 if __name__ == '__main__': unittest.main()

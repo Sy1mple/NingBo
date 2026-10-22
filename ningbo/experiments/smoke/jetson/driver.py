@@ -69,6 +69,7 @@ class SmokeDriver:
 
     def _read_frames(self):
         raw = bytearray()
+        fresh_frame_received = False
         deadline = self.clock() + self.config.timeout
         while len(raw) < self.config.read_size:
             count = min(max(self.serial.in_waiting, 1), self.config.read_size - len(raw))
@@ -78,6 +79,7 @@ class SmokeDriver:
             raw.extend(chunk)
             values = self.parser.feed(chunk)
             if values:
+                fresh_frame_received = True
                 if self._concentration is None:
                     LOGGER.info("烟雾有效帧已接收：%s；原始浓度=%d，单位未标定",
                                 self.parser.last_frame.hex(' '), values[-1])
@@ -94,7 +96,8 @@ class SmokeDriver:
             status, note = "unknown", "等待完整 FF AA H L 3C 烟雾帧"
         else:
             status, note = "error", "烟雾有效帧超时，请检查供电、共地、TX/RX 和波特率"
-        return {"protocol": "ffaa", "concentration": self._concentration if fresh else None,
+        return {"protocol": "ffaa", "fresh_frame_received": fresh_frame_received,
+                "concentration": self._concentration if fresh else None,
                 "unit": "raw", "percent": None, "online": fresh, "status": status, "note": note,
                 "raw": raw.hex() if raw else None,
                 "last_frame": self.parser.last_frame.hex() if self.parser.last_frame else None,
