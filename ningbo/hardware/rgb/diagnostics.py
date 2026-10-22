@@ -6,6 +6,10 @@ from hardware.diagnostics import ActuatorCheck
 from hardware.rgb.gpio import RgbDriver
 
 
+class _FeedbackUnavailable(RuntimeError):
+    """ADC 测量不可用，与 RGB GPIO 输出失败分开报告。"""
+
+
 class RgbStatusCheck(ActuatorCheck):
     def check(self, name, cancel_event=None):
         if name != "rgb":
@@ -35,24 +39,30 @@ class RgbStatusCheck(ActuatorCheck):
                 for color in ("red", "green", "blue"):
                     self._cancel(cancel_event)
                     changed = True
-                    before = self._sample("off", address, channel, cancel_event)
-                    running = self._sample(color, address, channel, cancel_event)
-                    after = self._sample("off", address, channel, cancel_event)
-                    baseline = median((before["volts"], after["volts"]))
-                    delta = running["volts"] - baseline
-                    drift = abs(after["volts"] - before["volts"])
-                    minimum = self.manager.config.rgb.diagnostic_minimum_delta_volts[color]
-                    stable = drift <= self.manager.config.rgb.diagnostic_maximum_baseline_drift_volts
-                    normal = stable and delta >= minimum
-                    checks[color] = {"status": "normal" if normal else "error",
-                        "before": before, "running": running, "after": after,
-                        "delta_volts": delta, "minimum_delta_volts": minimum,
-                        "baseline_drift_volts": drift}
-                normal = all(item["status"] == "normal" for item in checks.values())
-                summary = "，".join(f"{color}={item['delta_volts'] * 1000:.3f}mV"
-                                   for color, item in checks.items())
-                result.update(status="normal" if normal else "error",
-                    note=f"ADC 0x{address:02X}/AIN{channel} 三色电气反馈{'通过' if normal else '未通过'}；{summary}")
+                    attempts = []
+                    for attempt in range(2):
+                        try:
+                            measurement = self._measure_color(color, address, channel, cancel_event)
+                        except _FeedbackUnavailable as exc:
+                            measurement = {"status": "unknown", "reason": "adc_unavailable", "note": str(exc)}
+                        attempts.append(measurement)
+                        if measurement["status"] == "normal":
+                            break
+                    # 一次稳定失败、另一次不稳定，仍不足以确定灯的状态。
+                    selected = next((item for item in reversed(attempts) if item["status"] == "normal"), None)
+                    if selected is None:
+                        selected = next((item for item in reversed(attempts) if item["status"] == "unknown"), attempts[-1])
+                    checks[color] = {**selected, "attempts": attempts}
+                status = ("error" if any(item["status"] == "error" for item in checks.values()) else
+                          "unknown" if any(item["status"] == "unknown" for item in checks.values()) else "normal")
+                summary = "，".join(
+                    (f"{color}={item['delta_volts'] * 1000:.3f}mV"
+                     f"(基线漂移{item['baseline_drift_volts'] * 1000:.3f}mV，{item['status']})")
+                    if "delta_volts" in item else f"{color}: {item.get('note', item['status'])}"
+                    for color, item in checks.items())
+                verdict = {"normal": "三色电气反馈通过", "error": "稳定采样仍有颜色反馈不足",
+                           "unknown": "反馈测量未能确认；不能据此判定指示灯损坏"}[status]
+                result.update(status=status, note=f"ADC 0x{address:02X}/AIN{channel} {verdict}；{summary}")
             except InterruptedError:
                 result.update(status="unknown", note="指示灯状态检测已取消")
             except Exception as exc:
@@ -70,6 +80,33 @@ class RgbStatusCheck(ActuatorCheck):
                             result["stop_error"] = str(stop_exc)
             self.manager.record_actuator_diagnostic(name, result)
             return result
+
+    def _measure_color(self, color, address, channel, cancel_event):
+        samples, errors = [], []
+        for output in ("off", color, "off"):
+            try:
+                samples.append(self._sample(output, address, channel, cancel_event))
+            except _FeedbackUnavailable as exc:
+                errors.append(str(exc))
+        if errors:
+            raise _FeedbackUnavailable("；".join(errors))
+        before, running, after = samples
+        baseline = median((before["volts"], after["volts"]))
+        delta = running["volts"] - baseline
+        drift = abs(after["volts"] - before["volts"])
+        minimum = self.manager.config.rgb.diagnostic_minimum_delta_volts[color]
+        stable = drift <= self.manager.config.rgb.diagnostic_maximum_baseline_drift_volts
+        # 漂移略超常规范围时，须相对前后两个熄灯基线都达到原阈值。
+        # 漂移本身不得超过该颜色的最小响应，避免大幅变化被当作灯的反馈。
+        conservative_delta = running["volts"] - max(before["volts"], after["volts"])
+        bounded_response = drift <= minimum and conservative_delta >= minimum
+        status = ("normal" if bounded_response else "unknown" if not stable else
+                  "normal" if delta >= minimum else "error")
+        return {"status": status, "reason": "baseline_unstable" if status == "unknown" else "response",
+                "before": before, "running": running, "after": after,
+                "delta_volts": delta, "minimum_delta_volts": minimum,
+                "conservative_delta_volts": conservative_delta,
+                "baseline_drift_volts": drift}
 
     @staticmethod
     def _cancel(event):
@@ -92,12 +129,15 @@ class RgbStatusCheck(ActuatorCheck):
         values = []
         for _ in range(config.diagnostic_sample_count):
             self._cancel(cancel_event)
-            sample = self.manager.adc_monitor.read_channel(channel, address=address,
-                full_scale_volts=config.diagnostic_full_scale_volts)
+            try:
+                sample = self.manager.adc_monitor.read_channel(channel, address=address,
+                    full_scale_volts=config.diagnostic_full_scale_volts)
+            except Exception as exc:
+                raise _FeedbackUnavailable(f"{color} ADC 读取失败: {exc}") from exc
             volts = sample.get("volts")
             if (sample.get("saturated") or isinstance(volts, bool)
                     or not isinstance(volts, (int, float)) or not math.isfinite(volts)):
-                raise ValueError("A3 电压无效或超出 ADC 量程")
+                raise _FeedbackUnavailable("A3 电压无效或超出 ADC 量程")
             values.append(volts)
         return {"volts": median(values), "samples_volts": values, "gpio": observed}
 

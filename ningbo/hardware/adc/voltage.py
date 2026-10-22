@@ -22,12 +22,19 @@ class Ads1115Monitor:
             bus = self.i2c.bus
             bus.write_i2c_block_data(address, 1, [register >> 8, register & 255])
             deadline = time.monotonic() + self.config.timeout_seconds
+            configuration_retries = 0
             while True:
                 state = bus.read_i2c_block_data(address, 1, 2)
                 if len(state) != 2:
                     raise IOError("ADS1115 配置寄存器读取不完整")
                 observed = (state[0] << 8) | state[1]
                 if (observed & 0x7fff) != (register & 0x7fff):
+                    # 瞬时配置丢失不能被当成当前通道数据；有限重写后重新等转换。
+                    if configuration_retries < 2 and time.monotonic() < deadline:
+                        configuration_retries += 1
+                        bus.write_i2c_block_data(address, 1, [register >> 8, register & 255])
+                        time.sleep(0.002)
+                        continue
                     raise IOError(f"ADS1115 配置读回不一致: expected=0x{register:04X}, actual=0x{observed:04X}")
                 if observed & 0x8000:
                     break

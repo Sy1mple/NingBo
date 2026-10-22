@@ -2,7 +2,7 @@
 from .status_addresses import RGB_STATUS_RESULT_ADDR
 
 STATUS_TEXT = {
-    "unknown": "待", "normal": "好", "error": "坏", "unconfigured": "缺",
+    "unknown": "坏", "normal": "好", "error": "坏", "unconfigured": "缺",
     "disabled": "停", "checking": "检", "idle": "待",
 }
 

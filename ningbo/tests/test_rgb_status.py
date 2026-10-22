@@ -58,13 +58,33 @@ class RgbStatusTests(unittest.TestCase):
 
     def test_unstable_off_baseline_cannot_pass_as_a_color_response(self):
         manager, _ = self.manager()
-        values = ([.0] * 9 + [.0006] * 9 + [.0002] * 9) * 3
+        values = ([.0] * 9 + [.0006] * 9 + [.0002] * 9) * 6
         manager.adc_monitor.read_channel.side_effect = [
             {'volts': value, 'saturated': False} for value in values]
         result = self.check(manager)
-        self.assertEqual(result['status'], 'error')
+        self.assertEqual(result['status'], 'unknown')
         self.assertTrue(all(item['baseline_drift_volts'] > .00006
                             for item in result['colors'].values()))
+
+    def test_observed_red_response_exceeds_both_off_baselines(self):
+        manager, _ = self.manager()
+        values = [0.] * 9 + [.000289] * 9 + [.000094] * 9
+        manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        with patch('hardware.rgb.diagnostics.time.sleep'):
+            result = RgbStatusCheck(manager)._measure_color('red', 0x48, 3, None)
+        self.assertEqual(result['status'], 'normal')
+        self.assertAlmostEqual(result['conservative_delta_volts'], .000195)
+
+    def test_drifting_baseline_cannot_pass_on_median_response_alone(self):
+        manager, _ = self.manager()
+        values = [0.] * 9 + [.00023] * 9 + [.000094] * 9
+        manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        with patch('hardware.rgb.diagnostics.time.sleep'):
+            result = RgbStatusCheck(manager)._measure_color('red', 0x48, 3, None)
+        self.assertGreater(result['delta_volts'], result['minimum_delta_volts'])
+        self.assertEqual(result['status'], 'unknown')
 
     def test_gpio_mismatch_and_adc_failures_do_not_pass_and_restore_color(self):
         for failure in ('gpio', 'saturation', 'nan', 'i2c'):
@@ -80,7 +100,7 @@ class RgbStatusTests(unittest.TestCase):
                     manager.adc_monitor.read_channel.return_value = {
                         'volts': float('nan') if failure == 'nan' else .256,
                         'saturated': failure == 'saturation'}
-                self.assertEqual(self.check(manager)['status'], 'error')
+                self.assertEqual(self.check(manager)['status'], 'error' if failure == 'gpio' else 'unknown')
                 self.assertEqual(manager.actuator_state('rgb')['color'], 'green')
 
     def test_cancel_before_detection_does_not_switch_the_light(self):
@@ -90,6 +110,33 @@ class RgbStatusTests(unittest.TestCase):
         self.assertEqual(self.check(manager, cancel)['status'], 'unknown')
         manager.control.assert_not_called()
         manager.adc_monitor.read_channel.assert_not_called()
+
+    def test_transient_adc_failure_retries_and_all_three_colors_are_still_tested(self):
+        manager, _ = self.manager('green')
+        read = manager.adc_monitor.read_channel.side_effect
+        first = [True]
+        def sample(*args, **kwargs):
+            if first[0]:
+                first[0] = False
+                raise OSError('configuration reset to 0x8583')
+            return read(*args, **kwargs)
+        manager.adc_monitor.read_channel.side_effect = sample
+        result = self.check(manager)
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual(len(result['colors']['red']['attempts']), 2)
+        colors = [call.kwargs['color'] for call in manager.control.call_args_list]
+        self.assertTrue({'red', 'green', 'blue'}.issubset(colors))
+        self.assertEqual(manager.actuator_state('rgb')['color'], 'green')
+
+    def test_persistent_adc_failure_is_unconfirmed_but_all_colors_are_exercised(self):
+        manager, _ = self.manager('off')
+        manager.adc_monitor.read_channel.side_effect = OSError('configuration mismatch')
+        result = self.check(manager)
+        self.assertEqual(result['status'], 'unknown')
+        self.assertIn('不能据此判定', result['note'])
+        colors = [call.kwargs['color'] for call in manager.control.call_args_list]
+        self.assertTrue({'red', 'green', 'blue'}.issubset(colors))
+        self.assertEqual(manager.actuator_state('rgb')['color'], 'off')
 
     def test_cancel_during_detection_restores_previous_color(self):
         manager, _ = self.manager('red')
@@ -124,7 +171,8 @@ class RgbStatusTests(unittest.TestCase):
         manager.control.assert_not_called()
 
     def test_fixed_6008_receives_exactly_one_word_without_overwriting_6009(self):
-        for status, glyph in [('checking', '检'), ('normal', '好'), ('error', '坏')]:
+        for status, glyph in [('checking', '检'), ('normal', '好'), ('error', '坏'),
+                              ('unknown', '坏')]:
             item = MessageParser().parse({'scene': 'diagnostics', 'statuses': {'rgb': status}})[0]
             self.assertEqual(item['address'], 0x6008)
             self.assertEqual(item['data'], glyph.encode('gb2312'))
