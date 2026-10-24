@@ -343,6 +343,9 @@ class GatewayHandler(BaseHTTPRequestHandler):
                     "actuators": snap.get("actuators"),
                 })
                 return
+            if path == "/api/diagnostics":
+                self._send(HTTPStatus.OK, {"ok": True, "report": self.devices.diagnostic_snapshot()})
+                return
             if path == "/api/state":
                 snap = self.devices.snapshot()
                 self._send(HTTPStatus.OK, {
@@ -406,6 +409,16 @@ class GatewayHandler(BaseHTTPRequestHandler):
             if path == "/api/emergency_stop":
                 result = self.devices.emergency_stop()
                 self._send(HTTPStatus.OK, {"ok": bool(result.get("ok", True)), "result": result})
+                return
+
+            if path == "/api/diagnostics":
+                target = body.get("target")
+                if not isinstance(target, str) or target not in ACTUATOR_NAMES:
+                    raise ValueError("单项执行器检测需要合法的 target")
+                result = self.devices.request_diagnostics(target=target)
+                accepted = bool(result.get("accepted"))
+                self._send(HTTPStatus.OK if accepted else HTTPStatus.CONFLICT,
+                           {"ok": accepted, "result": result})
                 return
 
             if path.startswith("/api/actuators/"):

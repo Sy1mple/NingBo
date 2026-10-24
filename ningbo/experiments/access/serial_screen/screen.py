@@ -4,7 +4,7 @@ from .addresses import (BUTTON_EVENT_MAP, INPUT_EVENT_MAP,
 
 
 STATUS_TEXT = {
-    "unknown": "待", "normal": "好", "error": "坏", "unconfigured": "缺",
+    "unknown": "坏", "normal": "好", "error": "坏", "unconfigured": "缺",
     "disabled": "停", "checking": "检", "idle": "待",
 }
 

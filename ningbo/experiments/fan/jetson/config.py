@@ -12,7 +12,10 @@ class FanConfig:
     diagnostic_on_settle_seconds: float = 1.2
     diagnostic_off_settle_seconds: float = 0.6
     diagnostic_sample_count: int = 15
-    diagnostic_noise_multiplier: float = 6.0
+    # 2026-10-24 四轮通断样本：正常运行 41.906~45.680mV，
+    # 关闭 -0.570~-0.539mV；用户确认其中两轮均正常转动。
+    # 20mV 为该工况的运行响应参考；断开负载识别尚未验证。
+    diagnostic_minimum_delta_volts: float = 0.020
     diagnostic_maximum_baseline_drift_volts: float = 0.005
 
 
@@ -30,8 +33,9 @@ def validate(self):
     if (not math.isfinite(cfg.diagnostic_maximum_baseline_drift_volts)
             or not 0 < cfg.diagnostic_maximum_baseline_drift_volts < cfg.diagnostic_full_scale_volts):
         raise ValueError("风扇状态检测电压差阈值无效")
-    if not math.isfinite(cfg.diagnostic_noise_multiplier) or not 3 <= cfg.diagnostic_noise_multiplier <= 12:
-        raise ValueError("风扇状态检测噪声倍率无效")
+    if (not math.isfinite(cfg.diagnostic_minimum_delta_volts)
+            or not 0 < cfg.diagnostic_minimum_delta_volts < cfg.diagnostic_full_scale_volts):
+        raise ValueError("风扇状态检测参考增量无效")
 
 
 def pin_assignments(config):

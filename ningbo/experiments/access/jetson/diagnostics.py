@@ -1,14 +1,11 @@
-"""access 场景的执行器状态检查。"""
+"""lock 场景的执行器状态检查。"""
 import math
 from statistics import median
 import time
-
 from hardware.diagnostics import ActuatorCheck
 
 
 class LockStatusCheck(ActuatorCheck):
-    """短暂通断门锁，通过 ADS1115/A1 验证负载电气响应。"""
-
     def check(self, name, cancel_event=None):
         if name != "lock":
             raise ValueError("门锁检测设备名称不匹配")
@@ -16,49 +13,52 @@ class LockStatusCheck(ActuatorCheck):
             adc = self.manager.config.ads1115
             if (getattr(self.manager, "_pintest_mode", False)
                     or name not in self.manager._outputs or not adc.enabled
-                    or name not in adc.feedback_channels
-                    or name not in adc.feedback_voltage_limits):
+                    or name not in adc.feedback_channels or name not in adc.feedback_voltage_limits):
                 return super().check(name, cancel_event)
             previous = self.manager.actuator_state(name)
-            if (not previous.get("initialized") or previous.get("driver_error")
-                    or previous.get("control_error")):
+            if not previous.get("initialized") or previous.get("driver_error") or previous.get("control_error"):
                 return super().check(name, cancel_event)
             was_on = bool(previous.get("on"))
             cfg = self.manager.config.lock
             address = adc.feedback_addresses.get(name, adc.address)
             channel = adc.feedback_channels[name]
-            off_max, on_min = adc.feedback_voltage_limits[name]
+            off_max, _ = adc.feedback_voltage_limits[name]
             result = {"status": "error", "transport": "i2c_ads1115",
-                      "check_scope": "electrical_response", "address": hex(address),
-                      "channel": channel, "cmd_on": was_on,
-                      "maximum_off_absolute_volts": off_max,
-                      "minimum_run_volts": on_min,
-                      "minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
-                      "calibration_basis": "three post-swap loaded cycles; mechanical movement not measured"}
+                      "check_scope": "electrical_response", "address": hex(address), "channel": channel,
+                      "cmd_on": was_on, "maximum_off_absolute_volts": off_max, "rounds": [],
+                      "reference_minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
+                      "calibration_basis": "existing_normal_load_reference; mechanical_movement_not_measured"}
             changed = False
             try:
                 self._cancel(cancel_event)
                 changed = True
-                before = self._sample(False, address, channel, cancel_event)
-                result["before"] = before
-                energized = self._sample(True, address, channel, cancel_event)
-                result["energized"] = energized
-                after = self._sample(False, address, channel, cancel_event)
-                result["after"] = after
-                baseline = median((before["volts"], after["volts"]))
-                delta = energized["volts"] - baseline
-                drift = abs(after["volts"] - before["volts"])
-                normal = (abs(before["volts"]) <= off_max
-                          and abs(after["volts"]) <= off_max
-                          and energized["volts"] >= on_min
-                          and delta >= cfg.diagnostic_minimum_delta_volts
-                          and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
-                result.update(status="normal" if normal else "error", delta_volts=delta,
-                    baseline_drift_volts=drift,
-                    note=f"ADC 0x{address:02X}/AIN{channel} 门锁电气反馈"
-                         f"{'通过' if normal else '未通过'}；"
-                         f"断电={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；"
-                         f"通电={energized['volts'] * 1000:.3f}mV；未测量锁舌机械动作")
+                passed = 0
+                for index in range(3):
+                    self._cancel(cancel_event)
+                    before = self._sample(False, address, channel, cancel_event)
+                    energized = self._sample(True, address, channel, cancel_event)
+                    after = self._sample(False, address, channel, cancel_event)
+                    round_result = self._evaluate_round(before, energized, after, off_max)
+                    result["rounds"].append(round_result)
+                    passed += round_result["status"] == "normal"
+                    if passed >= 2 or passed + 2 - index < 2:
+                        break
+                normal = passed >= 2
+                reasons = {r["reason"] for r in result["rounds"] if r["status"] != "normal"}
+                detail = "，".join({
+                    "off_not_returned": "断电反馈未回到允许基线",
+                    "insufficient_response": "未达到正常负载参考，不能确认门锁正常",
+                }[reason] for reason in sorted(reasons))
+                result.update(before=before, energized=energized, after=after,
+                    delta_volts=round_result["delta_volts"],
+                    baseline_drift_volts=round_result["baseline_drift_volts"],
+                    passed_rounds=passed, status="normal" if normal else "error",
+                    note=f"ADC 0x{address:02X}/AIN{channel} 门锁电气反馈{'通过' if normal else '未通过'}；"
+                         f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；"
+                         f"运行={energized['volts'] * 1000:.3f}mV；"
+                         f"{passed}/{len(result['rounds'])}轮通过，需两轮；"
+                         f"参考增量={cfg.diagnostic_minimum_delta_volts * 1000:.3f}mV；"
+                         f"{detail + '；' if detail else ''}未测量锁舌机械动作")
             except InterruptedError:
                 result.update(status="unknown", note="门锁状态检测已取消")
             except Exception as exc:
@@ -85,6 +85,25 @@ class LockStatusCheck(ActuatorCheck):
     def _cancel(event):
         if event is not None and event.is_set():
             raise InterruptedError("检测已取消")
+
+    def _evaluate_round(self, before, energized, after, off_max):
+        cfg = self.manager.config.lock
+        baseline = max(before["volts"], after["volts"])
+        drift = abs(after["volts"] - before["volts"])
+        minimum = cfg.diagnostic_minimum_delta_volts
+        values = energized["samples_volts"]
+        responding = sum(value - baseline >= minimum for value in values)
+        # 使用已有正常负载参考检查持续响应，不根据少量停止读数自动下调门槛。
+        required = math.ceil(len(values) * .75)
+        off_ok = (abs(before["volts"]) <= off_max and abs(after["volts"]) <= off_max
+                  and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
+        reason = ("off_not_returned" if not off_ok else
+                  "insufficient_response" if responding < required else "response")
+        return {"status": "normal" if reason == "response" else "error", "reason": reason, "before": before,
+                "energized": energized, "after": after,
+                "delta_volts": energized["volts"] - baseline, "minimum_delta_volts": minimum,
+                "response_samples": responding, "required_response_samples": required,
+                "baseline_drift_volts": drift}
 
     def _sample(self, on, address, channel, event):
         self._cancel(event)

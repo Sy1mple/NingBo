@@ -137,22 +137,28 @@ class FanStatusTests(unittest.TestCase):
         self.assertEqual(result['running']['levels'], {31: 0})
         self.assertEqual(result['restored_levels'], {31: 1})
 
-    def test_observed_running_fan_feedback_passes_without_old_absolute_limit(self):
+    def test_user_confirmed_running_fan_feedback_passes_calibrated_reference(self):
         for value in (.041539, .042070):
             with self.subTest(value=value):
                 self.volts[True] = value
                 result = self.check()
                 self.assertEqual(result['status'], 'normal')
-                self.assertEqual(result['passed_rounds'], 2)
+                self.assertEqual(result['reference_minimum_delta_volts'], .020)
 
-    def test_noisy_stopped_signal_raises_response_threshold(self):
+    def test_small_unvalidated_response_does_not_pass(self):
+        for value in (.0005, .005, .015):
+            with self.subTest(value=value):
+                self.volts[True] = value
+                self.assertEqual(self.check()['status'], 'error')
+
+    def test_stop_sample_scatter_does_not_auto_adjust_reference(self):
         off = [-.001, 0, .001] * 5
         values = (off + [.002] * 15 + off) * 2
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': value, 'saturated': False} for value in values]
         result = self.check()
         self.assertEqual(result['status'], 'error')
-        self.assertGreater(result['rounds'][0]['minimum_delta_volts'], .002)
+        self.assertEqual(result['rounds'][0]['minimum_delta_volts'], .020)
 
     def test_startup_spike_without_sustained_feedback_does_not_pass(self):
         off = [-.000531] * 15
@@ -170,7 +176,7 @@ class FanStatusTests(unittest.TestCase):
     def test_one_failed_round_can_recover_but_one_success_is_not_enough(self):
         off = [-.000531] * 15
         failure = off * 3
-        success = off + [.042] * 15 + off
+        success = off + [.100] * 15 + off
         for values, status in ((failure + success * 2, 'normal'),
                                (success + failure * 2, 'error')):
             with self.subTest(status=status):
@@ -178,11 +184,11 @@ class FanStatusTests(unittest.TestCase):
                     {'volts': value, 'saturated': False} for value in values]
                 self.assertEqual(self.check()['status'], status)
 
-    def test_invalid_noise_setting_is_rejected(self):
+    def test_invalid_reference_setting_is_rejected(self):
         for value in (0, float('nan'), 30):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 replace(self.config, fan=replace(self.config.fan,
-                    diagnostic_noise_multiplier=value)).validate()
+                    diagnostic_minimum_delta_volts=value)).validate()
 
     def test_missing_adc_configuration_does_not_start_fan(self):
         self.manager.config = replace(self.config,

@@ -25,7 +25,8 @@ class ServoConfig:
     # 动作下发后立刻覆盖整个运动窗口采样，而非等到位置保持后再读。
     diagnostic_motion_window_seconds: float = 0.8
     diagnostic_motion_sample_count: int = 31
-    diagnostic_noise_multiplier: float = 6.0
+    # 恢复原正常负载参考；当前接线条件仍需通过接好/断开负载对照复核。
+    diagnostic_minimum_delta_volts: float = 0.002
     diagnostic_maximum_baseline_drift_volts: float = 0.0005
 
 import math
@@ -58,9 +59,9 @@ def validate(self):
             or isinstance(sweep.diagnostic_motion_sample_count, bool)
             or not isinstance(sweep.diagnostic_motion_sample_count, int)
             or not 9 <= sweep.diagnostic_motion_sample_count <= 63
-            or not math.isfinite(sweep.diagnostic_noise_multiplier)
-            or not 3 <= sweep.diagnostic_noise_multiplier <= 12):
-        raise ValueError("舵机运动采样窗口、次数或噪声倍率无效")
+            or not math.isfinite(sweep.diagnostic_minimum_delta_volts)
+            or not 0 < sweep.diagnostic_minimum_delta_volts < sweep.diagnostic_full_scale_volts):
+        raise ValueError("舵机运动采样窗口、次数或参考增量无效")
     if (any(isinstance(v, bool) or not math.isfinite(v) for v in
             (sweep.sweep_min_angle, sweep.sweep_max_angle,
              sweep.sweep_interval_seconds, sweep.display_interval_seconds))

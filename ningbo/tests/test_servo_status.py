@@ -72,7 +72,7 @@ class ServoStatusTests(unittest.TestCase):
         self.assertEqual(result['positions'][1]['status'], 'error')
         self.assertFalse(self.driver.on)
 
-    def test_user_confirmed_moving_servo_low_feedback_samples_pass(self):
+    def test_current_low_feedback_is_not_automatically_accepted_without_calibration(self):
         for before, positions, after in (
                 (.000695, (.001531, .001313, .001258), .000680),
                 (.000687, (.002664, .001367, .001281), .000672)):
@@ -81,8 +81,8 @@ class ServoStatusTests(unittest.TestCase):
                 self.manager.adc_monitor.read_channel.side_effect = [
                     {'volts': value, 'saturated': False} for value in values]
                 result = self.check()
-                self.assertEqual(result['status'], 'normal')
-                self.assertTrue(all(p['delta_volts'] >= .0003 for p in result['positions']))
+                self.assertEqual(result['status'], 'error')
+                self.assertEqual(result['reference_minimum_delta_volts'], .002)
                 self.assertFalse(self.driver.on)
 
     def test_low_feedback_without_clear_response_still_fails(self):
@@ -126,7 +126,7 @@ class ServoStatusTests(unittest.TestCase):
         self.manager.adc_monitor.read_channel.side_effect = read
 
     def test_motion_pulse_passes_even_when_holding_current_returns_to_stop_level(self):
-        self.motion_readings(lambda i: .002 if i < 7 else .00068)
+        self.motion_readings(lambda i: .006 if i < 7 else .00068)
         result = self.check()
         self.assertEqual(result['status'], 'normal')
         self.assertTrue(all(p['volts'] == .00068 for p in result['positions']))
@@ -147,7 +147,7 @@ class ServoStatusTests(unittest.TestCase):
     def test_one_failed_round_is_retested_and_two_successful_rounds_required(self):
         before = [.00068] * 9
         failure = before + [.00068] * 93 + before
-        success = before + [.0015] * 93 + before
+        success = before + [.006] * 93 + before
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': v, 'saturated': False} for v in failure + success * 2]
         result = self.check()
@@ -157,21 +157,21 @@ class ServoStatusTests(unittest.TestCase):
     def test_single_successful_round_cannot_pass(self):
         before = [.00068] * 9
         failure = before + [.00068] * 93 + before
-        success = before + [.0015] * 93 + before
+        success = before + [.006] * 93 + before
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': v, 'saturated': False} for v in success + failure * 2]
         result = self.check()
         self.assertEqual(result['status'], 'error')
         self.assertEqual(result['passed_rounds'], 1)
 
-    def test_noise_adapts_threshold_instead_of_accepting_small_change(self):
+    def test_stop_sample_scatter_does_not_auto_adjust_reference(self):
         off = [.0005, .0007, .0009] * 3
         values = (off + [.0010] * 93 + off) * 2
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': v, 'saturated': False} for v in values]
         result = self.check()
         self.assertEqual(result['status'], 'error')
-        self.assertGreater(result['rounds'][0]['minimum_delta_volts'], .001)
+        self.assertEqual(result['rounds'][0]['minimum_delta_volts'], .002)
 
     def test_motion_sample_is_taken_before_waiting_for_position_settle(self):
         events = []
@@ -208,7 +208,7 @@ class ServoStatusTests(unittest.TestCase):
                         {'diagnostic_motion_window_seconds': 20},
                         {'diagnostic_motion_sample_count': 2},
                         {'diagnostic_motion_sample_count': True},
-                        {'diagnostic_noise_multiplier': float('nan')}):
+                        {'diagnostic_minimum_delta_volts': float('nan')}):
             with self.subTest(changes=changes), self.assertRaises(ValueError):
                 replace(self.config, servo=replace(self.config.servo, **changes)).validate()
 
@@ -232,6 +232,18 @@ class ServoStatusTests(unittest.TestCase):
                 if isinstance(failure, dict): self.manager.adc_monitor.read_channel.return_value = failure
                 self.assertEqual(self.check()['status'], 'error')
                 self.assertFalse(self.driver.on)
+
+    def test_motion_saturation_is_reread_at_larger_range_and_clipped_values_are_not_used(self):
+        read = self.manager.adc_monitor.read_channel.side_effect
+        def sample(*args, **kwargs):
+            if self.driver.on and kwargs['full_scale_volts'] == .256:
+                return {'volts': .256, 'saturated': True}
+            return read(*args, **kwargs)
+        self.manager.adc_monitor.read_channel.side_effect = sample
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertTrue(all(set(p['full_scales_volts']) == {.512} for p in result['positions']))
+        self.assertTrue(all(.256 not in p['samples_volts'] for p in result['positions']))
 
     def test_cancel_before_check_never_allocates_pwm(self):
         event = threading.Event(); event.set()

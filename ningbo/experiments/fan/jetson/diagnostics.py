@@ -26,7 +26,8 @@ class FanStatusCheck(ActuatorCheck):
             result = {"status": "error", "transport": "i2c_ads1115",
                       "check_scope": "electrical_response", "address": hex(address), "channel": channel,
                       "cmd_on": was_on, "maximum_off_absolute_volts": off_max, "rounds": [],
-                      "calibration_basis": "per_round_off_noise; disconnected_load_not_verified"}
+                      "reference_minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
+                      "calibration_basis": "20261024_user_confirmed_rotation_on_off_samples; disconnected_load_not_verified"}
             changed = False
             try:
                 self._cancel(cancel_event)
@@ -51,7 +52,7 @@ class FanStatusCheck(ActuatorCheck):
                          f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；"
                          f"运行={running['volts'] * 1000:.3f}mV；"
                          f"{passed}/{len(result['rounds'])}轮通过，需两轮；"
-                         f"本轮噪声阈值={round_result['minimum_delta_volts'] * 1000:.3f}mV；未测量转速或风量")
+                         f"参考增量={round_result['minimum_delta_volts'] * 1000:.3f}mV；未测量转速或风量")
             except InterruptedError:
                 result.update(status="unknown", note="风扇状态检测已取消")
             except Exception as exc:
@@ -83,10 +84,7 @@ class FanStatusCheck(ActuatorCheck):
         cfg = self.manager.config.fan
         baseline = max(before["volts"], after["volts"])
         drift = abs(after["volts"] - before["volts"])
-        noise = max(median(abs(v - group["volts"]) for v in group["samples_volts"])
-                    for group in (before, after)) * 1.4826
-        minimum = max(8 * cfg.diagnostic_full_scale_volts / 32768,
-                      cfg.diagnostic_noise_multiplier * noise)
+        minimum = cfg.diagnostic_minimum_delta_volts
         values = running["samples_volts"]
         responding = sum(value - baseline >= minimum for value in values)
         # 风扇运行反馈须持续存在，单次启动尖峰不能代替运行响应。
@@ -94,7 +92,7 @@ class FanStatusCheck(ActuatorCheck):
         normal = (abs(before["volts"]) <= off_max and abs(after["volts"]) <= off_max
                   and drift <= cfg.diagnostic_maximum_baseline_drift_volts and responding >= required)
         return {"status": "normal" if normal else "error", "before": before,
-                "running": running, "after": after, "noise_volts": noise,
+                "running": running, "after": after,
                 "delta_volts": running["volts"] - baseline, "minimum_delta_volts": minimum,
                 "response_samples": responding, "required_response_samples": required,
                 "baseline_drift_volts": drift}
