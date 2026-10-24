@@ -1,5 +1,6 @@
 """舵机手动检测：硬件 PWM 配置与 ADS1115/A0 运行反馈。"""
 import math
+from contextlib import contextmanager
 from statistics import median
 import time
 from hardware.diagnostics import ThreadedActuatorCheck
@@ -122,6 +123,32 @@ class ServoStatusCheck(ThreadedActuatorCheck):
             raise InterruptedError("检测已取消")
 
     def _sample(self, angle, address, channel, cancel_event):
+        # 在运动开始前取得共享I2C锁，避免其他检测把0.8秒采样窗口占满。
+        # 停止后的等待不占总线，其他设备仍可在各运动窗口之间采样。
+        with self._motion_bus_session(angle, cancel_event):
+            return self._capture_sample(angle, address, channel, cancel_event)
+
+    @contextmanager
+    def _motion_bus_session(self, angle, cancel_event):
+        resource = getattr(self.manager.adc_monitor, "i2c", None)
+        lock = getattr(resource, "lock", None)
+        if angle is None or lock is None:
+            yield
+            return
+        deadline = time.monotonic() + 1.0
+        while True:
+            self._cancel(cancel_event)
+            if lock.acquire(timeout=.02):
+                break
+            if time.monotonic() >= deadline:
+                raise TimeoutError("舵机运动采样等待I2C总线超时")
+        try:
+            self._cancel(cancel_event)
+            yield
+        finally:
+            lock.release()
+
+    def _capture_sample(self, angle, address, channel, cancel_event):
         self._cancel(cancel_event)
         if angle is None:
             self.manager.stop_actuator("servo")
@@ -139,6 +166,7 @@ class ServoStatusCheck(ThreadedActuatorCheck):
         if driver["status"] != "normal" or signal["status"] != "normal":
             raise RuntimeError(driver["note"] if driver["status"] != "normal" else signal["note"])
         values, ranges_used = [], []
+        full_scale = cfg.diagnostic_full_scale_volts
         count = cfg.diagnostic_sample_count if angle is None else cfg.diagnostic_motion_sample_count
         for index in range(count):
             self._cancel(cancel_event)
@@ -147,7 +175,7 @@ class ServoStatusCheck(ThreadedActuatorCheck):
                     break
                 target = started + index * cfg.diagnostic_motion_window_seconds / (count - 1)
                 self._wait(target - time.monotonic(), cancel_event)
-            volts, full_scale = self._read_feedback(address, channel, cancel_event)
+            volts, full_scale = self._read_feedback(address, channel, cancel_event, full_scale)
             values.append(volts)
             ranges_used.append(full_scale)
         if len(values) < cfg.diagnostic_sample_count:
@@ -155,9 +183,9 @@ class ServoStatusCheck(ThreadedActuatorCheck):
         return {"volts": median(values), "samples_volts": values,
                 "full_scales_volts": ranges_used, "driver": driver, "signal": signal}
 
-    def _read_feedback(self, address, channel, cancel_event):
+    def _read_feedback(self, address, channel, cancel_event, initial=None):
         # 窄量程运动尖峰饱和时扩大 PGA 量程复读，不使用截顶数值参与判断。
-        initial = self.manager.config.servo.diagnostic_full_scale_volts
+        initial = self.manager.config.servo.diagnostic_full_scale_volts if initial is None else initial
         ranges = [initial] + [value for value in (.512, 1.024, 2.048, 4.096, 6.144) if value > initial]
         for full_scale in ranges:
             self._cancel(cancel_event)

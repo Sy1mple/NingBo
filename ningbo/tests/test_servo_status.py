@@ -245,6 +245,78 @@ class ServoStatusTests(unittest.TestCase):
         self.assertTrue(all(set(p['full_scales_volts']) == {.512} for p in result['positions']))
         self.assertTrue(all(.256 not in p['samples_volts'] for p in result['positions']))
 
+    def test_motion_reserves_bus_before_command_and_releases_on_read_failure(self):
+        lock = threading.RLock()
+        self.manager.adc_monitor.i2c = SimpleNamespace(lock=lock)
+        self.manager.prepare_actuator('servo')
+        command = self.manager.control
+        def control(*args, **kwargs):
+            self.assertTrue(lock._is_owned())
+            return command(*args, **kwargs)
+        self.manager.control = control
+        self.manager.adc_monitor.read_channel.side_effect = OSError('ADC error')
+        with self.assertRaises(OSError):
+            ServoStatusCheck(self.manager)._sample(45, 0x48, 0, None)
+        self.assertFalse(lock._is_owned())
+
+    def test_bus_reservation_wait_is_bounded_and_does_not_move_servo(self):
+        self.manager.adc_monitor.i2c = SimpleNamespace(lock=Mock(acquire=Mock(return_value=False)))
+        command = Mock(wraps=self.manager.control)
+        self.manager.control = command
+        with patch('experiments.servo.jetson.diagnostics.time.monotonic', side_effect=[0., 1.1]):
+            with self.assertRaisesRegex(TimeoutError, '总线超时'):
+                ServoStatusCheck(self.manager)._sample(45, 0x48, 0, None)
+        command.assert_not_called()
+        self.manager.adc_monitor.i2c.lock.release.assert_not_called()
+
+    def test_stop_settle_does_not_reserve_i2c_bus(self):
+        lock = threading.RLock()
+        self.manager.adc_monitor.i2c = SimpleNamespace(lock=lock)
+        self.manager.prepare_actuator('servo')
+        with patch('experiments.servo.jetson.diagnostics.time.sleep',
+                   side_effect=lambda seconds: self.assertFalse(lock._is_owned())):
+            ServoStatusCheck(self.manager)._sample(None, 0x48, 0, None)
+
+    def test_concurrent_adc_cannot_consume_motion_window_and_ui_lock_stays_available(self):
+        bus = threading.RLock()
+        self.manager.adc_monitor.i2c = SimpleNamespace(lock=bus)
+        self.manager.prepare_actuator('servo')
+        started, attempted, acquired, ui_available = [threading.Event() for _ in range(4)]
+        def competitor():
+            started.wait(1)
+            with self.manager._control_lock:
+                ui_available.set()
+            attempted.set()
+            with bus:
+                acquired.set()
+        worker = threading.Thread(target=competitor)
+        worker.start()
+        reader = self.manager.adc_monitor.read_channel
+        original = reader.side_effect
+        def read(*args, **kwargs):
+            started.set()
+            self.assertTrue(attempted.wait(.5))
+            self.assertTrue(ui_available.is_set())
+            self.assertFalse(acquired.is_set())
+            return original(*args, **kwargs)
+        reader.side_effect = read
+        try:
+            result = ServoStatusCheck(self.manager)._sample(45, 0x48, 0, None)
+            self.assertEqual(len(result['samples_volts']), 31)
+            self.assertTrue(acquired.wait(.5))
+        finally:
+            started.set()
+            worker.join(1)
+
+    def test_larger_range_is_retained_during_one_motion_window(self):
+        self.manager.prepare_actuator('servo')
+        reader = self.manager.adc_monitor.read_channel
+        reader.side_effect = lambda *a, **kw: {'volts': .256 if kw['full_scale_volts'] == .256 else .3,
+                                              'saturated': kw['full_scale_volts'] == .256}
+        result = ServoStatusCheck(self.manager)._sample(45, 0x48, 0, None)
+        self.assertEqual(set(result['full_scales_volts']), {.512})
+        self.assertEqual(sum(c.kwargs['full_scale_volts'] == .256 for c in reader.call_args_list), 1)
+
     def test_cancel_before_check_never_allocates_pwm(self):
         event = threading.Event(); event.set()
         self.assertEqual(self.check(event)['status'], 'unknown')
