@@ -114,15 +114,29 @@ class DiagnosticService:
 
     def _run_sensors(self, targets, publish):
         pending = {}
-        for name in targets:
-            if self._cancel.is_set():
-                return
+        def launch(name):
             job = self._start_sensor(name)
             if job is None:
                 publish(name, self._sensor_failure(name, "上轮读取尚未退出，本轮无法取得新的响应"))
             else:
                 LOGGER.info("状态检测开始 %s，独立等待上限 %.1f 秒", name, job["timeout"])
                 pending[name] = job
+        # 舵机需要捕捉短运动窗口，先完成再启动其他ADC密集检测。
+        # 各项超时仍从真正启动时计时，普通传感器不会等待舵机。
+        deferred = [name for name in targets if 'servo' in targets
+                    and ((name in ACTUATOR_TARGETS and name != 'servo') or name == 'current')]
+        initial = (['servo'] if 'servo' in targets else []) + [
+            name for name in targets if name != 'servo' and name not in deferred]
+        for name in initial:
+            if self._cancel.is_set():
+                return
+            launch(name)
+        if 'servo' not in pending:
+            for name in deferred:
+                if self._cancel.is_set():
+                    return
+                launch(name)
+            deferred = []
         while pending and not self._cancel.is_set():
             now = time.monotonic()
             for name, job in list(pending.items()):
@@ -137,6 +151,12 @@ class DiagnosticService:
                     continue
                 publish(name, result)
                 del pending[name]
+            if deferred and 'servo' not in pending:
+                for name in deferred:
+                    if self._cancel.is_set():
+                        break
+                    launch(name)
+                deferred = []
             if pending:
                 self._cancel.wait(.02)
         if self._cancel.is_set():

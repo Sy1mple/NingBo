@@ -24,13 +24,13 @@ class ParallelActuatorTests(unittest.TestCase):
                 self.fail('result did not arrive independently')
             time.sleep(.005)
 
-    def test_lock_finishes_and_updates_screen_while_servo_still_waits(self):
+    def test_lock_finishes_and_updates_screen_while_fan_still_waits(self):
         service = self.service()
         gate = threading.Event()
         started = {name: threading.Event() for name in service.targets('actuators')}
         def check(name, cancel_event=None):
             started[name].set()
-            if name == 'servo':
+            if name == 'fan':
                 gate.wait(2)
             return {'status': 'normal'}
         service.actuator_checker.check = check
@@ -43,15 +43,43 @@ class ParallelActuatorTests(unittest.TestCase):
             bridge.handle_event('diagnostics.actuators')
             self.assertTrue(all(event.wait(1) for event in started.values()))
             self.wait_for(lambda:service.snapshot()['results']['lock']['status'] == 'normal')
-            self.assertEqual(service.snapshot()['results']['servo']['status'], 'checking')
+            self.assertEqual(service.snapshot()['results']['fan']['status'], 'checking')
             bridge.tick()
             clock[0] += .6
             bridge.tick()
             self.assertEqual(screen.handle_message.call_args[0][0]['statuses']['lock'], 'normal')
-            self.assertEqual(screen.handle_message.call_args[0][0]['statuses']['servo'], 'checking')
+            self.assertEqual(screen.handle_message.call_args[0][0]['statuses']['fan'], 'checking')
         finally:
             gate.set()
             service._worker.join(2)
+            service.stop()
+
+    def test_servo_captures_before_other_adc_checks_without_blocking_ordinary_sensor(self):
+        service = self.service()
+        gate, servo_started = threading.Event(), threading.Event()
+        other = []
+        def check(name, cancel_event=None):
+            if name == 'servo':
+                servo_started.set()
+                gate.wait(2)
+            else:
+                other.append(name)
+            return {'status': 'normal'}
+        service.actuator_checker.check = check
+        service.sensor_checker.check = lambda name: {'status': 'normal'}
+        try:
+            service.request()
+            self.assertTrue(servo_started.wait(1))
+            self.wait_for(lambda: service.snapshot()['results']['dht11']['status'] == 'normal')
+            self.assertEqual(other, [])
+            self.assertNotIn('current', service._sensor_jobs)
+            gate.set()
+            service._worker.join(2)
+            self.assertFalse(service.snapshot()['busy'])
+            self.assertEqual(set(other), set(service.targets('actuators')) - {'servo'})
+            self.assertEqual(service.snapshot()['results']['current']['status'], 'normal')
+        finally:
+            gate.set()
             service.stop()
 
     def test_stuck_actuator_times_out_without_late_result_or_duplicate_job(self):
