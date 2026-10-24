@@ -151,26 +151,33 @@ class StepperDisplayTests(unittest.TestCase):
         self.app.process_once()
         self.assertEqual(self.serial.frames[-2:],self.pair('正转',511))
 
-    def test_current_text_address_overlap_is_reported(self):
+    def test_legacy_text_address_overlap_is_reported(self):
         formatter._warned_layouts.clear()
-        with self.assertLogs(formatter.LOGGER,level='WARNING') as logs:
-            self.press()
-        self.assertIn('stepper.steps=0x1063',logs.output[0])
-        self.assertIn('voice.recognized_text=0x1064',logs.output[0])
-        self.assertEqual(addresses.STEPPER_DIRECTION,0x1062)
-        self.assertEqual(addresses.STEPPER_NUMBER,0x1063)
+        with patch.object(addresses, 'STEPPER_DIRECTION', 0x1062):
+            with self.assertLogs(formatter.LOGGER, level='WARNING') as logs:
+                self.press()
+        self.assertIn('stepper.steps=0x1063', logs.output[0])
+        self.assertIn('voice.recognized_text=0x1064', logs.output[0])
 
-    def test_isolated_text_buffer_keeps_chinese_and_number_independent(self):
-        # 只在测试中模拟独立文本 VP，不更改用户的地址定义。
-        with patch.object(addresses,'STEPPER_DIRECTION',0x10f3):
-            self.press()
-            memory = {}
-            for frame in self.serial.frames:
-                begin = int.from_bytes(frame[4:6],'big')
-                for offset in range(0,len(frame[6:]),2):
-                    memory[begin+offset//2] = frame[6+offset:8+offset]
-            self.assertEqual(memory[0x10f3]+memory[0x10f4],'正转'.encode('gb2312'))
-            self.assertEqual(memory[0x1063],(512).to_bytes(2,'big'))
+    def test_direction_number_and_voice_memory_remain_independent(self):
+        self.assertEqual(addresses.STEPPER_DIRECTION, 0x1300)
+        self.assertEqual(addresses.STEPPER_NUMBER, 0x1063)
+        memory = {}
+        def write(frame):
+            begin = int.from_bytes(frame[4:6], 'big')
+            for offset in range(0, len(frame[6:]), 2):
+                memory[begin + offset // 2] = frame[6+offset:8+offset]
+        for direction in ('正转', '反转', '停止'):
+            for steps in (512, 37, 0):
+                for frame in self.pair(direction, steps):
+                    write(frame)
+                # Reproduce a voice update after the stepper update.
+                voice = '语音识别'.encode('gb2312') + b'\xff\xff' * 28
+                write(ScreenSender.build_write_bytes_frame(0x1064, voice))
+                self.assertEqual(memory[0x1300] + memory[0x1301], direction.encode('gb2312'))
+                self.assertEqual(memory[0x1302], b'\xff\xff')
+                self.assertEqual(memory[0x1063], steps.to_bytes(2, 'big'))
+                self.assertEqual(memory[0x1064] + memory[0x1065], '语音'.encode('gb2312'))
 
 
 if __name__ == '__main__': unittest.main()

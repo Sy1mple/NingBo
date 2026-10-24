@@ -1,6 +1,7 @@
 """stepper: the authoritative VP and button definitions for this screen page."""
 
-STEPPER_DIRECTION = 0x1062
+# Match the paired HMI project; six bytes occupy only 0x1300~0x1302.
+STEPPER_DIRECTION = 0x1300
 
 STEPPER_NUMBER = 0x1063
 

@@ -2,6 +2,8 @@
 
 当前正式项目位于 [ningbo](ningbo/README.md)，与开发板 `/opt/ningbo` 同步。
 
+2026-10-24 步进方向文字修复需要配套下载 [串口屏工程](hmi/README.md)。程序改用独立文本地址 `0x1300`，仅更新开发板无法更新屏幕内部工程。
+
 请从 `ningbo/` 目录部署和运行，安装及双服务说明见 [部署文档](ningbo/deploy/SCREEN_SERVICES.md)。
 
 代码按 `experiments/` 场景、`hardware/` 共用驱动、`system/diagnostics/` 状态检测拆分；测试位于 `ningbo/tests/`。
