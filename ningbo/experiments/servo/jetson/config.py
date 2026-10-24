@@ -22,7 +22,9 @@ class ServoConfig:
     diagnostic_full_scale_volts: float = 0.256
     diagnostic_settle_seconds: float = 0.8
     diagnostic_sample_count: int = 9
-    diagnostic_minimum_delta_volts: float = 0.002
+    # 2026-10-24 用户确认能转动的两轮读数：最小增量约 0.563mV，
+    # 停止前后变化约 0.015mV；以 0.300mV 检查运行响应。
+    diagnostic_minimum_delta_volts: float = 0.0003
     diagnostic_maximum_baseline_drift_volts: float = 0.0005
 
 import math

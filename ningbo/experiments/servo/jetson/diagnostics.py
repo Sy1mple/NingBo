@@ -20,13 +20,13 @@ class ServoStatusCheck(ThreadedActuatorCheck):
             cfg = self.manager.config.servo
             address = adc.feedback_addresses.get(name, adc.address)
             channel = adc.feedback_channels[name]
-            off_max, on_min = adc.feedback_voltage_limits[name]
+            off_max, _ = adc.feedback_voltage_limits[name]
             result = {"status": "error", "check_scope": "electrical_response",
                       "transport": "i2c_ads1115", "address": hex(address), "channel": channel,
                       "cmd_on": bool(previous.get("on")), "positions": [],
-                      "maximum_off_volts": off_max, "minimum_run_volts": on_min,
+                      "maximum_off_volts": off_max,
                       "minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
-                      "calibration_basis": "normal_load_samples; disconnected_load_not_verified"}
+                      "calibration_basis": "20261024_observed_moving_servo; disconnected_load_not_verified"}
             prepared = False
             try:
                 self._cancel(cancel_event)
@@ -41,21 +41,23 @@ class ServoStatusCheck(ThreadedActuatorCheck):
                     result["positions"].append({"angle": angle, **sample})
                 after = self._sample(None, address, channel, cancel_event)
                 result["after"] = after
-                baseline = median((before["volts"], after["volts"]))
+                # 相对前后两次停止读数均须有响应；不再依赖旧负载的绝对运行电压。
+                baseline = max(before["volts"], after["volts"])
                 drift = abs(after["volts"] - before["volts"])
                 off_ok = (0 <= before["volts"] <= off_max and 0 <= after["volts"] <= off_max
                           and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
                 for sample in result["positions"]:
                     delta = sample["volts"] - baseline
                     sample.update(delta_volts=delta,
-                        status="normal" if sample["volts"] >= on_min
-                        and delta >= cfg.diagnostic_minimum_delta_volts else "error")
+                        status="normal" if delta >= cfg.diagnostic_minimum_delta_volts else "error")
                 normal = off_ok and all(p["status"] == "normal" for p in result["positions"])
                 summary = "，".join(f"{p['angle']:g}°={p['volts'] * 1000:.3f}mV"
+                                   f"(增量={p['delta_volts'] * 1000:.3f}mV)"
                                    for p in result["positions"])
                 result.update(status="normal" if normal else "error", baseline_drift_volts=drift,
                     note=f"ADC 0x{address:02X}/AIN{channel} 舵机电气反馈{'通过' if normal else '未通过'}；"
-                         f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；{summary}；未测量实际转角")
+                         f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；{summary}；"
+                         f"最小增量={cfg.diagnostic_minimum_delta_volts * 1000:.3f}mV；未测量实际转角")
             except InterruptedError:
                 result.update(status="unknown", note="舵机状态检测已取消")
             except Exception as exc:

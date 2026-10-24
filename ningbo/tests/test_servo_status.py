@@ -71,6 +71,32 @@ class ServoStatusTests(unittest.TestCase):
         self.assertEqual(result['positions'][1]['status'], 'error')
         self.assertFalse(self.driver.on)
 
+    def test_user_confirmed_moving_servo_low_feedback_samples_pass(self):
+        for before, positions, after in (
+                (.000695, (.001531, .001313, .001258), .000680),
+                (.000687, (.002664, .001367, .001281), .000672)):
+            with self.subTest(positions=positions):
+                values = [before] * 9 + [v for value in positions for v in [value] * 9] + [after] * 9
+                self.manager.adc_monitor.read_channel.side_effect = [
+                    {'volts': value, 'saturated': False} for value in values]
+                result = self.check()
+                self.assertEqual(result['status'], 'normal')
+                self.assertTrue(all(p['delta_volts'] >= .0003 for p in result['positions']))
+                self.assertFalse(self.driver.on)
+
+    def test_low_feedback_without_clear_response_still_fails(self):
+        self.values.update({'off': .00068, 45: .00090, 90: .00085, 135: .00095})
+        self.assertEqual(self.check()['status'], 'error')
+        self.assertFalse(self.driver.on)
+
+    def test_response_must_exceed_both_stop_baselines(self):
+        values = [.00068] * 9 + [.00108] * 27 + [.00088] * 9
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        result = self.check()
+        self.assertEqual(result['status'], 'error')
+        self.assertAlmostEqual(result['positions'][0]['delta_volts'], .0002)
+
     def test_stuck_high_feedback_cannot_pass_stopped_or_delta_checks(self):
         self.values['off'] = .013
         self.assertEqual(self.check()['status'], 'error')
