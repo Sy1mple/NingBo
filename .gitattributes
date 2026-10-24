@@ -6,6 +6,3 @@
 
 # Preserve the byte-verified deployment snapshot.
 ningbo/** -text
-
-# Keep the paired HMI project and compiled files byte-identical.
-hmi/** -text
