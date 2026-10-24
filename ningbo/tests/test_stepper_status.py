@@ -55,7 +55,12 @@ class StepperStatusTests(unittest.TestCase):
 
         self.manager.adc_monitor = SimpleNamespace(read_channel=Mock(side_effect=read))
         patcher = patch('experiments.stepper.jetson.diagnostics.time.sleep')
-        patcher.start(); self.addCleanup(patcher.stop)
+        sleep = patcher.start(); self.addCleanup(patcher.stop)
+        def wait(seconds):
+            if seconds == .05 and self.advance:
+                for _ in range(50):
+                    self.driver.step_once()
+        sleep.side_effect = wait
 
     def check(self, event=None):
         return StepperStatusCheck(self.manager).check('stepper', event)
@@ -70,6 +75,7 @@ class StepperStatusTests(unittest.TestCase):
         self.assertEqual(result['status'], 'normal')
         self.assertEqual([s['direction'] for s in result['runs']], ['fwd', 'rev'])
         self.assertTrue(all(s['progressed_steps'] == 25 for s in result['runs']))
+        self.assertTrue(all(s['completed_steps'] == 500 for s in result['runs']))
         self.assertEqual(result['restored_mode'], 'off')
         self.assertFalse(self.driver.snapshot()['running'])
         self.assertTrue(all(value == 0 for value in self.gpio.levels.values()))
@@ -83,6 +89,58 @@ class StepperStatusTests(unittest.TestCase):
         self.assertEqual(result['runs'][0]['status'], 'normal')
         self.assertEqual(result['runs'][1]['status'], 'error')
         self.assertFalse(self.driver.snapshot()['running'])
+
+    def test_observed_moving_motor_feedback_passes_current_reference(self):
+        self.values.update({'stop': .000031, 'fwd': .016672, 'rev': .016203})
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual(result['minimum_delta_volts'], .008)
+        self.assertTrue(all(s['completed_steps'] == 500 for s in result['runs']))
+
+    def test_sampling_does_not_stop_motor_before_all_commanded_steps_finish(self):
+        original = self.manager.stop_actuator
+        stopped_remaining = []
+        def stop(name):
+            stopped_remaining.append(self.driver.remaining)
+            return original(name)
+        self.manager.stop_actuator = stop
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertTrue(all(n == 0 for n in stopped_remaining), stopped_remaining)
+
+    def test_isolated_response_spikes_do_not_pass(self):
+        original = self.manager.adc_monitor.read_channel.side_effect
+        count = [0]
+        def read(*args, **kwargs):
+            sample = original(*args, **kwargs)
+            if self.driver.direction != 'stop':
+                count[0] += 1
+                sample['volts'] = .020 if count[0] % 5 == 0 else .000031
+            return sample
+        self.manager.adc_monitor.read_channel.side_effect = read
+        self.assertEqual(self.check()['status'], 'error')
+
+    def test_cancel_during_remaining_motion_stops_phases(self):
+        event = threading.Event()
+        with patch.object(StepperStatusCheck, '_finish_direction', side_effect=InterruptedError('cancelled')):
+            result = self.check(event)
+        self.assertEqual(result['status'], 'unknown')
+        self.assertFalse(self.driver.snapshot()['running'])
+        self.assertTrue(all(v == 0 for v in self.gpio.levels.values()))
+
+    def test_remaining_motion_detects_stalled_thread_and_bounds_wait(self):
+        self.manager.control('stepper', dir_='fwd', n=500, spd=10)
+        self.advance = False
+        checker = StepperStatusCheck(self.manager)
+        with patch('experiments.stepper.jetson.diagnostics.time.monotonic', side_effect=[0., 0., .6]):
+            with self.assertRaisesRegex(RuntimeError, '持续未推进'):
+                checker._finish_direction('fwd', 0., None)
+
+    def test_invalid_diagnostic_speed_and_excessive_duration_are_rejected(self):
+        for changes in ({'diagnostic_speed_ms': True}, {'diagnostic_speed_ms': 1},
+                        {'diagnostic_steps': 1000}, {'diagnostic_speed_ms': 20}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                replace(self.config, stepper=replace(self.config.stepper, **changes)).validate()
 
     def test_constant_high_adc_cannot_pass_off_or_delta_checks(self):
         self.values['stop'] = .240

@@ -78,7 +78,7 @@ class DiagnosticService:
     def _check_timeout(self, name):
         if name in SENSOR_TARGETS:
             return self._sensor_timeout(name)
-        if name in ("servo", "fan"):
+        if name in ("servo", "fan", "stepper"):
             # 最多三轮，运行反馈与停止基线均需真实采样；两轮通过即可结束。
             return 20.0
         # 各项独立计时；保留真实动作/采样时间，超时不会让其它结果停在检测中。

@@ -21,8 +21,11 @@ class StepperConfig:
     diagnostic_full_scale_volts: float = 0.512
     diagnostic_settle_seconds: float = 0.20
     diagnostic_sample_count: int = 25
-    diagnostic_steps: int = 256
-    diagnostic_minimum_delta_volts: float = 0.150
+    diagnostic_steps: int = 500
+    diagnostic_speed_ms: int = 10
+    # 2026-10-24 用户确认500步/10ms正反转均实际运动；
+    # 运行反馈约11~20mV，停止约0.031mV；断开负载识别未验证。
+    diagnostic_minimum_delta_volts: float = 0.008
     diagnostic_maximum_baseline_drift_volts: float = 0.005
 
 import math
@@ -47,6 +50,10 @@ def validate(self):
             or isinstance(cfg.diagnostic_steps, bool) or not isinstance(cfg.diagnostic_steps, int)
             or not 1 <= cfg.diagnostic_steps <= cfg.maximum_steps):
         raise ValueError("步进状态检测采样次数或步数无效")
+    if (isinstance(cfg.diagnostic_speed_ms, bool) or not isinstance(cfg.diagnostic_speed_ms, int)
+            or not cfg.minimum_speed_ms <= cfg.diagnostic_speed_ms <= cfg.maximum_speed_ms
+            or cfg.diagnostic_steps * cfg.diagnostic_speed_ms / 1000 > 6):
+        raise ValueError("步进状态检测速度无效或单方向动作超过6秒")
     if (not math.isfinite(cfg.diagnostic_settle_seconds)
             or not 0 < cfg.diagnostic_settle_seconds <= 1
             or not math.isfinite(cfg.diagnostic_minimum_delta_volts)
@@ -54,7 +61,7 @@ def validate(self):
             or not math.isfinite(cfg.diagnostic_maximum_baseline_drift_volts)
             or not 0 < cfg.diagnostic_maximum_baseline_drift_volts < cfg.diagnostic_full_scale_volts):
         raise ValueError("步进状态检测稳定时间或电压差阈值无效")
-    if cfg.diagnostic_steps * cfg.default_speed_ms / 1000 <= cfg.diagnostic_settle_seconds + cfg.diagnostic_sample_count / 128 + .2:
+    if cfg.diagnostic_steps * cfg.diagnostic_speed_ms / 1000 <= cfg.diagnostic_settle_seconds + cfg.diagnostic_sample_count / 128 + .2:
         raise ValueError("步进状态检测步数不足以覆盖采样窗口")
 
 
