@@ -22,9 +22,10 @@ class ServoConfig:
     diagnostic_full_scale_volts: float = 0.256
     diagnostic_settle_seconds: float = 0.8
     diagnostic_sample_count: int = 9
-    # 2026-10-24 用户确认能转动的两轮读数：最小增量约 0.563mV，
-    # 停止前后变化约 0.015mV；以 0.300mV 检查运行响应。
-    diagnostic_minimum_delta_volts: float = 0.0003
+    # 动作下发后立刻覆盖整个运动窗口采样，而非等到位置保持后再读。
+    diagnostic_motion_window_seconds: float = 0.8
+    diagnostic_motion_sample_count: int = 31
+    diagnostic_noise_multiplier: float = 6.0
     diagnostic_maximum_baseline_drift_volts: float = 0.0005
 
 import math
@@ -49,11 +50,17 @@ def validate(self):
         raise ValueError("舵机状态检测采样次数必须为 3~31")
     if (not math.isfinite(sweep.diagnostic_settle_seconds)
             or not 0 < sweep.diagnostic_settle_seconds <= 2
-            or not math.isfinite(sweep.diagnostic_minimum_delta_volts)
-            or not 0 < sweep.diagnostic_minimum_delta_volts < sweep.diagnostic_full_scale_volts
             or not math.isfinite(sweep.diagnostic_maximum_baseline_drift_volts)
             or not 0 < sweep.diagnostic_maximum_baseline_drift_volts < sweep.diagnostic_full_scale_volts):
         raise ValueError("舵机状态检测稳定时间或电压差阈值无效")
+    if (not math.isfinite(sweep.diagnostic_motion_window_seconds)
+            or not 0.2 <= sweep.diagnostic_motion_window_seconds <= 1
+            or isinstance(sweep.diagnostic_motion_sample_count, bool)
+            or not isinstance(sweep.diagnostic_motion_sample_count, int)
+            or not 9 <= sweep.diagnostic_motion_sample_count <= 63
+            or not math.isfinite(sweep.diagnostic_noise_multiplier)
+            or not 3 <= sweep.diagnostic_noise_multiplier <= 12):
+        raise ValueError("舵机运动采样窗口、次数或噪声倍率无效")
     if (any(isinstance(v, bool) or not math.isfinite(v) for v in
             (sweep.sweep_min_angle, sweep.sweep_max_angle,
              sweep.sweep_interval_seconds, sweep.display_interval_seconds))

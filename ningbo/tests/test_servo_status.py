@@ -57,15 +57,16 @@ class ServoStatusTests(unittest.TestCase):
         self.assertEqual(self.gpio.calls, [])
         result = self.check()
         self.assertEqual(result['status'], 'normal')
-        self.assertEqual([p['angle'] for p in result['positions']], [45, 90, 135])
+        self.assertEqual([p['angle'] for p in result['positions']], [45, 135, 90] * 2)
+        self.assertEqual(result['passed_rounds'], 2)
         self.assertEqual(result['restored_mode'], 'off')
         self.assertFalse(self.driver.on)
         self.assertEqual(sum(c[0] == 'create' for c in self.gpio.calls), 1)
         self.manager.adc_monitor.read_channel.assert_called_with(0, address=0x48, full_scale_volts=.256)
-        self.assertEqual(self.manager.adc_monitor.read_channel.call_count, 45)
+        self.assertEqual(self.manager.adc_monitor.read_channel.call_count, 222)
 
     def test_missing_run_feedback_is_error_and_pwm_is_stopped(self):
-        self.values[90] = .0085
+        self.values[90] = self.values[135] = .0085
         result = self.check()
         self.assertEqual(result['status'], 'error')
         self.assertEqual(result['positions'][1]['status'], 'error')
@@ -76,7 +77,7 @@ class ServoStatusTests(unittest.TestCase):
                 (.000695, (.001531, .001313, .001258), .000680),
                 (.000687, (.002664, .001367, .001281), .000672)):
             with self.subTest(positions=positions):
-                values = [before] * 9 + [v for value in positions for v in [value] * 9] + [after] * 9
+                values = ([before] * 9 + [v for value in positions for v in [value] * 31] + [after] * 9) * 2
                 self.manager.adc_monitor.read_channel.side_effect = [
                     {'volts': value, 'saturated': False} for value in values]
                 result = self.check()
@@ -85,17 +86,17 @@ class ServoStatusTests(unittest.TestCase):
                 self.assertFalse(self.driver.on)
 
     def test_low_feedback_without_clear_response_still_fails(self):
-        self.values.update({'off': .00068, 45: .00090, 90: .00085, 135: .00095})
+        self.values.update({'off': .00068, 45: .00070, 90: .00072, 135: .00071})
         self.assertEqual(self.check()['status'], 'error')
         self.assertFalse(self.driver.on)
 
     def test_response_must_exceed_both_stop_baselines(self):
-        values = [.00068] * 9 + [.00108] * 27 + [.00088] * 9
+        values = ([.00068] * 9 + [.00090] * 93 + [.00088] * 9) * 2
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': value, 'saturated': False} for value in values]
         result = self.check()
         self.assertEqual(result['status'], 'error')
-        self.assertAlmostEqual(result['positions'][0]['delta_volts'], .0002)
+        self.assertAlmostEqual(result['positions'][0]['delta_volts'], .00002)
 
     def test_stuck_high_feedback_cannot_pass_stopped_or_delta_checks(self):
         self.values['off'] = .013
@@ -103,12 +104,113 @@ class ServoStatusTests(unittest.TestCase):
         self.assertFalse(self.driver.on)
 
     def test_excessive_baseline_drift_cannot_pass_even_if_absolute_limits_pass(self):
-        values = [.0085] * 9 + [.013] * 27 + [.0095] * 9
+        values = ([.0085] * 9 + [.013] * 93 + [.0095] * 9) * 2
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': value, 'saturated': False} for value in values]
         result = self.check()
         self.assertEqual(result['status'], 'error')
-        self.assertGreater(result['baseline_drift_volts'], .0005)
+        self.assertTrue(all(r['baseline_drift_volts'] > .0005 for r in result['rounds']))
+
+    def motion_readings(self, waveform):
+        control = self.manager.control
+        counter = [0]
+        def command(*args, **kwargs):
+            counter[0] = 0
+            return control(*args, **kwargs)
+        self.manager.control = command
+        def read(*args, **kwargs):
+            index = counter[0]
+            counter[0] += 1
+            value = waveform(index) if self.driver.on else .00068
+            return {'volts': value, 'saturated': False}
+        self.manager.adc_monitor.read_channel.side_effect = read
+
+    def test_motion_pulse_passes_even_when_holding_current_returns_to_stop_level(self):
+        self.motion_readings(lambda i: .002 if i < 7 else .00068)
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertTrue(all(p['volts'] == .00068 for p in result['positions']))
+        self.assertTrue(all(p['response_run'] >= 3 for p in result['positions']))
+
+    def test_one_or_two_sample_spikes_do_not_pass(self):
+        for width in (1, 2):
+            with self.subTest(width=width):
+                self.motion_readings(lambda i: .01 if 4 <= i < 4 + width else .00068)
+                self.assertEqual(self.check()['status'], 'error')
+
+    def test_one_quiet_position_per_round_does_not_reject_repeatable_response(self):
+        self.values[45] = self.values['off']
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual([r['responsive_positions'] for r in result['rounds']], [2, 2])
+
+    def test_one_failed_round_is_retested_and_two_successful_rounds_required(self):
+        before = [.00068] * 9
+        failure = before + [.00068] * 93 + before
+        success = before + [.0015] * 93 + before
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': v, 'saturated': False} for v in failure + success * 2]
+        result = self.check()
+        self.assertEqual(result['status'], 'normal')
+        self.assertEqual([r['status'] for r in result['rounds']], ['error', 'normal', 'normal'])
+
+    def test_single_successful_round_cannot_pass(self):
+        before = [.00068] * 9
+        failure = before + [.00068] * 93 + before
+        success = before + [.0015] * 93 + before
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': v, 'saturated': False} for v in success + failure * 2]
+        result = self.check()
+        self.assertEqual(result['status'], 'error')
+        self.assertEqual(result['passed_rounds'], 1)
+
+    def test_noise_adapts_threshold_instead_of_accepting_small_change(self):
+        off = [.0005, .0007, .0009] * 3
+        values = (off + [.0010] * 93 + off) * 2
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': v, 'saturated': False} for v in values]
+        result = self.check()
+        self.assertEqual(result['status'], 'error')
+        self.assertGreater(result['rounds'][0]['minimum_delta_volts'], .001)
+
+    def test_motion_sample_is_taken_before_waiting_for_position_settle(self):
+        events = []
+        checker = ServoStatusCheck(self.manager)
+        self.manager.prepare_actuator('servo')
+        read = self.manager.adc_monitor.read_channel.side_effect
+        self.manager.adc_monitor.read_channel.side_effect = lambda *a, **kw: (events.append('read'), read(*a, **kw))[1]
+        with patch('experiments.servo.jetson.diagnostics.time.sleep', side_effect=lambda seconds: events.append('wait')):
+            checker._sample(45, 0x48, 0, None)
+        self.assertEqual(events[0], 'read')
+
+    def test_motion_sample_shortage_is_an_error(self):
+        checker = ServoStatusCheck(self.manager)
+        self.manager.prepare_actuator('servo')
+        with patch('experiments.servo.jetson.diagnostics.time.monotonic', side_effect=[0., .0, 1.]):
+            with self.assertRaisesRegex(TimeoutError, '样本不足'):
+                checker._sample(45, 0x48, 0, None)
+
+    def test_cancel_during_motion_restores_stopped_state(self):
+        event = threading.Event()
+        read = self.manager.adc_monitor.read_channel.side_effect
+        def sample(*args, **kwargs):
+            value = read(*args, **kwargs)
+            if self.driver.on:
+                event.set()
+            return value
+        self.manager.adc_monitor.read_channel.side_effect = sample
+        result = self.check(event)
+        self.assertEqual(result['status'], 'unknown')
+        self.assertFalse(self.driver.on)
+
+    def test_motion_configuration_rejects_unbounded_or_insufficient_sampling(self):
+        for changes in ({'diagnostic_motion_window_seconds': 0},
+                        {'diagnostic_motion_window_seconds': 20},
+                        {'diagnostic_motion_sample_count': 2},
+                        {'diagnostic_motion_sample_count': True},
+                        {'diagnostic_noise_multiplier': float('nan')}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                replace(self.config, servo=replace(self.config.servo, **changes)).validate()
 
     def test_pwm_configuration_mismatch_is_error(self):
         original = self.gpio.pwm_state

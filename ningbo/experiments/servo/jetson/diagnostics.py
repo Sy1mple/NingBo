@@ -23,10 +23,9 @@ class ServoStatusCheck(ThreadedActuatorCheck):
             off_max, _ = adc.feedback_voltage_limits[name]
             result = {"status": "error", "check_scope": "electrical_response",
                       "transport": "i2c_ads1115", "address": hex(address), "channel": channel,
-                      "cmd_on": bool(previous.get("on")), "positions": [],
+                      "cmd_on": bool(previous.get("on")), "positions": [], "rounds": [],
                       "maximum_off_volts": off_max,
-                      "minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
-                      "calibration_basis": "20261024_observed_moving_servo; disconnected_load_not_verified"}
+                      "calibration_basis": "per_round_off_noise; disconnected_load_not_verified"}
             prepared = False
             try:
                 self._cancel(cancel_event)
@@ -34,30 +33,28 @@ class ServoStatusCheck(ThreadedActuatorCheck):
                 # Startup and snapshots still leave the PWM uninitialized.
                 self.manager.prepare_actuator(name)
                 prepared = True
-                before = self._sample(None, address, channel, cancel_event)
-                result["before"] = before
-                for angle in (cfg.sweep_min_angle, cfg.default_angle, cfg.sweep_max_angle):
-                    sample = self._sample(angle, address, channel, cancel_event)
-                    result["positions"].append({"angle": angle, **sample})
-                after = self._sample(None, address, channel, cancel_event)
-                result["after"] = after
-                # 相对前后两次停止读数均须有响应；不再依赖旧负载的绝对运行电压。
-                baseline = max(before["volts"], after["volts"])
-                drift = abs(after["volts"] - before["volts"])
-                off_ok = (0 <= before["volts"] <= off_max and 0 <= after["volts"] <= off_max
-                          and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
-                for sample in result["positions"]:
-                    delta = sample["volts"] - baseline
-                    sample.update(delta_volts=delta,
-                        status="normal" if delta >= cfg.diagnostic_minimum_delta_volts else "error")
-                normal = off_ok and all(p["status"] == "normal" for p in result["positions"])
-                summary = "，".join(f"{p['angle']:g}°={p['volts'] * 1000:.3f}mV"
-                                   f"(增量={p['delta_volts'] * 1000:.3f}mV)"
-                                   for p in result["positions"])
-                result.update(status="normal" if normal else "error", baseline_drift_volts=drift,
+                passed = 0
+                for index in range(3):
+                    before = self._sample(None, address, channel, cancel_event)
+                    positions = []
+                    for angle in (cfg.sweep_min_angle, cfg.sweep_max_angle, cfg.default_angle):
+                        positions.append({"angle": angle, **self._sample(angle, address, channel, cancel_event)})
+                    after = self._sample(None, address, channel, cancel_event)
+                    round_result = self._evaluate_round(before, positions, after, off_max)
+                    result["rounds"].append(round_result)
+                    result["positions"].extend({"round": index + 1, **p} for p in positions)
+                    passed += round_result["status"] == "normal"
+                    if passed >= 2 or passed + 2 - index < 2:
+                        break
+                normal = passed >= 2
+                summary = "；".join(
+                    f"第{i + 1}轮{r['responsive_positions']}/3次响应，"
+                    f"噪声阈值={r['minimum_delta_volts'] * 1000:.3f}mV，"
+                    f"基线变化={r['baseline_drift_volts'] * 1000:.3f}mV"
+                    for i, r in enumerate(result["rounds"]))
+                result.update(status="normal" if normal else "error", passed_rounds=passed,
                     note=f"ADC 0x{address:02X}/AIN{channel} 舵机电气反馈{'通过' if normal else '未通过'}；"
-                         f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；{summary}；"
-                         f"最小增量={cfg.diagnostic_minimum_delta_volts * 1000:.3f}mV；未测量实际转角")
+                         f"{summary}；需两轮通过；未测量实际转角")
             except InterruptedError:
                 result.update(status="unknown", note="舵机状态检测已取消")
             except Exception as exc:
@@ -89,6 +86,44 @@ class ServoStatusCheck(ThreadedActuatorCheck):
         if event is not None and event.is_set():
             raise InterruptedError("检测已取消")
 
+    def _evaluate_round(self, before, positions, after, off_max):
+        cfg = self.manager.config.servo
+        baseline = max(before["volts"], after["volts"])
+        drift = abs(after["volts"] - before["volts"])
+        # MAD 不会因单次毛刺而大幅改变；两组停止样本各自估计噪声。
+        noise = max(median(abs(v - group["volts"]) for v in group["samples_volts"])
+                    for group in (before, after)) * 1.4826
+        # 下限为 ADC 的 8 个量化步长，不使用某一次电流的标定值。
+        minimum = max(8 * cfg.diagnostic_full_scale_volts / 32768,
+                      cfg.diagnostic_noise_multiplier * noise)
+        off_ok = (abs(before["volts"]) <= off_max and abs(after["volts"]) <= off_max
+                  and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
+        for sample in positions:
+            values = sample["samples_volts"]
+            filtered = [median(values[i:i + 3]) for i in range(len(values) - 2)]
+            run = longest = 0
+            for value in filtered:
+                run = run + 1 if value - baseline >= minimum else 0
+                longest = max(longest, run)
+            delta = max(filtered) - baseline
+            sample.update(delta_volts=delta, response_run=longest,
+                          status="normal" if longest >= 3 else "error")
+        responses = sum(p["status"] == "normal" for p in positions)
+        return {"status": "normal" if off_ok and responses >= 2 else "error",
+                "before": before, "after": after, "positions": positions,
+                "noise_volts": noise, "minimum_delta_volts": minimum,
+                "baseline_drift_volts": drift, "off_ok": off_ok,
+                "responsive_positions": responses}
+
+    @staticmethod
+    def _wait(seconds, cancel_event):
+        if seconds <= 0:
+            return
+        if cancel_event is None:
+            time.sleep(seconds)
+        elif cancel_event.wait(seconds):
+            raise InterruptedError("检测已取消")
+
     def _sample(self, angle, address, channel, cancel_event):
         self._cancel(cancel_event)
         if angle is None:
@@ -96,10 +131,10 @@ class ServoStatusCheck(ThreadedActuatorCheck):
         else:
             self.manager.control("servo", angle=angle)
         cfg = self.manager.config.servo
-        if cancel_event is None:
-            time.sleep(cfg.diagnostic_settle_seconds)
-        elif cancel_event.wait(cfg.diagnostic_settle_seconds):
-            raise InterruptedError("检测已取消")
+        started = time.monotonic()
+        # 停止后先稳定；运动样本则从动作下发后立即开始，覆盖整个窗口。
+        if angle is None:
+            self._wait(cfg.diagnostic_settle_seconds, cancel_event)
         state = self.manager.actuator_state("servo")
         on = angle is not None
         driver = self._check_driver("servo", state, on, state.get("driver_error") or state.get("control_error"))
@@ -107,8 +142,14 @@ class ServoStatusCheck(ThreadedActuatorCheck):
         if driver["status"] != "normal" or signal["status"] != "normal":
             raise RuntimeError(driver["note"] if driver["status"] != "normal" else signal["note"])
         values = []
-        for _ in range(cfg.diagnostic_sample_count):
+        count = cfg.diagnostic_sample_count if angle is None else cfg.diagnostic_motion_sample_count
+        for index in range(count):
             self._cancel(cancel_event)
+            if angle is not None:
+                if index and time.monotonic() - started >= cfg.diagnostic_motion_window_seconds:
+                    break
+                target = started + index * cfg.diagnostic_motion_window_seconds / (count - 1)
+                self._wait(target - time.monotonic(), cancel_event)
             sample = self.manager.adc_monitor.read_channel(channel, address=address,
                 full_scale_volts=cfg.diagnostic_full_scale_volts)
             volts = sample.get("volts")
@@ -116,6 +157,8 @@ class ServoStatusCheck(ThreadedActuatorCheck):
                     or not isinstance(volts, (int, float)) or not math.isfinite(volts)):
                 raise ValueError("舵机反馈电压无效或超出 ADC 量程")
             values.append(volts)
+        if len(values) < cfg.diagnostic_sample_count:
+            raise TimeoutError("舵机运动窗口内有效样本不足")
         return {"volts": median(values), "samples_volts": values,
                 "driver": driver, "signal": signal}
 
