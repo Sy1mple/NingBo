@@ -55,7 +55,8 @@ class FanStatusTests(unittest.TestCase):
         self.assertFalse(self.driver.on)
         self.assertEqual(result['restored_levels'], {31: 0})
         self.manager.adc_monitor.read_channel.assert_called_with(2, address=0x48, full_scale_volts=.256)
-        self.assertEqual(self.manager.adc_monitor.read_channel.call_count, 45)
+        self.assertEqual(self.manager.adc_monitor.read_channel.call_count, 90)
+        self.assertEqual(result['passed_rounds'], 2)
 
     def test_low_run_feedback_is_error(self):
         self.volts[True] = -.000531
@@ -67,7 +68,7 @@ class FanStatusTests(unittest.TestCase):
         self.assertEqual(self.check()['status'], 'error')
 
     def test_off_baseline_drift_cannot_pass(self):
-        values = [-.001] * 15 + [.100] * 15 + [.008] * 15
+        values = ([-.001] * 15 + [.100] * 15 + [.008] * 15) * 2
         self.manager.adc_monitor.read_channel.side_effect = [
             {'volts': value, 'saturated': False} for value in values]
         result = self.check()
@@ -120,7 +121,7 @@ class FanStatusTests(unittest.TestCase):
         count = [0]
         def change(on):
             count[0] += 1
-            if count[0] == 4: raise OSError('restore failed')
+            if count[0] == 7: raise OSError('restore failed')
             return original(on)
         self.driver.set = change
         result = self.check()
@@ -135,6 +136,53 @@ class FanStatusTests(unittest.TestCase):
         self.assertEqual(result['status'], 'normal')
         self.assertEqual(result['running']['levels'], {31: 0})
         self.assertEqual(result['restored_levels'], {31: 1})
+
+    def test_observed_running_fan_feedback_passes_without_old_absolute_limit(self):
+        for value in (.041539, .042070):
+            with self.subTest(value=value):
+                self.volts[True] = value
+                result = self.check()
+                self.assertEqual(result['status'], 'normal')
+                self.assertEqual(result['passed_rounds'], 2)
+
+    def test_noisy_stopped_signal_raises_response_threshold(self):
+        off = [-.001, 0, .001] * 5
+        values = (off + [.002] * 15 + off) * 2
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        result = self.check()
+        self.assertEqual(result['status'], 'error')
+        self.assertGreater(result['rounds'][0]['minimum_delta_volts'], .002)
+
+    def test_startup_spike_without_sustained_feedback_does_not_pass(self):
+        off = [-.000531] * 15
+        values = (off + [.100] * 3 + [-.000531] * 12 + off) * 2
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        self.assertEqual(self.check()['status'], 'error')
+
+    def test_response_must_exceed_both_stopped_baselines(self):
+        values = ([0.] * 15 + [.00052] * 15 + [.0005] * 15) * 2
+        self.manager.adc_monitor.read_channel.side_effect = [
+            {'volts': value, 'saturated': False} for value in values]
+        self.assertEqual(self.check()['status'], 'error')
+
+    def test_one_failed_round_can_recover_but_one_success_is_not_enough(self):
+        off = [-.000531] * 15
+        failure = off * 3
+        success = off + [.042] * 15 + off
+        for values, status in ((failure + success * 2, 'normal'),
+                               (success + failure * 2, 'error')):
+            with self.subTest(status=status):
+                self.manager.adc_monitor.read_channel.side_effect = [
+                    {'volts': value, 'saturated': False} for value in values]
+                self.assertEqual(self.check()['status'], status)
+
+    def test_invalid_noise_setting_is_rejected(self):
+        for value in (0, float('nan'), 30):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                replace(self.config, fan=replace(self.config.fan,
+                    diagnostic_noise_multiplier=value)).validate()
 
     def test_missing_adc_configuration_does_not_start_fan(self):
         self.manager.config = replace(self.config,

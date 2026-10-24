@@ -22,33 +22,36 @@ class FanStatusCheck(ActuatorCheck):
             cfg = self.manager.config.fan
             address = adc.feedback_addresses.get(name, adc.address)
             channel = adc.feedback_channels[name]
-            off_max, on_min = adc.feedback_voltage_limits[name]
+            off_max, _ = adc.feedback_voltage_limits[name]
             result = {"status": "error", "transport": "i2c_ads1115",
                       "check_scope": "electrical_response", "address": hex(address), "channel": channel,
-                      "cmd_on": was_on, "maximum_off_absolute_volts": off_max,
-                      "minimum_run_volts": on_min, "minimum_delta_volts": cfg.diagnostic_minimum_delta_volts,
-                      "calibration_basis": "normal_load_samples; disconnected_load_not_verified"}
+                      "cmd_on": was_on, "maximum_off_absolute_volts": off_max, "rounds": [],
+                      "calibration_basis": "per_round_off_noise; disconnected_load_not_verified"}
             changed = False
             try:
                 self._cancel(cancel_event)
                 changed = True
-                before = self._sample(False, address, channel, cancel_event)
-                result["before"] = before
-                running = self._sample(True, address, channel, cancel_event)
-                result["running"] = running
-                after = self._sample(False, address, channel, cancel_event)
-                result["after"] = after
-                baseline = median((before["volts"], after["volts"]))
-                delta = running["volts"] - baseline
-                drift = abs(after["volts"] - before["volts"])
-                normal = (abs(before["volts"]) <= off_max and abs(after["volts"]) <= off_max
-                          and running["volts"] >= on_min and delta >= cfg.diagnostic_minimum_delta_volts
-                          and drift <= cfg.diagnostic_maximum_baseline_drift_volts)
-                result.update(status="normal" if normal else "error", delta_volts=delta,
-                    baseline_drift_volts=drift,
+                passed = 0
+                for index in range(3):
+                    self._cancel(cancel_event)
+                    before = self._sample(False, address, channel, cancel_event)
+                    running = self._sample(True, address, channel, cancel_event)
+                    after = self._sample(False, address, channel, cancel_event)
+                    round_result = self._evaluate_round(before, running, after, off_max)
+                    result["rounds"].append(round_result)
+                    passed += round_result["status"] == "normal"
+                    if passed >= 2 or passed + 2 - index < 2:
+                        break
+                normal = passed >= 2
+                result.update(before=before, running=running, after=after,
+                    delta_volts=round_result["delta_volts"],
+                    baseline_drift_volts=round_result["baseline_drift_volts"],
+                    passed_rounds=passed, status="normal" if normal else "error",
                     note=f"ADC 0x{address:02X}/AIN{channel} 风扇电气反馈{'通过' if normal else '未通过'}；"
                          f"停止={before['volts'] * 1000:.3f}/{after['volts'] * 1000:.3f}mV；"
-                         f"运行={running['volts'] * 1000:.3f}mV；未测量转速或风量")
+                         f"运行={running['volts'] * 1000:.3f}mV；"
+                         f"{passed}/{len(result['rounds'])}轮通过，需两轮；"
+                         f"本轮噪声阈值={round_result['minimum_delta_volts'] * 1000:.3f}mV；未测量转速或风量")
             except InterruptedError:
                 result.update(status="unknown", note="风扇状态检测已取消")
             except Exception as exc:
@@ -75,6 +78,26 @@ class FanStatusCheck(ActuatorCheck):
     def _cancel(event):
         if event is not None and event.is_set():
             raise InterruptedError("检测已取消")
+
+    def _evaluate_round(self, before, running, after, off_max):
+        cfg = self.manager.config.fan
+        baseline = max(before["volts"], after["volts"])
+        drift = abs(after["volts"] - before["volts"])
+        noise = max(median(abs(v - group["volts"]) for v in group["samples_volts"])
+                    for group in (before, after)) * 1.4826
+        minimum = max(8 * cfg.diagnostic_full_scale_volts / 32768,
+                      cfg.diagnostic_noise_multiplier * noise)
+        values = running["samples_volts"]
+        responding = sum(value - baseline >= minimum for value in values)
+        # 风扇运行反馈须持续存在，单次启动尖峰不能代替运行响应。
+        required = math.ceil(len(values) * .75)
+        normal = (abs(before["volts"]) <= off_max and abs(after["volts"]) <= off_max
+                  and drift <= cfg.diagnostic_maximum_baseline_drift_volts and responding >= required)
+        return {"status": "normal" if normal else "error", "before": before,
+                "running": running, "after": after, "noise_volts": noise,
+                "delta_volts": running["volts"] - baseline, "minimum_delta_volts": minimum,
+                "response_samples": responding, "required_response_samples": required,
+                "baseline_drift_volts": drift}
 
     def _sample(self, on, address, channel, event):
         self._cancel(event)
